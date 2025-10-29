@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="240" height="160" viewBox="0 0 240 160" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="240" height="160" rx="12" fill="#FCE7F3"/>
+  <g transform="translate(30,20)">
+    <circle cx="40" cy="40" r="30" fill="#F59E0B" />
+    <rect x="60" y="60" width="80" height="40" rx="8" fill="#F97316" />
+    <circle cx="32" cy="36" r="4" fill="#111827" />
+  </g>
+  <text x="50%" y="90%" dominant-baseline="middle" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="14" fill="#6B7280">Dog (placeholder)</text>
+</svg>
