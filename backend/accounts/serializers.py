@@ -1,6 +1,6 @@
 from django.contrib.auth.models import User
 from rest_framework import serializers
-from .models import Profile
+from .models import Profile, LoginActivity
 
 
 class RegisterSerializer(serializers.Serializer):
@@ -77,3 +77,20 @@ class ProfileSerializer(serializers.Serializer):
             instance.set_password(new)
         instance.save()
         return instance
+
+
+class LoginActivitySerializer(serializers.ModelSerializer):
+    username = serializers.CharField(source='user.username', read_only=True)
+    role = serializers.SerializerMethodField()
+    is_active = serializers.BooleanField(source='user.is_active', read_only=True)
+
+    class Meta:
+        model = LoginActivity
+        fields = ['id', 'username', 'role', 'login_time', 'is_active', 'user']
+        read_only_fields = ['id', 'username', 'role', 'login_time', 'is_active']
+
+    def get_role(self, obj):
+        try:
+            return obj.user.profile.role
+        except:
+            return 'user' if not obj.user.is_staff else 'admin'

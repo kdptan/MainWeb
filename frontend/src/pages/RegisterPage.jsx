@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
+import logo from '../assets/ChonkyLogo.png';
 
 export default function RegisterPage() {
   const navigate = useNavigate();
@@ -78,43 +79,88 @@ export default function RegisterPage() {
   }, [params.role]);
 
   return (
-    <div className="min-h-[60vh] flex items-center justify-center px-4">
-      <div className="w-full max-w-md bg-white shadow-md rounded-md p-8 text-center">
-        <h2 className="text-3xl font-extrabold text-gray-900 mb-4">Create account</h2>
-        <p className="text-sm text-gray-600 mb-6">Create an account to start shopping for your pets.</p>
+    <div className="min-h-[80vh] flex items-center justify-center px-4 py-8 bg-primary-darker">
+      <div className="w-full max-w-md bg-accent-cream shadow-2xl rounded-xl p-8 text-center border-4 border-secondary">
+        {/* Logo */}
+        <div className="flex justify-center mb-6">
+          <img src={logo} alt="Chonky Boi Logo" className="h-24 w-auto" />
+        </div>
+        
+        <h2 className="text-3xl font-extrabold text-primary-darker mb-2">Create account</h2>
+        <p className="text-sm text-primary-dark mb-6">Create an account to start shopping for your pets.</p>
         {role === 'admin' && (
-          <div className="mb-4 text-sm text-red-600">Note: Registering on this URL will create an admin account.</div>
+          <div className="mb-4 text-sm text-red-600 font-medium bg-red-50 border border-red-200 rounded-lg p-3">
+            Note: Registering on this URL will create an admin account.
+          </div>
         )}
 
         <form onSubmit={onSubmit} className="space-y-4 text-left">
           <div>
-            <label htmlFor="username" className="block text-sm font-medium text-gray-700">Username</label>
-            <input id="username" name="username" value={form.username} onChange={onChange} type="text" required className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500" />
+            <label htmlFor="username" className="block text-sm font-medium text-primary-darker">Username</label>
+            <input 
+              id="username" 
+              name="username" 
+              value={form.username} 
+              onChange={onChange} 
+              type="text" 
+              required 
+              className="mt-1 block w-full rounded-lg border-2 border-primary px-3 py-2 shadow-sm focus:ring-2 focus:ring-secondary focus:border-secondary text-primary-darker bg-white" 
+            />
           </div>
           <div>
-            <label htmlFor="email" className="block text-sm font-medium text-gray-700">Email</label>
-            <input id="email" name="email" value={form.email} onChange={onChange} type="email" required className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500" />
+            <label htmlFor="email" className="block text-sm font-medium text-primary-darker">Email</label>
+            <input 
+              id="email" 
+              name="email" 
+              value={form.email} 
+              onChange={onChange} 
+              type="email" 
+              required 
+              className="mt-1 block w-full rounded-lg border-2 border-primary px-3 py-2 shadow-sm focus:ring-2 focus:ring-secondary focus:border-secondary text-primary-darker bg-white" 
+            />
           </div>
           <div>
-            <label htmlFor="password" className="block text-sm font-medium text-gray-700">Password</label>
-            <input id="password" name="password" value={form.password} onChange={onChange} type="password" required className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500" />
+            <label htmlFor="password" className="block text-sm font-medium text-primary-darker">Password</label>
+            <input 
+              id="password" 
+              name="password" 
+              value={form.password} 
+              onChange={onChange} 
+              type="password" 
+              required 
+              className="mt-1 block w-full rounded-lg border-2 border-primary px-3 py-2 shadow-sm focus:ring-2 focus:ring-secondary focus:border-secondary text-primary-darker bg-white" 
+            />
           </div>
           <div>
-            <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700">Confirm password</label>
-            <input id="confirmPassword" name="confirmPassword" value={form.confirmPassword} onChange={onChange} type="password" required className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500" />
+            <label htmlFor="confirmPassword" className="block text-sm font-medium text-primary-darker">Confirm password</label>
+            <input 
+              id="confirmPassword" 
+              name="confirmPassword" 
+              value={form.confirmPassword} 
+              onChange={onChange} 
+              type="password" 
+              required 
+              className="mt-1 block w-full rounded-lg border-2 border-primary px-3 py-2 shadow-sm focus:ring-2 focus:ring-secondary focus:border-secondary text-primary-darker bg-white" 
+            />
           </div>
 
           {/* No invite code required for admin registration; role is derived from the URL (/register/admin) */}
 
-          {error && <div className="text-sm text-red-600">{error}</div>}
+          {error && <div className="text-sm text-red-600 font-medium bg-red-50 border border-red-200 rounded-lg p-3">{error}</div>}
 
           <div>
-            <button disabled={loading} type="submit" className="w-full inline-flex justify-center items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 disabled:opacity-60">{loading ? 'Creating...' : 'Create account'}</button>
+            <button 
+              disabled={loading} 
+              type="submit" 
+              className="w-full inline-flex justify-center items-center px-4 py-3 border border-transparent text-base font-semibold rounded-lg text-accent-cream bg-secondary hover:bg-secondary-light transition-colors shadow-lg disabled:opacity-60"
+            >
+              {loading ? 'Creating...' : 'Create account'}
+            </button>
           </div>
         </form>
 
-        <div className="mt-4 text-sm text-gray-600">
-          Already have an account? <Link to="/signin" className="text-indigo-600 hover:underline">Sign in</Link>
+        <div className="mt-6 text-sm text-primary-dark">
+          Already have an account? <Link to="/signin" className="text-secondary hover:text-secondary-light font-semibold">Sign in</Link>
         </div>
       </div>
     </div>

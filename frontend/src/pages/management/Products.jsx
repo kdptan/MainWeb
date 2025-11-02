@@ -1,5 +1,8 @@
 import React, { useState } from 'react';
 import { useAuth } from '../../hooks/useAuth';
+import { useToast } from '../../hooks/useToast';
+import Toast from '../../components/Toast';
+import managementBg from '../../assets/Management.png';
 
 export default function Products(){
   const initialForm = {
@@ -18,6 +21,7 @@ export default function Products(){
   const [tempList, setTempList] = useState([]);
   const [errors, setErrors] = useState({});
   const { token } = useAuth();
+  const { toast, showToast } = useToast();
   const [showConfirm, setShowConfirm] = useState(false);
   const [loadingConfirm, setLoadingConfirm] = useState(false);
 
@@ -102,23 +106,23 @@ export default function Products(){
       // success: clear temp list and close modal
       setTempList([]);
       setShowConfirm(false);
-      alert('Products saved to inventory. View them on the Inventory page.');
+      showToast('Products saved to inventory. View them on the Inventory page.', 'success');
     } catch (err) {
       console.error(err);
-      alert('Failed to save products. Check console for details.');
+      showToast('Failed to save products. Check console for details.', 'error');
     } finally {
       setLoadingConfirm(false);
     }
   }
 
   return (
-    <div className="p-6">
-      <h1 className="text-2xl font-bold mb-4">Products Management</h1>
+    <div className="p-6 min-h-screen bg-accent-cream bg-cover bg-center bg-no-repeat" style={{ backgroundImage: `url(${managementBg})` }}>
+      <h1 className="text-2xl font-bold mb-4 text-primary-darker">Products Management</h1>
 
       <div className="flex flex-col lg:flex-row gap-6">
         {/* Left: input form */}
-        <div className="flex-1 bg-white rounded shadow p-4">
-          <h2 className="text-lg font-semibold mb-3">Add Product</h2>
+        <div className="flex-1 bg-white rounded shadow p-4 border-2 border-primary">
+          <h2 className="text-lg font-semibold mb-3 text-primary-darker">Add Product</h2>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
@@ -240,6 +244,8 @@ export default function Products(){
           </div>
         </div>
       )}
+      
+      <Toast message={toast.message} type={toast.type} isVisible={toast.isVisible} />
     </div>
   );
 }

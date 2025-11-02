@@ -26,8 +26,15 @@ urlpatterns = [
     path('', include('accounts.urls')),
     # inventory API (products)
     path('api/inventory/', include('inventory.urls')),
-    # JWT token endpoints
-    path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
+    # services API
+    path('api/', include('services.urls')),
+    # pets API
+    path('api/', include('pets.urls')),
+    # orders API
+    path('api/orders/', include('orders.urls')),
+    # appointments API
+    path('api/appointments/', include('appointments.urls')),
+    # JWT token refresh endpoint (login is now handled in accounts.urls)
     path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
 ]
 
