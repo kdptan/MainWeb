@@ -238,8 +238,8 @@ export default function CartPage() {
       
       {/* Header */}
       <div className="mb-8">
-        <h1 className="text-4xl font-bold text-gray-900 mb-2">Shopping Cart</h1>
-        <p className="text-gray-600">Review your items and checkout</p>
+        <h1 className="text-4xl font-bold text-accent-cream mb-2">Shopping Cart</h1>
+        <p className="text-accent-cream text-lg">Review your items and checkout</p>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -333,7 +333,7 @@ export default function CartPage() {
 
             <button
               onClick={continueShopping}
-              className="mt-6 text-blue-600 hover:text-blue-700 font-semibold"
+              className="text-secondary hover:text-secondary-light flex items-center gap-2 font-semibold transition-colors"
             >
               ← Continue Shopping
             </button>

@@ -83,6 +83,15 @@ REST_FRAMEWORK = {
     ),
 }
 
+from datetime import timedelta
+
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=60),  # Access token valid for 60 minutes
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=7),     # Refresh token valid for 7 days
+    'ROTATE_REFRESH_TOKENS': True,                   # Issue new refresh token on refresh
+    'ALGORITHM': 'HS256',
+}
+
 WSGI_APPLICATION = 'chonkyweb_backend.wsgi.application'
 
 

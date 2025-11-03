@@ -116,6 +116,32 @@ export default function AdminOrdersPage() {
     });
   };
 
+  const handleMarkAsAvailableForPickup = async (orderId) => {
+    setConfirmDialog({
+      isOpen: true,
+      title: 'Mark as Available for Pickup',
+      message: 'Mark this order as available for pickup? The customer will be notified.',
+      onConfirm: async () => {
+        setConfirmDialog({ ...confirmDialog, isOpen: false });
+        
+        try {
+          await orderService.adminUpdateOrderStatus(orderId, 'available_for_pickup');
+          toast.showToast('Order marked as available for pickup', 'success');
+          
+          // Refresh orders list
+          const filters = {};
+          if (filterStatus !== 'all') filters.status = filterStatus;
+          if (filterBranch !== 'all') filters.branch = filterBranch;
+          const data = await orderService.getAllOrdersAdmin(filters);
+          setOrders(data);
+        } catch (error) {
+          console.error('Error marking order as available:', error);
+          toast.showToast('Failed to mark order as available', 'error');
+        }
+      }
+    });
+  };
+
   const getStatusColor = (status) => {
     switch (status.toLowerCase()) {
       case 'pending':
@@ -182,14 +208,14 @@ export default function AdminOrdersPage() {
       <div className="mb-8">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-4xl font-bold text-red-600 mb-2 flex items-center gap-3">
+            <h1 className="text-4xl font-bold text-accent-cream mb-2 flex items-center gap-3">
               <FaShoppingBag /> Admin: All Orders
             </h1>
-            <p className="text-gray-600">View and manage orders from all users</p>
+            <p className="text-accent-cream">View and manage orders from all users</p>
           </div>
           <button
             onClick={() => navigate('/products')}
-            className="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors"
+            className="px-4 py-2 bg-secondary text-accent-cream rounded-lg hover:bg-secondary-light transition-colors"
           >
             Back to Products
           </button>
@@ -197,68 +223,70 @@ export default function AdminOrdersPage() {
       </div>
 
       {/* Filters */}
-      <div className="mb-6 flex flex-wrap gap-4">
-        {/* Status Filter */}
-        <div className="flex gap-2">
-          <button
-            onClick={() => setFilterStatus('all')}
-            className={`px-4 py-2 rounded-lg font-medium transition-colors ${
-              filterStatus === 'all'
-                ? 'bg-red-600 text-white'
-                : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-            }`}
-          >
-            All Orders
-          </button>
-          <button
-            onClick={() => setFilterStatus('pending')}
-            className={`px-4 py-2 rounded-lg font-medium transition-colors ${
-              filterStatus === 'pending'
-                ? 'bg-yellow-500 text-white'
-                : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-            }`}
-          >
-            Pending
-          </button>
-          <button
-            onClick={() => setFilterStatus('completed')}
-            className={`px-4 py-2 rounded-lg font-medium transition-colors ${
-              filterStatus === 'completed'
-                ? 'bg-green-600 text-white'
-                : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-            }`}
-          >
-            Completed
-          </button>
-          <button
-            onClick={() => setFilterStatus('cancelled')}
-            className={`px-4 py-2 rounded-lg font-medium transition-colors ${
-              filterStatus === 'cancelled'
-                ? 'bg-red-500 text-white'
-                : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-            }`}
-          >
-            Cancelled
-          </button>
-        </div>
+      <div className="bg-white rounded-lg shadow-sm p-4 mb-6">
+        <div className="flex flex-wrap gap-4">
+          {/* Status Filter */}
+          <div className="flex gap-2">
+            <button
+              onClick={() => setFilterStatus('all')}
+              className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+                filterStatus === 'all'
+                  ? 'bg-red-600 text-white'
+                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+              }`}
+            >
+              All Orders
+            </button>
+            <button
+              onClick={() => setFilterStatus('pending')}
+              className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+                filterStatus === 'pending'
+                  ? 'bg-yellow-500 text-white'
+                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+              }`}
+            >
+              Pending
+            </button>
+            <button
+              onClick={() => setFilterStatus('completed')}
+              className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+                filterStatus === 'completed'
+                  ? 'bg-green-600 text-white'
+                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+              }`}
+            >
+              Completed
+            </button>
+            <button
+              onClick={() => setFilterStatus('cancelled')}
+              className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+                filterStatus === 'cancelled'
+                  ? 'bg-red-500 text-white'
+                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+              }`}
+            >
+              Cancelled
+            </button>
+          </div>
 
-        {/* Branch Filter */}
-        <div>
-          <select
-            value={filterBranch}
-            onChange={(e) => setFilterBranch(e.target.value)}
-            className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
-          >
-            <option value="all">All Branches</option>
-            <option value="Matina">Matina</option>
-            <option value="Toril">Toril</option>
-          </select>
+          {/* Branch Filter */}
+          <div>
+            <select
+              value={filterBranch}
+              onChange={(e) => setFilterBranch(e.target.value)}
+              className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
+            >
+              <option value="all">All Branches</option>
+              <option value="Matina">Matina</option>
+              <option value="Toril">Toril</option>
+            </select>
+          </div>
         </div>
       </div>
 
       {/* Orders List */}
       {orders.length === 0 ? (
-        <div className="text-center py-12">
+        <div className="text-center py-12 bg-white rounded-lg shadow-sm">
           <FaBox className="mx-auto text-6xl text-gray-300 mb-4" />
           <h3 className="text-xl font-semibold text-gray-600 mb-2">No orders found</h3>
           <p className="text-gray-500">No orders match your current filters.</p>
@@ -333,8 +361,18 @@ export default function AdminOrdersPage() {
                     )}
                   </button>
                   
-                  {/* Mark as Completed Button - Only for pending orders */}
+                  {/* Mark as Available for Pickup Button - Only for pending orders */}
                   {order.status === 'pending' && (
+                    <button
+                      onClick={() => handleMarkAsAvailableForPickup(order.id)}
+                      className="ml-auto flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium text-sm transition-colors"
+                    >
+                      🔔 Mark as Available for Pickup
+                    </button>
+                  )}
+
+                  {/* Mark as Completed Button - Only for orders available for pickup */}
+                  {order.status === 'available_for_pickup' && (
                     <button
                       onClick={() => handleMarkAsCompleted(order.id)}
                       className="ml-auto flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 font-medium text-sm transition-colors"
@@ -343,8 +381,8 @@ export default function AdminOrdersPage() {
                     </button>
                   )}
                   
-                  {/* Cancel Order Button - Only for pending orders */}
-                  {order.status === 'pending' && (
+                  {/* Cancel Order Button - For pending or available for pickup orders */}
+                  {(order.status === 'pending' || order.status === 'available_for_pickup') && (
                     <button
                       onClick={() => handleCancelOrder(order.id)}
                       className="flex items-center gap-2 px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 font-medium text-sm transition-colors"

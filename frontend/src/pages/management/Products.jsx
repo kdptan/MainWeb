@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { useAuth } from '../../hooks/useAuth';
 import { useToast } from '../../hooks/useToast';
 import Toast from '../../components/Toast';
-import managementBg from '../../assets/Management.png';
 
 export default function Products(){
   const initialForm = {
@@ -116,7 +115,7 @@ export default function Products(){
   }
 
   return (
-    <div className="p-6 min-h-screen bg-accent-cream bg-cover bg-center bg-no-repeat" style={{ backgroundImage: `url(${managementBg})` }}>
+    <div className="p-6 min-h-screen bg-accent-cream">
       <h1 className="text-2xl font-bold mb-4 text-primary-darker">Products Management</h1>
 
       <div className="flex flex-col lg:flex-row gap-6">

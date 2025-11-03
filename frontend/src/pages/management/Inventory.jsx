@@ -4,7 +4,6 @@ import { FaTrash, FaPencilAlt } from 'react-icons/fa';
 import { useToast } from '../../hooks/useToast';
 import Toast from '../../components/Toast';
 import ConfirmDialog from '../../components/ConfirmDialog';
-import managementBg from '../../assets/Management.png';
 
 // eslint-disable-next-line no-unused-vars
 const categories = [
@@ -301,7 +300,7 @@ export default function Inventory(){
   }, [showAuditLog]);
 
   return (
-    <div className="p-6 min-h-screen bg-accent-cream bg-cover bg-center bg-no-repeat" style={{ backgroundImage: `url(${managementBg})` }}>
+    <div className="p-6 min-h-screen bg-accent-cream">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold text-primary-darker">Inventory — {branch}</h1>
         <div className="flex items-center gap-2">

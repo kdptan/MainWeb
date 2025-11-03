@@ -4,6 +4,7 @@ import { useAuth } from '../hooks/useAuth';
 import { useNavigate } from 'react-router-dom';
 import { useToast } from '../hooks/useToast';
 import Toast from '../components/Toast';
+import DecorativeBackground from '../components/DecorativeBackground';
 
 export default function ProductsPage() {
   const { token, user } = useAuth();
@@ -243,8 +244,9 @@ export default function ProductsPage() {
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      {/* Header */}
+    <DecorativeBackground variant="bones">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Header */}
       <div className="mb-8">
         <h1 className="text-4xl font-bold text-accent-cream mb-2">Shop Products</h1>
         <p className="text-accent-cream">Browse our wide selection of pet supplies and accessories</p>
@@ -326,8 +328,15 @@ export default function ProductsPage() {
                     key={product.id}
                     className="product-card bg-primary-dark rounded-lg shadow-xl hover:shadow-2xl transition-shadow duration-300 overflow-hidden group flex flex-col border-2 border-primary"
                   >
-                    {/* Product Image Placeholder */}
-                    <div className="bg-gradient-to-br from-accent-brown to-secondary h-48 flex items-center justify-center relative overflow-hidden flex-shrink-0">
+                    {/* Category Badge */}
+                    <div className="px-4 pt-3 pb-1">
+                      <p className="text-xs text-accent-cream uppercase tracking-wide font-semibold">
+                        {product.category}
+                      </p>
+                    </div>
+
+                    {/* Product Image */}
+                    <div className="bg-gradient-to-br from-accent-brown to-secondary h-40 flex items-center justify-center relative overflow-hidden flex-shrink-0">
                       <div className="text-6xl opacity-30 group-hover:scale-110 transition-transform duration-300">
                         🐾
                       </div>
@@ -347,86 +356,58 @@ export default function ProductsPage() {
 
                     {/* Product Info */}
                     <div className="p-4 flex flex-col flex-grow">
-                      {/* Category */}
-                      <p className="text-xs text-accent-cream uppercase tracking-wide mb-1">
-                        {product.category}
-                      </p>
-
-                      {/* Product Name - Fixed height */}
-                      <h3 className="text-lg font-semibold text-accent-cream mb-2 line-clamp-2 h-14">
-                        {product.name}
-                      </h3>
-
-                      {/* Description - Fixed height */}
-                      <div className="h-12 mb-3">
-                        {product.description && (
-                          <p className="text-sm text-accent-cream line-clamp-2">
-                            {product.description}
-                          </p>
-                        )}
+                      {/* Product Name and Price Row */}
+                      <div className="flex justify-between items-start gap-2 mb-3">
+                        <h3 className="text-lg font-semibold text-accent-cream line-clamp-2 flex-1">
+                          {product.name}
+                        </h3>
+                        <p className="text-2xl font-bold text-secondary-lighter flex-shrink-0">
+                          ₱{product.unit_cost ? Number(product.unit_cost).toFixed(2) : '0.00'}
+                        </p>
                       </div>
 
-                      {/* Rating Display - Fixed height */}
-                      <div className="h-8 mb-3">
-                        {productRatings[product.id] && productRatings[product.id].review_count > 0 && (
-                          <button
-                            onClick={() => viewProductFeedback(product)}
-                            className="flex items-center gap-2 text-sm hover:text-secondary-lighter transition-colors"
-                          >
-                            <div className="flex items-center gap-1">
-                              <FaStar className="text-secondary-lighter" />
-                              <span className="font-semibold text-accent-cream">
-                                {productRatings[product.id].average_rating.toFixed(1)}
-                              </span>
-                            </div>
-                            <span className="text-accent-cream">
-                              ({productRatings[product.id].review_count} {productRatings[product.id].review_count === 1 ? 'review' : 'reviews'})
-                            </span>
-                          </button>
-                        )}
-                      </div>
+                      {/* Divider Line */}
+                      <div className="border-b-2 border-primary mb-3"></div>
 
-                      {/* Spacer to push content to bottom */}
-                      <div className="flex-grow"></div>
-
-                      {/* Price and Stock */}
-                      <div className="flex justify-between items-center mb-3">
+                      {/* Ratings and Add to Cart Row */}
+                      <div className="flex justify-between items-center">
+                        {/* Ratings */}
                         <div>
-                          <p className="text-2xl font-bold text-secondary-lighter">
-                            ₱{product.unit_cost ? Number(product.unit_cost).toFixed(2) : '0.00'}
-                          </p>
+                          {productRatings[product.id] && productRatings[product.id].review_count > 0 ? (
+                            <button
+                              onClick={() => viewProductFeedback(product)}
+                              className="flex items-center gap-2 text-sm hover:text-secondary-lighter transition-colors"
+                            >
+                              <div className="flex items-center gap-1">
+                                <FaStar className="text-secondary-lighter" />
+                                <span className="font-semibold text-accent-cream">
+                                  {productRatings[product.id].average_rating.toFixed(1)}
+                                </span>
+                              </div>
+                              <span className="text-accent-cream text-xs">
+                                ({productRatings[product.id].review_count})
+                              </span>
+                            </button>
+                          ) : (
+                            <p className="text-xs text-accent-cream">No ratings yet</p>
+                          )}
                         </div>
-                        <div className="text-right">
-                          <p className="text-xs text-accent-cream">Available</p>
-                          <p className="text-sm font-semibold text-accent-cream">
-                            {product.quantity} units
-                          </p>
-                        </div>
-                      </div>
 
-                      {/* Supplier - Fixed height */}
-                      <div className="h-5 mb-3">
-                        {product.supplier && (
-                          <p className="text-xs text-accent-cream">
-                            Supplier: {product.supplier}
-                          </p>
-                        )}
+                        {/* Add to Cart Button */}
+                        <button
+                          onClick={() => openQuantityModal(product)}
+                          disabled={product.quantity === 0}
+                          className={`py-2 px-3 rounded-lg font-semibold flex items-center justify-center gap-2 transition-colors shadow-md text-sm ${
+                            product.quantity === 0
+                              ? 'bg-primary text-accent-cream cursor-not-allowed'
+                              : 'bg-secondary text-accent-cream hover:bg-secondary-light'
+                          }`}
+                          title={!user ? 'Login required to add to cart' : ''}
+                        >
+                          <FaShoppingCart />
+                          {product.quantity === 0 ? 'Out of Stock' : !user ? 'Login' : 'Add'}
+                        </button>
                       </div>
-
-                      {/* Add to Cart Button */}
-                      <button
-                        onClick={() => openQuantityModal(product)}
-                        disabled={product.quantity === 0}
-                        className={`w-full py-2 px-4 rounded-lg font-semibold flex items-center justify-center gap-2 transition-colors shadow-md ${
-                          product.quantity === 0
-                            ? 'bg-primary text-accent-cream cursor-not-allowed'
-                            : 'bg-secondary text-accent-cream hover:bg-secondary-light'
-                        }`}
-                        title={!user ? 'Login required to add to cart' : ''}
-                      >
-                        <FaShoppingCart />
-                        {product.quantity === 0 ? 'Out of Stock' : !user ? 'Login to Add' : 'Add to Cart'}
-                      </button>
                     </div>
                   </div>
                 );
@@ -677,6 +658,7 @@ export default function ProductsPage() {
           </div>
         </div>
       )}
-    </div>
+      </div>
+    </DecorativeBackground>
   );
 }
