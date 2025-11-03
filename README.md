@@ -60,7 +60,7 @@ Database:
 Backend (development)
 1. Activate your virtual environment:
    - PowerShell: `.\venv\Scripts\Activate`
-2. Install Python dependencies (if a `requirements.txt` exists):
+2. Install Python dependencies:
    - `pip install -r requirements.txt`
 3. Apply migrations and run:
    - `cd backend`
