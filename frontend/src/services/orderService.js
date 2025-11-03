@@ -1,7 +1,7 @@
 import { API_BASE_URL } from './api';
 
 const getAuthHeaders = () => {
-  const token = localStorage.getItem('access'); // Changed from 'token' to 'access'
+  const token = localStorage.getItem('access') || sessionStorage.getItem('access');
   return {
     'Content-Type': 'application/json',
     ...(token ? { Authorization: `Bearer ${token}` } : {}),

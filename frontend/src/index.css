@@ -3,6 +3,25 @@
 @tailwind utilities;
 
 /* ============================================
+   HIDE SCROLLBAR - Keep scrolling functional
+   ============================================ */
+
+/* Hide scrollbar for Chrome, Safari, Edge */
+::-webkit-scrollbar {
+  display: none;
+}
+
+/* Hide scrollbar for Firefox */
+html {
+  scrollbar-width: none;
+}
+
+/* Hide scrollbar for IE and Edge */
+body {
+  -ms-overflow-style: none;
+}
+
+/* ============================================
    CUSTOM ANIMATIONS - Centralized
    ============================================ */
 
@@ -119,3 +138,181 @@
    ADD YOUR CUSTOM ANIMATIONS BELOW
    ============================================ */
 
+/* Dropdown slide down animation */
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.dropdown-menu {
+  animation: slideDown 0.2s ease-out;
+  transform-origin: top;
+}
+
+/* ============================================
+   DECORATIVE BACKGROUND ELEMENTS
+   ============================================ */
+
+/* Floating animation for background elements */
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-20px) rotate(5deg);
+  }
+}
+
+@keyframes floatSlow {
+  0%, 100% {
+    transform: translateY(0px) translateX(0px);
+  }
+  50% {
+    transform: translateY(-30px) translateX(10px);
+  }
+}
+
+/* Background decorative elements container */
+.bg-decorative {
+  position: relative;
+  overflow: hidden;
+}
+
+.bg-decorative::before,
+.bg-decorative::after {
+  content: '';
+  position: absolute;
+  border-radius: 50%;
+  opacity: 0.05;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.bg-decorative::before {
+  width: 300px;
+  height: 300px;
+  background: radial-gradient(circle, rgba(227, 183, 108, 0.3) 0%, transparent 70%);
+  top: 10%;
+  right: 5%;
+  animation: float 8s ease-in-out infinite;
+}
+
+.bg-decorative::after {
+  width: 400px;
+  height: 400px;
+  background: radial-gradient(circle, rgba(179, 117, 68, 0.2) 0%, transparent 70%);
+  bottom: 10%;
+  left: 5%;
+  animation: floatSlow 10s ease-in-out infinite;
+  animation-delay: 2s;
+}
+
+/* Paw print decorations */
+.paw-prints {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.03;
+}
+
+.paw-print {
+  position: absolute;
+  font-size: 3rem;
+  color: var(--color-primary-darker);
+  animation: float 6s ease-in-out infinite;
+}
+
+.paw-print:nth-child(1) { top: 15%; left: 10%; animation-delay: 0s; }
+.paw-print:nth-child(2) { top: 25%; right: 15%; animation-delay: 1s; font-size: 2.5rem; }
+.paw-print:nth-child(3) { top: 45%; left: 20%; animation-delay: 2s; font-size: 2rem; }
+.paw-print:nth-child(4) { top: 65%; right: 25%; animation-delay: 3s; font-size: 3.5rem; }
+.paw-print:nth-child(5) { bottom: 15%; left: 15%; animation-delay: 4s; font-size: 2.8rem; }
+.paw-print:nth-child(6) { bottom: 25%; right: 20%; animation-delay: 5s; font-size: 2.2rem; }
+
+/* Bone decorations */
+.bone-pattern {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.02;
+}
+
+.bone {
+  position: absolute;
+  width: 60px;
+  height: 20px;
+  background: var(--color-primary-dark);
+  border-radius: 20px;
+  animation: floatSlow 8s ease-in-out infinite;
+}
+
+.bone::before,
+.bone::after {
+  content: '';
+  position: absolute;
+  width: 15px;
+  height: 15px;
+  background: var(--color-primary-dark);
+  border-radius: 50%;
+}
+
+.bone::before {
+  left: -5px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.bone::after {
+  right: -5px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.bone:nth-child(1) { top: 20%; left: 25%; animation-delay: 0s; transform: rotate(25deg); }
+.bone:nth-child(2) { top: 40%; right: 30%; animation-delay: 2s; transform: rotate(-15deg); }
+.bone:nth-child(3) { bottom: 30%; left: 35%; animation-delay: 4s; transform: rotate(35deg); }
+.bone:nth-child(4) { bottom: 15%; right: 15%; animation-delay: 6s; transform: rotate(-25deg); }
+
+/* Circle decorations */
+.circle-pattern {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.04;
+}
+
+.circle {
+  position: absolute;
+  border-radius: 50%;
+  border: 3px solid var(--color-secondary);
+  animation: float 7s ease-in-out infinite;
+}
+
+.circle:nth-child(1) { width: 80px; height: 80px; top: 10%; right: 10%; animation-delay: 0s; }
+.circle:nth-child(2) { width: 120px; height: 120px; top: 50%; left: 8%; animation-delay: 1.5s; }
+.circle:nth-child(3) { width: 60px; height: 60px; bottom: 20%; right: 20%; animation-delay: 3s; }
+.circle:nth-child(4) { width: 100px; height: 100px; bottom: 10%; left: 25%; animation-delay: 4.5s; }
+
+/* Content should be above decorations */
+.bg-decorative > * {
+  position: relative;
+  z-index: 1;
+}

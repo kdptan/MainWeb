@@ -44,6 +44,14 @@ class CreateOrderView(APIView):
             if item_type == 'product':
                 try:
                     product = Product.objects.get(id=item_id)
+                    
+                    # Check if enough stock is available
+                    if product.quantity < quantity:
+                        return Response(
+                            {'error': f'Insufficient stock for {product.name}. Available: {product.quantity}, Requested: {quantity}'},
+                            status=status.HTTP_400_BAD_REQUEST
+                        )
+                    
                     price = float(product.unit_cost) * quantity
                     order_items.append({
                         'item_type': 'product',
@@ -94,6 +102,12 @@ class CreateOrderView(APIView):
                 quantity=item['quantity'],
                 price=item['price']
             )
+            
+            # Deduct stock for products
+            if item['item_type'] == 'product' and item.get('product'):
+                product = item['product']
+                product.quantity -= item['quantity']
+                product.save()
         
         # Return created order
         order_serializer = OrderSerializer(order)
@@ -171,14 +185,22 @@ class UpdateOrderStatusView(APIView):
             )
         
         new_status = request.data.get('status')
-        if new_status not in ['pending', 'completed', 'cancelled']:
+        if new_status not in ['pending', 'available_for_pickup', 'completed', 'cancelled']:
             return Response(
-                {'error': 'Invalid status. Must be pending, completed, or cancelled'},
+                {'error': 'Invalid status. Must be pending, available_for_pickup, completed, or cancelled'},
                 status=status.HTTP_400_BAD_REQUEST
             )
         
         # Only allow users to cancel their own pending orders
         if new_status == 'cancelled' and order.status == 'pending':
+            # Restore stock for cancelled orders
+            order_items = OrderItem.objects.filter(order=order, item_type='product')
+            for order_item in order_items:
+                if order_item.product:
+                    product = order_item.product
+                    product.quantity += order_item.quantity
+                    product.save()
+            
             order.status = new_status
             order.save()
             serializer = OrderSerializer(order)
@@ -204,11 +226,43 @@ class AdminUpdateOrderStatusView(APIView):
             )
         
         new_status = request.data.get('status')
-        if new_status not in ['pending', 'completed', 'cancelled']:
+        if new_status not in ['pending', 'available_for_pickup', 'completed', 'cancelled']:
             return Response(
-                {'error': 'Invalid status. Must be pending, completed, or cancelled'},
+                {'error': 'Invalid status. Must be pending, available_for_pickup, completed, or cancelled'},
                 status=status.HTTP_400_BAD_REQUEST
             )
+        
+        # Store old status to check if we need to restore stock
+        old_status = order.status
+        
+        # If cancelling an order that was not previously cancelled, restore stock
+        if new_status == 'cancelled' and old_status != 'cancelled':
+            order_items = OrderItem.objects.filter(order=order, item_type='product')
+            for order_item in order_items:
+                if order_item.product:
+                    product = order_item.product
+                    product.quantity += order_item.quantity
+                    product.save()
+        
+        # If un-cancelling an order (changing from cancelled to pending/completed), deduct stock again
+        elif old_status == 'cancelled' and new_status in ['pending', 'completed']:
+            order_items = OrderItem.objects.filter(order=order, item_type='product')
+            for order_item in order_items:
+                if order_item.product:
+                    product = order_item.product
+                    # Check if enough stock is available
+                    if product.quantity < order_item.quantity:
+                        return Response(
+                            {'error': f'Insufficient stock for {product.name}. Available: {product.quantity}, Needed: {order_item.quantity}'},
+                            status=status.HTTP_400_BAD_REQUEST
+                        )
+            
+            # If stock check passed, deduct stock
+            for order_item in order_items:
+                if order_item.product:
+                    product = order_item.product
+                    product.quantity -= order_item.quantity
+                    product.save()
         
         order.status = new_status
         if new_status == 'completed':

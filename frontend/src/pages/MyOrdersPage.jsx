@@ -119,8 +119,8 @@ export default function MyOrdersPage() {
       
       {/* Header */}
       <div className="mb-8">
-        <h1 className="text-4xl font-bold text-gray-900 mb-2">My Orders</h1>
-        <p className="text-gray-600">Track and manage your purchase history</p>
+        <h1 className="text-4xl font-bold text-accent-cream mb-2">My Orders</h1>
+        <p className="text-accent-cream">Track and manage your purchase history</p>
       </div>
 
       {/* Filters */}

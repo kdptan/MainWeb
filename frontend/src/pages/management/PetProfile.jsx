@@ -234,28 +234,29 @@ export default function PetProfile() {
   };
 
   return (
-    <div className="p-6 min-h-screen bg-accent-cream bg-cover bg-center bg-no-repeat" style={{ backgroundImage: `url(${managementBg})` }}>
+    <div className="p-8 min-h-screen bg-primary-darker flex flex-col">
       {/* Toast Notification */}
       {toast && <Toast message={toast.message} type={toast.type} onClose={hideToast} />}
 
-      {/* Header with Pet Gallery Button */}
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold">Pet Profile Management</h1>
-        <button
-          onClick={() => setShowGalleryModal(true)}
-          className="bg-purple-600 text-white px-4 py-2 rounded hover:bg-purple-700 flex items-center gap-2"
-        >
-          <FaPaw />
-          Pet Gallery
-        </button>
-      </div>
-
       {/* Centered Add Pet Form */}
-      <div className="flex justify-center">
-        <div className="w-full max-w-2xl bg-white rounded shadow p-6">
+      <div className="flex justify-center flex-1">
+        <div className="w-full max-w-5xl">
+          {/* Header with Pet Gallery Button */}
+          <div className="flex justify-between items-center mb-6">
+            <h1 className="text-3xl font-bold text-accent-cream">Pet Profile Management</h1>
+            <button
+              onClick={() => setShowGalleryModal(true)}
+              className="bg-purple-600 text-white px-4 py-2 rounded hover:bg-purple-700 flex items-center gap-2"
+            >
+              <FaPaw />
+              Pet Gallery
+            </button>
+          </div>
+
+          <div className="bg-white rounded shadow p-8">
           <h2 className="text-lg font-semibold mb-4">Add Pet Profile</h2>
 
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-2 gap-6">
             {/* Pet Picture */}
             <div className="col-span-2">
               <label className="block text-sm font-medium mb-2">Pet Picture</label>
@@ -409,6 +410,7 @@ export default function PetProfile() {
               Reset
             </button>
           </div>
+        </div>
         </div>
       </div>
 

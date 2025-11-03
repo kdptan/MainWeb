@@ -8,6 +8,7 @@ from services.models import Service
 class Order(models.Model):
     STATUS_CHOICES = [
         ('pending', 'Pending'),
+        ('available_for_pickup', 'Available for Pickup'),
         ('completed', 'Completed'),
         ('cancelled', 'Cancelled'),
     ]

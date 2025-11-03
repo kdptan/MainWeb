@@ -1,8 +1,11 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { FaSearch, FaClock, FaCheckCircle } from 'react-icons/fa';
 import { useAuth } from '../hooks/useAuth';
+import DecorativeBackground from '../components/DecorativeBackground';
 
 export default function ServicesPage() {
+  const navigate = useNavigate();
   const { token } = useAuth();
   const [services, setServices] = useState([]);
   const [filteredServices, setFilteredServices] = useState([]);
@@ -62,8 +65,9 @@ export default function ServicesPage() {
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      {/* Header */}
+    <DecorativeBackground variant="paws">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Header */}
       <div className="mb-8 text-center">
         <h1 className="text-4xl font-bold text-accent-cream mb-2">Our Services</h1>
         <p className="text-accent-cream text-lg">Professional pet care services tailored to your needs</p>
@@ -169,15 +173,15 @@ export default function ServicesPage() {
           onClick={() => setSelectedService(null)}
         >
           <div
-            className="bg-white rounded-lg shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto"
+            className="bg-primary-dark rounded-lg shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto border-2 border-primary"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Modal Header */}
-            <div className="bg-gradient-to-br from-blue-500 to-indigo-600 p-6 text-white">
+            <div className="bg-secondary p-6 text-accent-cream border-b-2 border-primary">
               <div className="flex justify-between items-start">
                 <div>
-                  <h2 className="text-3xl font-bold mb-2">{selectedService.service_name}</h2>
-                  <div className="flex items-center gap-2 text-blue-100">
+                  <h2 className="text-3xl font-bold mb-2 text-accent-cream">{selectedService.service_name}</h2>
+                  <div className="flex items-center gap-2 text-accent-cream">
                     <FaClock />
                     <span className="font-medium">
                       Duration: {formatDuration(selectedService.duration_minutes)}
@@ -186,7 +190,7 @@ export default function ServicesPage() {
                 </div>
                 <button
                   onClick={() => setSelectedService(null)}
-                  className="text-white hover:text-gray-200 text-3xl leading-none"
+                  className="text-accent-cream hover:text-accent-peach text-3xl leading-none"
                 >
                   &times;
                 </button>
@@ -194,24 +198,24 @@ export default function ServicesPage() {
             </div>
 
             {/* Modal Body */}
-            <div className="p-6">
+            <div className="p-6 bg-primary-darker">
               {/* Description */}
               {selectedService.description && (
                 <div className="mb-6">
-                  <h3 className="text-lg font-semibold text-gray-900 mb-2">Description</h3>
-                  <p className="text-gray-700 leading-relaxed">{selectedService.description}</p>
+                  <h3 className="text-lg font-semibold text-accent-cream mb-2">Description</h3>
+                  <p className="text-accent-cream leading-relaxed">{selectedService.description}</p>
                 </div>
               )}
 
               {/* Inclusions */}
               {selectedService.inclusions && selectedService.inclusions.length > 0 && (
                 <div className="mb-6">
-                  <h3 className="text-lg font-semibold text-gray-900 mb-3">What's Included</h3>
+                  <h3 className="text-lg font-semibold text-accent-cream mb-3">What's Included</h3>
                   <ul className="space-y-2">
                     {selectedService.inclusions.map((inclusion, idx) => (
                       <li key={idx} className="flex items-start gap-3">
-                        <FaCheckCircle className="text-green-500 mt-1 flex-shrink-0" />
-                        <span className="text-gray-700">{inclusion}</span>
+                        <FaCheckCircle className="text-secondary-light mt-1 flex-shrink-0" />
+                        <span className="text-accent-cream">{inclusion}</span>
                       </li>
                     ))}
                   </ul>
@@ -219,11 +223,19 @@ export default function ServicesPage() {
               )}
 
               {/* Book Now Button */}
-              <div className="mt-8 pt-6 border-t">
-                <button className="w-full bg-blue-600 text-white py-3 px-6 rounded-lg font-bold text-lg hover:bg-blue-700 transition-colors">
+              <div className="mt-8 pt-6 border-t border-primary">
+                <button 
+                  onClick={() => {
+                    setSelectedService(null);
+                    navigate('/appointment', { 
+                      state: { selectedService: selectedService }
+                    });
+                  }}
+                  className="w-full bg-secondary text-accent-cream py-3 px-6 rounded-lg font-bold text-lg hover:bg-secondary-light transition-colors shadow-md"
+                >
                   Book This Service
                 </button>
-                <p className="text-center text-sm text-gray-500 mt-2">
+                <p className="text-center text-sm text-accent-cream mt-2">
                   Contact us to schedule an appointment
                 </p>
               </div>
@@ -231,6 +243,7 @@ export default function ServicesPage() {
           </div>
         </div>
       )}
-    </div>
+      </div>
+    </DecorativeBackground>
   );
 }

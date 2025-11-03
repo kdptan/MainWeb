@@ -260,8 +260,8 @@ export default function FeedbackPage() {
 
       {/* Header */}
       <div className="mb-8">
-        <h1 className="text-4xl font-bold text-gray-900 mb-2">Give Feedback</h1>
-        <p className="text-gray-600">Rate your completed orders and help us improve</p>
+        <h1 className="text-4xl font-bold text-accent-cream mb-2">Give Feedback</h1>
+        <p className="text-accent-cream">Rate your completed orders and help us improve</p>
       </div>
 
       {/* Completed Orders List */}

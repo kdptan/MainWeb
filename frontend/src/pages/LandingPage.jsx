@@ -2,11 +2,13 @@ import React from 'react';
 import dog from '../assets/dog.svg';
 import cat from '../assets/cat.svg';
 import parrot from '../assets/parrot.svg';
+import DecorativeBackground from '../components/DecorativeBackground';
 
 export default function LandingPage() {
   return (
-    <div className="bg-primary-darker min-h-screen">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <DecorativeBackground variant="default">
+      <div className="bg-primary-darker">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Hero Section */}
         <section className="py-16 text-center bg-primary-dark rounded-xl shadow-2xl my-8 border-2 border-primary">
           <h1 className="text-5xl font-extrabold text-accent-cream mb-4">
@@ -19,13 +21,13 @@ export default function LandingPage() {
           <div className="mt-10 flex justify-center gap-4 flex-wrap">
             <a 
               href="/products" 
-              className="inline-flex items-center px-8 py-4 text-lg font-semibold rounded-lg text-primary-darker bg-secondary-lighter hover:bg-secondary-light transition-colors duration-200 shadow-lg"
+              className="inline-flex items-center px-8 py-4 text-lg font-semibold rounded-lg bg-secondary text-accent-cream hover:bg-secondary-light transition-colors duration-200 shadow-lg"
             >
               Shop Products
             </a>
             <a 
               href="/services" 
-              className="inline-flex items-center px-8 py-4 text-lg font-semibold rounded-lg text-accent-cream bg-secondary hover:bg-primary-dark border-2 border-secondary-light transition-colors duration-200 shadow-lg"
+              className="inline-flex items-center px-8 py-4 text-lg font-semibold rounded-lg bg-secondary text-accent-cream hover:bg-secondary-light transition-colors duration-200 shadow-lg"
             >
               Explore Services
             </a>
@@ -128,5 +130,6 @@ export default function LandingPage() {
         </section>
       </div>
     </div>
+    </DecorativeBackground>
   );
 }

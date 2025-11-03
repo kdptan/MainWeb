@@ -4,7 +4,6 @@ import { FaEye, FaEdit, FaTrash, FaPlus, FaMinus } from 'react-icons/fa';
 import { useToast } from '../../hooks/useToast';
 import Toast from '../../components/Toast';
 import ConfirmDialog from '../../components/ConfirmDialog';
-import managementBg from '../../assets/Management.png';
 
 export default function Services() {
   const { token } = useAuth();
@@ -247,7 +246,7 @@ export default function Services() {
   };
 
   return (
-    <div className="p-6 min-h-screen bg-accent-cream bg-cover bg-center bg-no-repeat" style={{ backgroundImage: `url(${managementBg})` }}>
+    <div className="p-6 min-h-screen bg-accent-cream">
       <h1 className="text-2xl font-bold mb-4 text-primary-darker">Services Management</h1>
 
       <div className="flex flex-col lg:flex-row gap-6">
