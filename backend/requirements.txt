@@ -3,3 +3,5 @@ djangorestframework>=3.15,<4
 djangorestframework-simplejwt>=5.3,<6
 django-cors-headers>=4.3,<5
 Pillow>=10,<11
+django-extensions>=3.2,<4
+graphviz>=0.20,<0.21

@@ -11,6 +11,7 @@
   - [Frontend (development)](#frontend-development)  
 - [Production Notes](#production-notes)  
 - [References](#references)
+  - [Entity Relationship Diagram (ERD)](#entity-relationship-diagram-erd)
 
 ## Project Overview
 MainWeb is a two-tier web application composed of a Python/Django backend that exposes RESTful APIs and a React single-page frontend. The repository separates server-side logic (backend/) from the client-side application (frontend/), enabling independent development and deployment.
@@ -84,6 +85,18 @@ Frontend entrypoint and scripts are defined in `frontend/package.json`.
 - `backend/manage.py`  
 - `backend/chonkyweb_backend/settings.py`  
 - `frontend/package.json`
+
+## Entity Relationship Diagram (ERD)
+- PNG/SVG: see `docs/erd/erd.png` (or `erd.svg` if present).
+- Source DOT: `docs/erd/erd.dot` (can be viewed with online Graphviz viewers).
+
+Regenerate locally (requires Graphviz executables `dot`):
+
+```bash
+python backend/manage.py graph_models -a -g -o erd.png
+# or output DOT only (no Graphviz executables required):
+python backend/manage.py graph_models -a --dot -o erd.dot
+```
 
 Contributions, bug reports, and improvements are welcome. Please follow repository contribution guidelines if present.
 
