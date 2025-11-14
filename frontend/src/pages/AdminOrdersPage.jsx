@@ -24,6 +24,8 @@ export default function AdminOrdersPage() {
   const [selectedOrderForPayment, setSelectedOrderForPayment] = useState(null);
   const [receiptModalOpen, setReceiptModalOpen] = useState(false);
   const [selectedReceipt, setSelectedReceipt] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const ordersPerPage = 5;
   const [confirmDialog, setConfirmDialog] = useState({
     isOpen: false,
     title: '',
@@ -55,6 +57,7 @@ export default function AdminOrdersPage() {
         
         const data = await orderService.getAllOrdersAdmin(filters);
         setOrders(data);
+        setCurrentPage(1); // Reset to first page when filters change
       } catch (error) {
         console.error('Error fetching orders:', error);
         toast.showToast('Failed to load orders', 'error');
@@ -339,8 +342,11 @@ export default function AdminOrdersPage() {
           <p className="text-gray-500">No orders match your current filters.</p>
         </div>
       ) : (
-        <div className="space-y-4">
-          {orders.map((order) => (
+        <>
+          <div className="space-y-4">
+            {orders
+              .slice((currentPage - 1) * ordersPerPage, currentPage * ordersPerPage)
+              .map((order) => (
             <div
               key={order.id}
               className="bg-white rounded-lg shadow-md border border-gray-200 overflow-hidden"
@@ -541,7 +547,53 @@ export default function AdminOrdersPage() {
               )}
             </div>
           ))}
-        </div>
+          </div>
+
+          {/* Pagination Controls */}
+          <div className="mt-8 flex justify-center items-center gap-4">
+            <button
+              onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+              disabled={currentPage === 1}
+              className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:bg-gray-400 disabled:cursor-not-allowed font-medium transition-colors"
+            >
+              Previous
+            </button>
+            
+            <div className="flex items-center gap-2">
+              {Array.from({ length: Math.ceil(orders.length / ordersPerPage) }, (_, i) => i + 1).map(
+                (page) => (
+                  <button
+                    key={page}
+                    onClick={() => setCurrentPage(page)}
+                    className={`px-3 py-2 rounded-lg font-medium transition-colors ${
+                      currentPage === page
+                        ? 'bg-red-600 text-white'
+                        : 'bg-gray-200 text-gray-800 hover:bg-gray-300'
+                    }`}
+                  >
+                    {page}
+                  </button>
+                )
+              )}
+            </div>
+            
+            <button
+              onClick={() =>
+                setCurrentPage(prev =>
+                  Math.min(prev + 1, Math.ceil(orders.length / ordersPerPage))
+                )
+              }
+              disabled={currentPage === Math.ceil(orders.length / ordersPerPage)}
+              className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:bg-gray-400 disabled:cursor-not-allowed font-medium transition-colors"
+            >
+              Next
+            </button>
+          </div>
+
+          <p className="text-center mt-4 text-gray-600">
+            Page {currentPage} of {Math.ceil(orders.length / ordersPerPage)} (Showing {Math.min(ordersPerPage, orders.length - (currentPage - 1) * ordersPerPage)} of {orders.length} orders)
+          </p>
+        </>
       )}
 
       {/* Confirm Dialog */}

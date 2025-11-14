@@ -15,6 +15,9 @@ class OrderAdmin(admin.ModelAdmin):
     search_fields = ['user__username', 'id']
     readonly_fields = ['created_at', 'completed_at']
     inlines = [OrderItemInline]
+    list_per_page = 5  # Show 5 orders per page
+
+    ordering = ['-created_at']  # Most recent orders first
 
 @admin.register(OrderItem)
 class OrderItemAdmin(admin.ModelAdmin):
