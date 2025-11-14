@@ -76,8 +76,16 @@ class CreateAppointmentView(APIView):
             start_time=validated_data['start_time'],
             end_time=end_time,
             notes=validated_data.get('notes', ''),
-            status='pending'
+            status='pending',
+            amount_paid=validated_data.get('amount_paid'),
+            change=validated_data.get('change')
         )
+        
+        # Add add-ons if provided
+        add_ons_ids = validated_data.get('add_ons', [])
+        if add_ons_ids:
+            add_ons = Service.objects.filter(id__in=add_ons_ids, is_solo=True)
+            appointment.add_ons.set(add_ons)
         
         appointment_serializer = AppointmentSerializer(appointment)
         return Response(appointment_serializer.data, status=status.HTTP_201_CREATED)
@@ -89,7 +97,7 @@ class AppointmentListView(generics.ListAPIView):
     
     def get_queryset(self):
         # Users see only their own appointments
-        queryset = Appointment.objects.filter(user=self.request.user).select_related('service', 'pet')
+        queryset = Appointment.objects.filter(user=self.request.user).select_related('service', 'pet').prefetch_related('add_ons')
         
         # Filter by status if provided
         status_filter = self.request.query_params.get('status')
@@ -105,7 +113,7 @@ class AdminAppointmentListView(generics.ListAPIView):
     permission_classes = [IsAuthenticated, IsAdminUser]
     
     def get_queryset(self):
-        queryset = Appointment.objects.all().select_related('user', 'service', 'pet')
+        queryset = Appointment.objects.all().select_related('user', 'service', 'pet').prefetch_related('add_ons')
         
         # Filters
         status_filter = self.request.query_params.get('status')
@@ -129,7 +137,7 @@ class AppointmentDetailView(generics.RetrieveAPIView):
     
     def get_queryset(self):
         # Users can only see their own appointments
-        return Appointment.objects.filter(user=self.request.user)
+        return Appointment.objects.filter(user=self.request.user).select_related('service', 'pet').prefetch_related('add_ons')
 
 
 class UpdateAppointmentStatusView(APIView):
@@ -169,6 +177,20 @@ class AdminUpdateAppointmentStatusView(APIView):
             return Response({'error': 'Invalid status'}, status=status.HTTP_400_BAD_REQUEST)
         
         appointment.status = new_status
+        
+        # Update payment information if provided
+        if 'amount_paid' in request.data:
+            try:
+                appointment.amount_paid = request.data.get('amount_paid')
+            except (ValueError, TypeError):
+                return Response({'error': 'Invalid amount_paid value'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        if 'change' in request.data:
+            try:
+                appointment.change = request.data.get('change')
+            except (ValueError, TypeError):
+                return Response({'error': 'Invalid change value'}, status=status.HTTP_400_BAD_REQUEST)
+        
         appointment.save()
         
         serializer = AppointmentSerializer(appointment)

@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { FaTrash, FaMinus, FaPlus, FaShoppingBag } from 'react-icons/fa';
+import { FaTrash, FaMinus, FaPlus, FaShoppingBag, FaArrowLeft } from 'react-icons/fa';
 import { useAuth } from '../hooks/useAuth';
 import { useToast } from '../hooks/useToast';
 import { orderService } from '../services/orderService';
@@ -217,13 +217,21 @@ export default function CartPage() {
     return (
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <Toast {...toast} />
+        <div className="mb-8">
+          <button
+            onClick={() => navigate('/products')}
+            className="flex items-center gap-2 bg-primary-dark text-white px-4 py-2 rounded-lg hover:bg-primary-darker transition-colors font-semibold"
+          >
+            <FaArrowLeft /> Back to Products
+          </button>
+        </div>
         <div className="text-center py-20">
-          <FaShoppingBag className="mx-auto text-6xl text-gray-300 mb-4" />
-          <h2 className="text-2xl font-bold text-gray-700 mb-2">Your cart is empty</h2>
-          <p className="text-gray-500 mb-6">Add some items to get started!</p>
+          <FaShoppingBag className="mx-auto text-6xl text-secondary/50 mb-4" />
+          <h2 className="heading-main text-accent-cream mb-2">Your cart is empty</h2>
+          <p className="text-gray-300 mb-6">Add some items to get started!</p>
           <button
             onClick={continueShopping}
-            className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors"
+            className="bg-secondary text-white px-6 py-3 rounded-lg hover:bg-orange-500 transition-colors"
           >
             Browse Products
           </button>
@@ -236,9 +244,17 @@ export default function CartPage() {
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <Toast {...toast} />
       
+      {/* Back Button */}
+      <button
+        onClick={() => navigate('/products')}
+        className="flex items-center gap-2 bg-primary-dark text-white px-4 py-2 rounded-lg hover:bg-primary-darker transition-colors font-semibold mb-6"
+      >
+        <FaArrowLeft /> Back to Products
+      </button>
+
       {/* Header */}
       <div className="mb-8">
-        <h1 className="text-4xl font-bold text-accent-cream mb-2">Shopping Cart</h1>
+        <h1 className="display-md text-accent-cream mb-2">Shopping Cart</h1>
         <p className="text-accent-cream text-lg">Review your items and checkout</p>
       </div>
 
@@ -246,7 +262,7 @@ export default function CartPage() {
         {/* Cart Items */}
         <div className="lg:col-span-2">
           <div className="bg-white rounded-lg shadow-md p-6">
-            <h2 className="text-xl font-bold text-gray-900 mb-4">
+            <h2 className="heading-card text-gray-900 mb-4">
               Cart Items ({cart.length})
             </h2>
             
@@ -343,7 +359,7 @@ export default function CartPage() {
         {/* Order Summary */}
         <div className="lg:col-span-1">
           <div className="bg-white rounded-lg shadow-md p-6 sticky top-4">
-            <h2 className="text-xl font-bold text-gray-900 mb-4">Order Summary</h2>
+            <h2 className="heading-card text-gray-900 mb-4">Order Summary</h2>
 
             {/* Branch Selection */}
             <div className="mb-4">

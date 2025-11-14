@@ -34,6 +34,8 @@ urlpatterns = [
     path('api/orders/', include('orders.urls')),
     # appointments API
     path('api/appointments/', include('appointments.urls')),
+    # sales API
+    path('api/sales/', include('sales.urls')),
     # JWT token refresh endpoint (login is now handled in accounts.urls)
     path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
 ]

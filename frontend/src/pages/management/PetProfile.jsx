@@ -11,7 +11,6 @@ import GenderIcon from '../../components/GenderIcon';
 import FormInput from '../../components/FormInput';
 import FormSelect from '../../components/FormSelect';
 import { formatAge } from '../../utils/formatters';
-import managementBg from '../../assets/Management.png';
 import {
   fetchPets as fetchPetsAPI,
   fetchNormalUsers as fetchNormalUsersAPI,
@@ -243,7 +242,7 @@ export default function PetProfile() {
         <div className="w-full max-w-5xl">
           {/* Header with Pet Gallery Button */}
           <div className="flex justify-between items-center mb-6">
-            <h1 className="text-3xl font-bold text-accent-cream">Pet Profile Management</h1>
+            <h1 className="heading-main text-accent-cream">Pet Profile Management</h1>
             <button
               onClick={() => setShowGalleryModal(true)}
               className="bg-purple-600 text-white px-4 py-2 rounded hover:bg-purple-700 flex items-center gap-2"

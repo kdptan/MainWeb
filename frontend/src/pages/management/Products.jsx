@@ -1,7 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '../../hooks/useAuth';
 import { useToast } from '../../hooks/useToast';
 import Toast from '../../components/Toast';
+import { FaTruck } from 'react-icons/fa';
+import SupplierManagementModal from '../../components/SupplierManagementModal';
 
 export default function Products(){
   const initialForm = {
@@ -23,6 +25,28 @@ export default function Products(){
   const { toast, showToast } = useToast();
   const [showConfirm, setShowConfirm] = useState(false);
   const [loadingConfirm, setLoadingConfirm] = useState(false);
+  const [showSupplierModal, setShowSupplierModal] = useState(false);
+  const [suppliers, setSuppliers] = useState([]);
+
+  const fetchSuppliers = useCallback(async () => {
+    try {
+      const res = await fetch('http://127.0.0.1:8000/api/inventory/suppliers/', {
+        headers: {
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        }
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setSuppliers(data);
+      }
+    } catch (err) {
+      console.error('Failed to fetch suppliers:', err);
+    }
+  }, [token]);
+
+  useEffect(() => {
+    fetchSuppliers();
+  }, [fetchSuppliers]);
 
   function validate() {
     const e = {};
@@ -116,7 +140,15 @@ export default function Products(){
 
   return (
     <div className="p-6 min-h-screen bg-accent-cream">
-      <h1 className="text-2xl font-bold mb-4 text-primary-darker">Products Management</h1>
+      <div className="flex items-center justify-between mb-6">
+        <h1 className="heading-main text-primary-darker">Products Management</h1>
+        <button
+          onClick={() => setShowSupplierModal(true)}
+          className="px-4 py-2 bg-blue-600 text-white hover:bg-blue-700 rounded-lg flex items-center gap-2 font-semibold transition"
+        >
+          <FaTruck /> Suppliers
+        </button>
+      </div>
 
       <div className="flex flex-col lg:flex-row gap-6">
         {/* Left: input form */}
@@ -129,6 +161,7 @@ export default function Products(){
               <select name="branch" value={form.branch} onChange={handleChange} className="mt-1 w-full border rounded px-2 py-1">
                 <option value="Matina">Matina</option>
                 <option value="Toril">Toril</option>
+                <option value="Both">Both</option>
               </select>
               {errors.branch && <div className="text-red-600 text-sm">{errors.branch}</div>}
             </div>
@@ -160,7 +193,14 @@ export default function Products(){
 
             <div>
               <label className="block text-sm font-medium">Supplier</label>
-              <input name="supplier" value={form.supplier} onChange={handleChange} className="mt-1 w-full border rounded px-2 py-1" />
+              <select name="supplier" value={form.supplier} onChange={handleChange} className="mt-1 w-full border rounded px-2 py-1">
+                <option value="">-- Select supplier --</option>
+                {suppliers.map(supplier => (
+                  <option key={supplier.id} value={supplier.name}>
+                    {supplier.name}
+                  </option>
+                ))}
+              </select>
             </div>
 
             <div>
@@ -170,7 +210,7 @@ export default function Products(){
             </div>
 
             <div>
-              <label className="block text-sm font-medium">Quantity in Stock</label>
+              <label className="block text-sm font-medium">Quantity</label>
               <input name="quantity" value={form.quantity} onChange={handleChange} className="mt-1 w-full border rounded px-2 py-1" />
               {errors.quantity && <div className="text-red-600 text-sm">{errors.quantity}</div>}
             </div>
@@ -226,25 +266,52 @@ export default function Products(){
       {/* Confirmation modal */}
       {showConfirm && (
         <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center">
-          <div className="bg-white rounded p-4 w-11/12 max-w-lg">
+          <div className="bg-white rounded p-6 w-11/12 max-w-3xl max-h-[90vh] overflow-auto">
             <h3 className="text-lg font-semibold">Confirm products</h3>
             <p className="text-sm text-gray-700 mt-2">You are about to add {tempList.length} products to inventory. This will persist them to the backend.</p>
-            <div className="mt-3 max-h-48 overflow-auto border rounded p-2 bg-gray-50">
+            <div className="mt-4 border rounded overflow-hidden bg-gray-50">
+              {/* Header Row */}
+              <div className="grid grid-cols-5 gap-4 font-semibold text-sm bg-gray-300 p-3 sticky top-0">
+                <div className="col-span-2">Product Name</div>
+                <div>Category</div>
+                <div className="text-center">Quantity</div>
+                <div className="text-right">Unit Cost</div>
+              </div>
+              {/* Product Rows */}
               {tempList.map(i => (
-                <div key={i.tempId} className="text-sm py-1 border-b last:border-b-0">
-                  <strong>{i.name}</strong> — {i.category} — Qty: {i.quantity}
+                <div key={i.tempId} className="grid grid-cols-5 gap-4 text-sm py-3 px-3 border-b last:border-b-0 hover:bg-gray-100 items-center">
+                  <div className="col-span-2 font-medium break-words">{i.name}</div>
+                  <div className="text-gray-600 break-words">{i.category}</div>
+                  <div className="text-center font-medium">{i.quantity}</div>
+                  <div className="text-right font-semibold">₱{i.unitCost.toFixed(2)}</div>
                 </div>
               ))}
             </div>
+            <div className="mt-4 bg-blue-50 border-2 border-blue-300 rounded p-3">
+              <div className="text-right">
+                <span className="text-sm font-medium text-gray-700">Total Cost: </span>
+                <span className="text-xl font-bold text-blue-600">
+                  ₱{tempList.reduce((sum, item) => sum + (item.quantity * item.unitCost), 0).toFixed(2)}
+                </span>
+              </div>
+            </div>
             <div className="mt-4 flex justify-end gap-2">
-              <button className="px-3 py-1 rounded border" onClick={() => setShowConfirm(false)} disabled={loadingConfirm}>Cancel</button>
-              <button className="px-4 py-1 rounded bg-green-600 text-white" onClick={confirmNow} disabled={loadingConfirm}>{loadingConfirm ? 'Saving...' : 'Confirm'}</button>
+              <button className="px-4 py-2 rounded border border-gray-300 hover:bg-gray-100" onClick={() => setShowConfirm(false)} disabled={loadingConfirm}>Cancel</button>
+              <button className="px-4 py-2 rounded bg-green-600 text-white hover:bg-green-700" onClick={confirmNow} disabled={loadingConfirm}>{loadingConfirm ? 'Saving...' : 'Confirm'}</button>
             </div>
           </div>
         </div>
       )}
       
       <Toast message={toast.message} type={toast.type} isVisible={toast.isVisible} />
+
+      <SupplierManagementModal
+        isOpen={showSupplierModal}
+        onClose={() => {
+          setShowSupplierModal(false);
+          fetchSuppliers();
+        }}
+      />
     </div>
   );
 }

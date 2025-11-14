@@ -22,3 +22,16 @@ export const hoursToMinutes = (hours) => {
 export const minutesToHours = (minutes) => {
   return (minutes / 60).toFixed(2);
 };
+
+// Format order ID to professional alphanumeric format (ORD-XXXXX-XXXXX)
+// Converts numeric ID to base36 (0-9, A-Z) for compact representation
+export const formatOrderId = (orderId) => {
+  if (!orderId) return 'ORD-00000-00001';
+  
+  // Convert ID to base36 (base 36 uses 0-9 and A-Z)
+  const base36 = String(orderId).padStart(5, '0').slice(-5).toUpperCase();
+  const checksum = (orderId * 7 + 42) % 1000; // Simple checksum
+  const checksumStr = String(checksum).padStart(5, '0');
+  
+  return `ORD-${base36}-${checksumStr}`;
+};

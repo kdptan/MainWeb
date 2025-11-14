@@ -158,7 +158,7 @@ const ActivityLog = () => {
   return (
     <div className="container mx-auto p-6 min-h-screen bg-accent-cream bg-cover bg-center bg-no-repeat" style={{ backgroundImage: `url(${managementBg})` }}>
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-bold text-accent-cream">Activity Log</h1>
+        <h1 className="heading-main text-accent-cream">Activity Log</h1>
         <button
           onClick={handleShowDeactivatedUsers}
           className="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition-colors"

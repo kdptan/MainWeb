@@ -1,0 +1,198 @@
+/* Floating Action Buttons Container */
+.floating-action-buttons {
+  position: fixed !important;
+  bottom: 1.5rem !important;
+  right: 1.5rem !important;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  z-index: 9999 !important;
+  pointer-events: auto;
+  /* Ensure it stays in viewport and doesn't get hidden */
+  will-change: transform;
+  backface-visibility: hidden;
+  transform: translateZ(0);
+}
+
+/* Individual FAB Button */
+.fab {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  border: none;
+  color: white;
+  font-size: 24px;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  position: relative;
+  overflow: visible;
+  animation: popIn 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+  will-change: transform, opacity;
+}
+
+/* Pop-in animation for buttons */
+@keyframes popIn {
+  0% {
+    transform: scale(0) translateY(20px);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(1) translateY(0);
+    opacity: 1;
+  }
+}
+
+/* Stagger animation for buttons appearing one after another */
+.fab:nth-child(1) {
+  animation-delay: 0.05s;
+}
+
+.fab:nth-child(2) {
+  animation-delay: 0.15s;
+}
+
+.fab:nth-child(3) {
+  animation-delay: 0.25s;
+}
+
+.fab:nth-child(4) {
+  animation-delay: 0.35s;
+}
+
+/* Hover state with smooth pop effect */
+.fab:hover {
+  transform: scale(1.15);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
+}
+
+.fab:active {
+  transform: scale(0.95);
+}
+
+/* Color variants */
+.fab-red {
+  background-color: #dc2626;
+}
+
+.fab-red:hover {
+  background-color: #991b1b;
+}
+
+.fab-yellow {
+  background-color: #eab308;
+  color: #333;
+}
+
+.fab-yellow:hover {
+  background-color: #ca8a04;
+  color: white;
+}
+
+.fab-purple {
+  background-color: #a855f7;
+}
+
+.fab-purple:hover {
+  background-color: #7e22ce;
+}
+
+.fab-blue {
+  background-color: #2563eb;
+}
+
+.fab-blue:hover {
+  background-color: #1d4ed8;
+}
+
+/* Badge styling */
+.fab-badge {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  border-radius: 50%;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: bold;
+  border: 2px solid white;
+  animation: badgePulse 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes badgePulse {
+  0% {
+    transform: scale(0);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.fab-badge-red {
+  background-color: #ef4444;
+  color: white;
+}
+
+.fab-badge-yellow {
+  background-color: #fbbf24;
+  color: #333;
+}
+
+.fab-badge-green {
+  background-color: #22c55e;
+  color: white;
+}
+
+.fab-badge-orange {
+  background-color: #f97316;
+  color: white;
+}
+
+/* Tooltip styling */
+.fab-tooltip {
+  position: absolute;
+  right: calc(100% + 12px);
+  top: 50%;
+  transform: translateY(-50%);
+  background-color: #1f2937;
+  color: white;
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-size: 13px;
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  animation: none;
+}
+
+.fab:hover .fab-tooltip {
+  opacity: 1;
+}
+
+/* Page transition smooth fade */
+@keyframes pageSlideIn {
+  from {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Apply page transition to main content areas */
+main {
+  animation: pageSlideIn 0.4s ease-out;
+}
+
+body {
+  transition: background-color 0.3s ease;
+}

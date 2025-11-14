@@ -1,11 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FaShoppingBag, FaBox, FaCheckCircle, FaTimesCircle, FaClock, FaChevronDown, FaChevronUp, FaUser } from 'react-icons/fa';
+import { FaShoppingBag, FaBox, FaCheckCircle, FaTimesCircle, FaClock, FaChevronDown, FaChevronUp, FaUser, FaReceipt, FaArrowLeft } from 'react-icons/fa';
 import { useAuth } from '../hooks/useAuth';
 import { useToast } from '../hooks/useToast';
 import { orderService } from '../services/orderService';
 import Toast from '../components/Toast';
 import ConfirmDialog from '../components/ConfirmDialog';
+import PaymentModal from '../components/PaymentModal';
+import ReceiptModal from '../components/ReceiptModal';
+import { formatOrderId } from '../utils/formatters';
 
 export default function AdminOrdersPage() {
   const navigate = useNavigate();
@@ -17,6 +20,10 @@ export default function AdminOrdersPage() {
   const [expandedOrder, setExpandedOrder] = useState(null);
   const [filterStatus, setFilterStatus] = useState('all');
   const [filterBranch, setFilterBranch] = useState('all');
+  const [paymentModalOpen, setPaymentModalOpen] = useState(false);
+  const [selectedOrderForPayment, setSelectedOrderForPayment] = useState(null);
+  const [receiptModalOpen, setReceiptModalOpen] = useState(false);
+  const [selectedReceipt, setSelectedReceipt] = useState(null);
   const [confirmDialog, setConfirmDialog] = useState({
     isOpen: false,
     title: '',
@@ -64,30 +71,26 @@ export default function AdminOrdersPage() {
     setExpandedOrder(expandedOrder === orderId ? null : orderId);
   };
 
-  const handleMarkAsCompleted = async (orderId) => {
-    setConfirmDialog({
-      isOpen: true,
-      title: 'Mark Order as Completed',
-      message: 'Mark this order as completed? The customer will be able to leave feedback.',
-      onConfirm: async () => {
-        setConfirmDialog({ ...confirmDialog, isOpen: false });
-        
-        try {
-          await orderService.adminUpdateOrderStatus(orderId, 'completed');
-          toast.showToast('Order marked as completed', 'success');
-          
-          // Refresh orders list
-          const filters = {};
-          if (filterStatus !== 'all') filters.status = filterStatus;
-          if (filterBranch !== 'all') filters.branch = filterBranch;
-          const data = await orderService.getAllOrdersAdmin(filters);
-          setOrders(data);
-        } catch (error) {
-          console.error('Error updating order status:', error);
-          toast.showToast('Failed to update order status', 'error');
-        }
-      }
-    });
+  const handleMarkAsCompleted = (orderId) => {
+    // Find the order and open payment modal
+    const order = orders.find(o => o.id === orderId);
+    if (order) {
+      setSelectedOrderForPayment(order);
+      setPaymentModalOpen(true);
+    }
+  };
+
+  const handleViewReceipt = (orderId) => {
+    // Get transaction data from localStorage
+    const transactions = JSON.parse(localStorage.getItem('orderTransactions') || '{}');
+    const transaction = transactions[orderId];
+    
+    if (transaction) {
+      setSelectedReceipt(transaction);
+      setReceiptModalOpen(true);
+    } else {
+      toast.showToast('No receipt found for this order', 'error');
+    }
   };
 
   const handleCancelOrder = async (orderId) => {
@@ -142,6 +145,42 @@ export default function AdminOrdersPage() {
     });
   };
 
+  const handlePaymentComplete = async (paymentData) => {
+    try {
+      if (selectedOrderForPayment) {
+        // Pass payment data to the backend
+        const data = {
+          amount_paid: paymentData?.amountPaid || selectedOrderForPayment.total_price,
+          change: paymentData?.change || 0,
+        };
+        
+        await orderService.adminUpdateOrderStatus(selectedOrderForPayment.id, 'completed', data);
+        
+        // Store payment data in sessionStorage for immediate receipt display
+        sessionStorage.setItem(
+          `orderPayment_${selectedOrderForPayment.id}`,
+          JSON.stringify(data)
+        );
+        
+        toast.showToast('Order marked as completed and payment recorded', 'success');
+        
+        // Refresh orders list
+        const filters = {};
+        if (filterStatus !== 'all') filters.status = filterStatus;
+        if (filterBranch !== 'all') filters.branch = filterBranch;
+        const updatedOrders = await orderService.getAllOrdersAdmin(filters);
+        setOrders(updatedOrders);
+        
+        // Close payment modal
+        setPaymentModalOpen(false);
+        setSelectedOrderForPayment(null);
+      }
+    } catch (error) {
+      console.error('Error completing payment:', error);
+      toast.showToast('Failed to complete payment', 'error');
+    }
+  };
+
   const getStatusColor = (status) => {
     switch (status.toLowerCase()) {
       case 'pending':
@@ -179,16 +218,6 @@ export default function AdminOrdersPage() {
     });
   };
 
-  const generateOrderId = (order) => {
-    // Generate unique order ID: ORD-YYYYMMDD-000X
-    const date = new Date(order.created_at);
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const day = String(date.getDate()).padStart(2, '0');
-    const orderId = String(order.id).padStart(4, '0');
-    return `ORD-${year}${month}${day}-${orderId}`;
-  };
-
   if (loading) {
     return (
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -203,21 +232,39 @@ export default function AdminOrdersPage() {
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <Toast {...toast} />
+      <PaymentModal 
+        isOpen={paymentModalOpen}
+        onClose={() => {
+          setPaymentModalOpen(false);
+          setSelectedOrderForPayment(null);
+        }}
+        order={selectedOrderForPayment}
+        onPaymentComplete={handlePaymentComplete}
+      />
+
+      <ReceiptModal 
+        isOpen={receiptModalOpen}
+        onClose={() => {
+          setReceiptModalOpen(false);
+          setSelectedReceipt(null);
+        }}
+        transaction={selectedReceipt}
+      />
 
       {/* Header */}
       <div className="mb-8">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-4xl font-bold text-accent-cream mb-2 flex items-center gap-3">
+            <h1 className="display-md text-accent-cream mb-2 flex items-center gap-3">
               <FaShoppingBag /> Admin: All Orders
             </h1>
             <p className="text-accent-cream">View and manage orders from all users</p>
           </div>
           <button
             onClick={() => navigate('/products')}
-            className="px-4 py-2 bg-secondary text-accent-cream rounded-lg hover:bg-secondary-light transition-colors"
+            className="flex items-center gap-2 bg-primary-dark text-white px-4 py-2 rounded-lg hover:bg-primary-darker transition-colors font-semibold"
           >
-            Back to Products
+            <FaArrowLeft /> Back to Products
           </button>
         </div>
       </div>
@@ -304,7 +351,7 @@ export default function AdminOrdersPage() {
                   <div className="flex-1">
                     <div className="flex items-center gap-4 mb-2">
                       <h3 className="text-lg font-semibold text-gray-900">
-                        Order ID: {generateOrderId(order)}
+                        Order ID: {formatOrderId(order.order_id || order.id)}
                       </h3>
                       <span
                         className={`px-3 py-1 rounded-full text-xs font-semibold border ${getStatusColor(
@@ -378,6 +425,16 @@ export default function AdminOrdersPage() {
                       className="ml-auto flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 font-medium text-sm transition-colors"
                     >
                       <FaCheckCircle /> Mark as Completed
+                    </button>
+                  )}
+
+                  {/* View Receipt Button - Only for completed orders */}
+                  {order.status === 'completed' && (
+                    <button
+                      onClick={() => handleViewReceipt(order.id)}
+                      className="ml-auto flex items-center gap-2 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 font-medium text-sm transition-colors"
+                    >
+                      <FaReceipt /> View Receipt
                     </button>
                   )}
                   

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { FaShoppingCart, FaSearch, FaFilter, FaTimes, FaMinus, FaPlus, FaBox, FaClipboardList, FaStar } from 'react-icons/fa';
+import { FaShoppingCart, FaSearch, FaFilter, FaTimes, FaMinus, FaPlus, FaStar } from 'react-icons/fa';
 import { useAuth } from '../hooks/useAuth';
 import { useNavigate } from 'react-router-dom';
 import { useToast } from '../hooks/useToast';
@@ -101,10 +101,9 @@ export default function ProductsPage() {
       });
       if (!res.ok) throw new Error('Failed to fetch products');
       const data = await res.json();
-      // Only show products that are in stock
-      const inStockProducts = data.filter(p => p.quantity > 0);
-      setProducts(inStockProducts);
-      setFilteredProducts(inStockProducts);
+      // Show all products regardless of stock status
+      setProducts(data);
+      setFilteredProducts(data);
     } catch (err) {
       console.error(err);
     } finally {
@@ -189,7 +188,7 @@ export default function ProductsPage() {
       setCart([...cart, { 
         ...product, 
         type: 'product',
-        price: Number(product.unit_cost),
+        price: Number(product.retail_price),
         availableStock: product.quantity,
         quantity: modalQuantity
       }]);
@@ -226,30 +225,13 @@ export default function ProductsPage() {
     setModalQuantity(newQuantity);
   };
 
-  const goToCart = () => {
-    // Check if user is logged in
-    if (!user) {
-      toast.showToast('Please login to view cart', 'error');
-      navigate('/signin');
-      return;
-    }
-    
-    navigate('/cart', { state: { cart } });
-  };
-
-  const getStockStatus = (quantity, reorderLevel) => {
-    if (quantity === 0) return { text: 'Out of Stock', color: 'text-red-600' };
-    if (quantity <= reorderLevel) return { text: 'Low Stock', color: 'text-yellow-600' };
-    return { text: 'In Stock', color: 'text-green-600' };
-  };
-
   return (
     <DecorativeBackground variant="bones">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
       <div className="mb-8">
-        <h1 className="text-4xl font-bold text-accent-cream mb-2">Shop Products</h1>
-        <p className="text-accent-cream">Browse our wide selection of pet supplies and accessories</p>
+        <h1 className="display-md text-accent-cream mb-2">Shop Products</h1>
+        <p className="text-body-lg text-accent-cream">Browse our wide selection of pet supplies and accessories</p>
       </div>
 
       {/* Search and Filters */}
@@ -322,7 +304,6 @@ export default function ProductsPage() {
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
               {filteredProducts.map((product) => {
-                const stockStatus = getStockStatus(product.quantity, product.reorder_level);
                 return (
                   <div
                     key={product.id}
@@ -340,17 +321,17 @@ export default function ProductsPage() {
                       <div className="text-6xl opacity-30 group-hover:scale-110 transition-transform duration-300">
                         🐾
                       </div>
-                      {/* Stock Badge */}
-                      <div className={`absolute top-2 right-2 px-3 py-1 rounded-full text-xs font-semibold ${
-                        stockStatus.text === 'In Stock' ? 'bg-secondary-lighter text-primary-darker' :
-                        stockStatus.text === 'Low Stock' ? 'bg-secondary-light text-primary-darker' :
-                        'bg-red-400 text-white'
-                      }`}>
-                        {stockStatus.text}
-                      </div>
                       {/* Branch Badge */}
                       <div className="absolute top-2 left-2 px-3 py-1 rounded-full text-xs font-semibold bg-secondary text-accent-cream">
                         {product.branch}
+                      </div>
+                      
+                      {/* Stock Status Badge */}
+                      <div 
+                        className="absolute top-2 right-2 px-3 py-1 rounded-full text-xs font-semibold text-white flex items-center gap-1"
+                        style={{backgroundColor: product.quantity > 10 ? '#10b981' : product.quantity > 0 ? '#f59e0b' : '#ef4444'}}
+                      >
+                        <span>{product.quantity > 10 ? '✓ In Stock' : product.quantity > 0 ? '⚠ Low' : '✕ Out'}</span>
                       </div>
                     </div>
 
@@ -358,11 +339,11 @@ export default function ProductsPage() {
                     <div className="p-4 flex flex-col flex-grow">
                       {/* Product Name and Price Row */}
                       <div className="flex justify-between items-start gap-2 mb-3">
-                        <h3 className="text-lg font-semibold text-accent-cream line-clamp-2 flex-1">
+                        <h3 className="heading-card text-accent-cream line-clamp-2 flex-1">
                           {product.name}
                         </h3>
-                        <p className="text-2xl font-bold text-secondary-lighter flex-shrink-0">
-                          ₱{product.unit_cost ? Number(product.unit_cost).toFixed(2) : '0.00'}
+                        <p className="price price-medium text-secondary-lighter flex-shrink-0">
+                          ₱{product.retail_price ? Number(product.retail_price).toFixed(2) : '0.00'}
                         </p>
                       </div>
 
@@ -370,7 +351,7 @@ export default function ProductsPage() {
                       <div className="border-b-2 border-primary mb-3"></div>
 
                       {/* Ratings and Add to Cart Row */}
-                      <div className="flex justify-between items-center">
+                      <div className="flex justify-between items-center mb-3">
                         {/* Ratings */}
                         <div>
                           {productRatings[product.id] && productRatings[product.id].review_count > 0 ? (
@@ -392,20 +373,17 @@ export default function ProductsPage() {
                             <p className="text-xs text-accent-cream">No ratings yet</p>
                           )}
                         </div>
+                      </div>
 
-                        {/* Add to Cart Button */}
+                      {/* Add to Cart Button */}
+                      <div>
                         <button
                           onClick={() => openQuantityModal(product)}
-                          disabled={product.quantity === 0}
-                          className={`py-2 px-3 rounded-lg font-semibold flex items-center justify-center gap-2 transition-colors shadow-md text-sm ${
-                            product.quantity === 0
-                              ? 'bg-primary text-accent-cream cursor-not-allowed'
-                              : 'bg-secondary text-accent-cream hover:bg-secondary-light'
-                          }`}
+                          className="py-2 px-3 rounded-lg font-semibold flex items-center justify-center gap-2 transition-colors shadow-md text-sm bg-secondary text-accent-cream hover:bg-secondary-light"
                           title={!user ? 'Login required to add to cart' : ''}
                         >
                           <FaShoppingCart />
-                          {product.quantity === 0 ? 'Out of Stock' : !user ? 'Login' : 'Add'}
+                          {!user ? 'Login' : 'Add'}
                         </button>
                       </div>
                     </div>
@@ -436,12 +414,14 @@ export default function ProductsPage() {
             <div className="mb-6">
               <h4 className="font-semibold text-gray-900 mb-1">{selectedProduct.name}</h4>
               <p className="text-sm text-gray-500 mb-2">{selectedProduct.category}</p>
-              <div className="flex justify-between items-center">
-                <p className="text-lg font-bold text-blue-600">
-                  ₱{Number(selectedProduct.unit_cost).toFixed(2)} each
-                </p>
-                <p className="text-sm text-gray-600">
-                  {selectedProduct.quantity} available
+              <p className="text-lg font-bold text-blue-600">
+                ₱{Number(selectedProduct.retail_price).toFixed(2)} each
+              </p>
+              
+              {/* Available Units */}
+              <div className="mt-3 p-2 rounded-lg" style={{backgroundColor: selectedProduct.quantity > 10 ? '#10b98133' : selectedProduct.quantity > 0 ? '#f59e0b33' : '#ef444433'}}>
+                <p className="text-sm font-semibold" style={{color: selectedProduct.quantity > 10 ? '#059669' : selectedProduct.quantity > 0 ? '#d97706' : '#dc2626'}}>
+                  Available: <span className="font-bold">{selectedProduct.quantity} units</span>
                 </p>
               </div>
             </div>
@@ -465,7 +445,8 @@ export default function ProductsPage() {
                     value={modalQuantity}
                     onChange={(e) => {
                       const value = parseInt(e.target.value) || 1;
-                      setModalQuantity(Math.max(1, Math.min(value, selectedProduct.quantity)));
+                      const maxQuantity = selectedProduct.quantity;
+                      setModalQuantity(Math.max(1, Math.min(value, maxQuantity)));
                     }}
                     className="w-20 text-center text-2xl font-bold border-2 border-gray-300 rounded-lg py-2"
                     min="1"
@@ -488,7 +469,7 @@ export default function ProductsPage() {
               <div className="flex justify-between items-center">
                 <span className="text-gray-600">Total Price:</span>
                 <span className="text-2xl font-bold text-gray-900">
-                  ₱{(Number(selectedProduct.unit_cost) * modalQuantity).toFixed(2)}
+                  ₱{(Number(selectedProduct.retail_price) * modalQuantity).toFixed(2)}
                 </span>
               </div>
             </div>
@@ -515,73 +496,6 @@ export default function ProductsPage() {
 
       {/* Toast Notification */}
       <Toast {...toast} />
-
-      {/* Floating Action Buttons */}
-      <div className="fixed bottom-6 right-6 flex flex-col gap-3">
-        {/* Admin Orders Button - Only for staff */}
-        {user && user.is_staff && (
-          <button
-            onClick={() => navigate('/admin/orders')}
-            className="bg-red-600 text-white rounded-full p-4 shadow-lg hover:bg-red-700 cursor-pointer transition-transform hover:scale-110 relative group"
-            title="Admin: All Orders"
-          >
-            <FaClipboardList size={24} />
-            <span className="absolute right-full mr-3 top-1/2 -translate-y-1/2 bg-gray-900 text-white text-sm px-3 py-1 rounded-lg whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
-              Admin: All Orders
-            </span>
-          </button>
-        )}
-        
-        {/* Debug: Log user info */}
-        {console.log('User data:', user)}
-
-        {/* My Orders Button */}
-        {user && (
-          <button
-            onClick={() => navigate('/my-orders')}
-            className="bg-yellow-500 text-white rounded-full p-4 shadow-lg hover:bg-yellow-600 cursor-pointer transition-transform hover:scale-110 relative group"
-            title="My Orders"
-          >
-            <FaBox size={24} />
-            <span className="absolute right-full mr-3 top-1/2 -translate-y-1/2 bg-gray-900 text-white text-sm px-3 py-1 rounded-lg whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
-              My Orders
-            </span>
-          </button>
-        )}
-
-        {/* Feedback Button */}
-        {user && (
-          <button
-            onClick={() => navigate('/feedback')}
-            className="bg-purple-500 text-white rounded-full p-4 shadow-lg hover:bg-purple-600 cursor-pointer transition-transform hover:scale-110 relative group"
-            title="Give Feedback"
-          >
-            <FaStar size={24} />
-            <span className="absolute right-full mr-3 top-1/2 -translate-y-1/2 bg-gray-900 text-white text-sm px-3 py-1 rounded-lg whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
-              Give Feedback
-            </span>
-          </button>
-        )}
-
-        {/* Cart Button - Always visible */}
-        <button
-          onClick={goToCart}
-          className="bg-blue-600 text-white rounded-full p-4 shadow-lg hover:bg-blue-700 cursor-pointer transition-transform hover:scale-110 relative group"
-          title={user ? 'View Cart' : 'Login to view cart'}
-        >
-          <FaShoppingCart size={24} />
-          {user && cart.length > 0 && (
-            <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold rounded-full h-6 w-6 flex items-center justify-center">
-              {cart.reduce((sum, item) => sum + item.quantity, 0)}
-            </span>
-          )}
-          {!user && (
-            <span className="absolute right-full mr-3 top-1/2 -translate-y-1/2 bg-gray-900 text-white text-sm px-3 py-1 rounded-lg whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
-              Login Required
-            </span>
-          )}
-        </button>
-      </div>
 
       {/* Product Feedback Modal */}
       {showFeedbackModal && selectedProductFeedback && (
@@ -658,6 +572,7 @@ export default function ProductsPage() {
           </div>
         </div>
       )}
+
       </div>
     </DecorativeBackground>
   );

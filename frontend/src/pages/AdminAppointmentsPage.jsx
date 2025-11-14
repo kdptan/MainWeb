@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FaCalendar, FaClock, FaMapMarkerAlt, FaCheckCircle, FaBan, FaUser } from 'react-icons/fa';
+import { FaCalendar, FaClock, FaMapMarkerAlt, FaCheckCircle, FaBan, FaUser, FaReceipt } from 'react-icons/fa';
 import { useAuth } from '../hooks/useAuth';
 import { useToast } from '../hooks/useToast';
 import { appointmentService } from '../services/appointmentService';
@@ -8,7 +8,8 @@ import Toast from '../components/Toast';
 import PetAvatar from '../components/PetAvatar';
 import GenderIcon from '../components/GenderIcon';
 import { formatAge } from '../utils/formatters';
-import ConfirmDialog from '../components/ConfirmDialog';
+import AppointmentPaymentModal from '../components/AppointmentPaymentModal';
+import AppointmentReceiptModal from '../components/AppointmentReceiptModal';
 
 export default function AdminAppointmentsPage() {
   const navigate = useNavigate();
@@ -20,7 +21,10 @@ export default function AdminAppointmentsPage() {
   const [statusFilter, setStatusFilter] = useState('upcoming'); // upcoming, all
   const [branchFilter, setBranchFilter] = useState('all');
   const [dateFilter, setDateFilter] = useState('');
-  const [confirmDialog, setConfirmDialog] = useState({ isOpen: false, appointmentId: null, action: '', newStatus: '' });
+  const [paymentModalOpen, setPaymentModalOpen] = useState(false);
+  const [selectedPaymentAppointment, setSelectedPaymentAppointment] = useState(null);
+  const [receiptModalOpen, setReceiptModalOpen] = useState(false);
+  const [selectedReceiptAppointment, setSelectedReceiptAppointment] = useState(null);
 
   useEffect(() => {
     // Wait for auth to settle
@@ -107,15 +111,35 @@ export default function AdminAppointmentsPage() {
     }
   };
 
-  const handleUpdateStatus = async () => {
+  const handlePaymentComplete = async (transaction) => {
     try {
-      await appointmentService.adminUpdateAppointmentStatus(confirmDialog.appointmentId, confirmDialog.newStatus);
-      toast.showToast(`Appointment ${confirmDialog.action} successfully`, 'success');
-      setConfirmDialog({ isOpen: false, appointmentId: null, action: '', newStatus: '' });
+      // Update appointment status to completed with payment information
+      await appointmentService.adminUpdateAppointmentStatus(
+        selectedPaymentAppointment.id, 
+        'completed',
+        {
+          amount_paid: transaction.amountPaid,
+          change: transaction.change
+        }
+      );
+      
+      // Store payment data in sessionStorage for immediate display in receipt
+      const paymentDataMap = JSON.parse(sessionStorage.getItem('appointmentPaymentData') || '{}');
+      paymentDataMap[selectedPaymentAppointment.id] = {
+        amount_paid: transaction.amountPaid,
+        change: transaction.change
+      };
+      sessionStorage.setItem('appointmentPaymentData', JSON.stringify(paymentDataMap));
+      
+      // Transaction is already stored in localStorage by AppointmentPaymentModal
+      // Now we close the modal and refresh
+      toast.showToast('Payment completed and appointment marked as complete!', 'success');
+      setPaymentModalOpen(false);
+      setSelectedPaymentAppointment(null);
       fetchAppointments();
     } catch (error) {
-      console.error('Error updating appointment:', error);
-      toast.showToast('Failed to update appointment', 'error');
+      console.error('Error completing payment:', error);
+      toast.showToast('Payment recorded but there was an error', 'error');
     }
   };
 
@@ -168,7 +192,7 @@ export default function AdminAppointmentsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-primary-darker py-8 px-4 sm:px-6 lg:px-8">
       <Toast {...toast} />
       
       <div className="max-w-7xl mx-auto">
@@ -176,16 +200,16 @@ export default function AdminAppointmentsPage() {
         <div className="mb-8">
           <button
             onClick={() => navigate('/appointment')}
-            className="text-blue-600 hover:text-blue-700 mb-4 flex items-center gap-2"
+            className="mb-4 flex items-center gap-2 px-4 py-2 bg-secondary text-white font-semibold rounded-lg hover:bg-secondary-light transition-colors"
           >
             ← Back to Appointments
           </button>
-          <h1 className="text-3xl font-bold text-gray-900">All Appointments (Admin)</h1>
-          <p className="text-gray-600 mt-2">Manage all customer appointments</p>
+          <h1 className="heading-main text-accent-cream">All Appointments (Admin)</h1>
+          <p className="text-white mt-2">Manage all customer appointments</p>
         </div>
 
         {/* Filters */}
-        <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
+        <div className="bg-white rounded-lg border border-gray-300 shadow-md p-6 mb-6">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             {/* Status Filter */}
             <div>
@@ -193,10 +217,10 @@ export default function AdminAppointmentsPage() {
               <select
                 value={statusFilter}
                 onChange={(e) => setStatusFilter(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg bg-white text-gray-900 focus:ring-2 focus:ring-secondary focus:border-transparent"
               >
-                <option value="upcoming">Upcoming Only</option>
-                <option value="all">All Appointments</option>
+                <option value="upcoming" className="bg-white text-gray-900">Upcoming Only</option>
+                <option value="all" className="bg-white text-gray-900">All Appointments</option>
               </select>
             </div>
 
@@ -206,11 +230,11 @@ export default function AdminAppointmentsPage() {
               <select
                 value={branchFilter}
                 onChange={(e) => setBranchFilter(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg bg-white text-gray-900 focus:ring-2 focus:ring-secondary focus:border-transparent"
               >
-                <option value="all">All Branches</option>
-                <option value="Matina">Matina</option>
-                <option value="Toril">Toril</option>
+                <option value="all" className="bg-white text-gray-900">All Branches</option>
+                <option value="Matina" className="bg-white text-gray-900">Matina</option>
+                <option value="Toril" className="bg-white text-gray-900">Toril</option>
               </select>
             </div>
 
@@ -221,7 +245,7 @@ export default function AdminAppointmentsPage() {
                 type="month"
                 value={dateFilter}
                 onChange={(e) => setDateFilter(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg bg-white text-gray-900 focus:ring-2 focus:ring-secondary focus:border-transparent"
               />
             </div>
 
@@ -233,7 +257,7 @@ export default function AdminAppointmentsPage() {
                   setDateFilter('');
                   setStatusFilter('upcoming');
                 }}
-                className="w-full px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300"
+                className="w-full px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 border border-gray-300 font-medium transition-colors"
               >
                 Clear Filters
               </button>
@@ -244,18 +268,18 @@ export default function AdminAppointmentsPage() {
         {/* Appointments List */}
         {loading ? (
           <div className="flex justify-center items-center h-64">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-secondary"></div>
           </div>
         ) : appointments.length === 0 ? (
-          <div className="bg-white rounded-lg shadow-md p-12 text-center">
-            <FaCalendar className="mx-auto text-gray-400 mb-4" size={64} />
-            <h3 className="text-xl font-bold text-gray-900 mb-2">No Appointments Found</h3>
-            <p className="text-gray-600">No appointments match your current filters.</p>
+          <div className="bg-white/10 backdrop-blur-sm rounded-lg border border-secondary/20 p-12 text-center">
+            <FaCalendar className="mx-auto text-secondary/50 mb-4" size={64} />
+            <h3 className="text-xl font-bold text-accent-cream mb-2">No Appointments Found</h3>
+            <p className="text-gray-400">No appointments match your current filters.</p>
           </div>
         ) : (
           <div className="space-y-4">
             {appointments.map((appointment) => (
-              <div key={appointment.id} className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow">
+              <div key={appointment.id} className="bg-white rounded-lg p-6 hover:shadow-lg transition-shadow">
                 <div className="flex justify-between items-start mb-4">
                   <div className="flex-1">
                     <div className="flex items-center gap-3 mb-2">
@@ -272,9 +296,9 @@ export default function AdminAppointmentsPage() {
                 </div>
 
                 {/* Customer Info */}
-                <div className="bg-blue-50 rounded-lg p-4 mb-4">
+                <div className="bg-secondary/5 rounded-lg p-4 mb-4 border border-secondary/10">
                   <div className="flex items-center gap-2 text-gray-900">
-                    <FaUser className="text-blue-600" />
+                    <FaUser className="text-secondary" />
                     <span className="font-medium">Customer:</span>
                     <span>{appointment.user_details?.username || 'N/A'}</span>
                     {appointment.user_details?.email && (
@@ -285,16 +309,16 @@ export default function AdminAppointmentsPage() {
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                   <div className="flex items-center gap-2 text-gray-700">
-                    <FaCalendar className="text-blue-600" />
+                    <FaCalendar className="text-secondary" />
                     <span>{formatDate(appointment.appointment_date)}</span>
                   </div>
                   <div className="flex items-center gap-2 text-gray-700">
-                    <FaClock className="text-blue-600" />
+                    <FaClock className="text-secondary" />
                     <span>{formatTime(appointment.start_time)} - {formatTime(appointment.end_time)}</span>
                     <span className="text-sm text-gray-500">({formatDuration(appointment.duration_minutes)})</span>
                   </div>
                   <div className="flex items-center gap-2 text-gray-700">
-                    <FaMapMarkerAlt className="text-blue-600" />
+                    <FaMapMarkerAlt className="text-secondary" />
                     <span>{appointment.branch} Branch</span>
                   </div>
                 </div>
@@ -317,7 +341,7 @@ export default function AdminAppointmentsPage() {
                 )}
 
                 {appointment.notes && (
-                  <div className="bg-gray-50 rounded p-3 mb-4">
+                  <div className="bg-secondary/5 rounded p-3 mb-4 border border-secondary/10">
                     <p className="text-sm text-gray-700">
                       <span className="font-medium">Notes:</span> {appointment.notes}
                     </p>
@@ -327,62 +351,37 @@ export default function AdminAppointmentsPage() {
                 {/* Admin Actions */}
                 <div className="flex flex-wrap gap-2 pt-4 border-t">
                   {appointment.status === 'pending' && (
-                    <>
-                      <button
-                        onClick={() => setConfirmDialog({ 
-                          isOpen: true, 
-                          appointmentId: appointment.id, 
-                          action: 'confirmed',
-                          newStatus: 'confirmed'
-                        })}
-                        className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center gap-2"
-                      >
-                        <FaCheckCircle />
-                        Confirm
-                      </button>
-                      <button
-                        onClick={() => setConfirmDialog({ 
-                          isOpen: true, 
-                          appointmentId: appointment.id, 
-                          action: 'cancelled',
-                          newStatus: 'cancelled'
-                        })}
-                        className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 flex items-center gap-2"
-                      >
-                        <FaBan />
-                        Cancel
-                      </button>
-                    </>
+                    <button
+                      onClick={() => {
+                        // Directly set appointment for payment without confirmation dialog
+                        setSelectedPaymentAppointment(appointment);
+                        setPaymentModalOpen(true);
+                      }}
+                      className="px-4 py-2 bg-secondary text-white rounded-lg hover:bg-orange-500 flex items-center gap-2"
+                    >
+                      <FaCheckCircle />
+                      Complete Payment
+                    </button>
                   )}
-                  {appointment.status === 'confirmed' && (
-                    <>
-                      <button
-                        onClick={() => setConfirmDialog({ 
-                          isOpen: true, 
-                          appointmentId: appointment.id, 
-                          action: 'completed',
-                          newStatus: 'completed'
-                        })}
-                        className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 flex items-center gap-2"
-                      >
-                        <FaCheckCircle />
-                        Mark as Completed
-                      </button>
-                      <button
-                        onClick={() => setConfirmDialog({ 
-                          isOpen: true, 
-                          appointmentId: appointment.id, 
-                          action: 'cancelled',
-                          newStatus: 'cancelled'
-                        })}
-                        className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 flex items-center gap-2"
-                      >
-                        <FaBan />
-                        Cancel
-                      </button>
-                    </>
+                  {appointment.status === 'completed' && (
+                    <button
+                      onClick={() => {
+                        // Merge stored payment data with appointment for receipt display
+                        const paymentDataMap = JSON.parse(sessionStorage.getItem('appointmentPaymentData') || '{}');
+                        const paymentData = paymentDataMap[appointment.id];
+                        const appointmentWithPayment = paymentData 
+                          ? { ...appointment, ...paymentData }
+                          : appointment;
+                        setSelectedReceiptAppointment(appointmentWithPayment);
+                        setReceiptModalOpen(true);
+                      }}
+                      className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 flex items-center gap-2"
+                    >
+                      <FaReceipt />
+                      View Receipt
+                    </button>
                   )}
-                  {(appointment.status === 'completed' || appointment.status === 'cancelled') && (
+                  {(appointment.status === 'cancelled') && (
                     <span className="text-sm text-gray-500 italic">No actions available</span>
                   )}
                 </div>
@@ -392,14 +391,28 @@ export default function AdminAppointmentsPage() {
         )}
       </div>
 
-      {/* Confirm Action Dialog */}
-      <ConfirmDialog
-        isOpen={confirmDialog.isOpen}
-        title={`${confirmDialog.action.charAt(0).toUpperCase() + confirmDialog.action.slice(1)} Appointment`}
-        message={`Are you sure you want to mark this appointment as ${confirmDialog.action}?`}
-        onConfirm={handleUpdateStatus}
-        onCancel={() => setConfirmDialog({ isOpen: false, appointmentId: null, action: '', newStatus: '' })}
+      {/* Payment Modal */}
+      <AppointmentPaymentModal
+        isOpen={paymentModalOpen}
+        onClose={() => {
+          setPaymentModalOpen(false);
+          setSelectedPaymentAppointment(null);
+        }}
+        appointment={selectedPaymentAppointment}
+        onPaymentComplete={handlePaymentComplete}
       />
+
+      {/* Receipt Modal */}
+      <AppointmentReceiptModal
+        isOpen={receiptModalOpen}
+        onClose={() => {
+          setReceiptModalOpen(false);
+          setSelectedReceiptAppointment(null);
+        }}
+        appointment={selectedReceiptAppointment}
+      />
+
+      <Toast {...toast} />
     </div>
   );
 }

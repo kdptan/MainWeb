@@ -48,7 +48,7 @@ export default function LoginPage() {
           <img src={logo} alt="Chonky Boi Logo" className="h-24 w-auto" />
         </div>
         
-        <h2 className="text-3xl font-extrabold text-primary-darker mb-2">Sign in</h2>
+        <h2 className="heading-main text-primary-darker mb-2">Sign in</h2>
         <p className="text-sm text-primary-dark mb-6">Welcome back! Please enter your details to continue.</p>
 
         <form onSubmit={onSubmit} className="space-y-4 text-left">

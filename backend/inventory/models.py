@@ -1,4 +1,24 @@
 from django.db import models
+from django.contrib.auth.models import User
+
+
+class Supplier(models.Model):
+    """Supplier management for inventory restocking"""
+    name = models.CharField(max_length=255, unique=True)
+    contact_person = models.CharField(max_length=255, blank=True)
+    email = models.EmailField(blank=True)
+    phone = models.CharField(max_length=20, blank=True)
+    address = models.TextField(blank=True)
+    city = models.CharField(max_length=100, blank=True)
+    is_active = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ['name']
+
+    def __str__(self):
+        return self.name
 
 
 class Product(models.Model):
@@ -25,6 +45,7 @@ class Product(models.Model):
     description = models.TextField(blank=True)
     supplier = models.CharField(max_length=255, blank=True)
     unit_cost = models.DecimalField(max_digits=10, decimal_places=2)
+    retail_price = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
     quantity = models.IntegerField(default=0)
     reorder_level = models.IntegerField(default=0)
     reorder_quantity = models.IntegerField(default=0)
@@ -41,7 +62,32 @@ class Product(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
+    # Markup percentages by category
+    MARKUP_PERCENTAGES = {
+        'Pet Food & Treats': 25,
+        'Grooming & Hygiene': 40,
+        'Health & Wellness': 40,
+        'Accessories & Toys': 50,
+        'Cages & Bedding': 40,
+        'Feeding Supplies': 40,
+        'Cleaning Supplies': 25,
+    }
+
+    def get_markup_percentage(self):
+        """Get markup percentage for this product's category"""
+        return self.MARKUP_PERCENTAGES.get(self.category, 25)  # Default 25% if not found
+
+    def calculate_retail_price(self):
+        """Calculate retail price based on unit cost and category markup"""
+        from decimal import Decimal
+        markup_percent = Decimal(str(self.get_markup_percentage()))
+        return self.unit_cost * (Decimal('1') + markup_percent / Decimal('100'))
+
     def save(self, *args, **kwargs):
+        # Automatically calculate retail_price based on unit_cost and category markup
+        if self.unit_cost:
+            self.retail_price = self.calculate_retail_price()
+        
         # compute remarks automatically if not provided
         # Remarks logic:
         # - 'Out of Stock' when quantity == 0
@@ -90,3 +136,34 @@ class Product(models.Model):
 
     def __str__(self):
         return f"{self.name} ({self.category})"
+
+
+class ProductHistory(models.Model):
+    """Track all inventory changes - additions, subtractions, restocking"""
+    TRANSACTION_TYPE_CHOICES = [
+        ('addition', 'Product Added'),
+        ('restock', 'Restock'),
+        ('sale', 'Sale'),
+        ('adjustment', 'Adjustment'),
+        ('damaged', 'Damaged/Loss'),
+        ('return', 'Customer Return'),
+    ]
+    
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='history')
+    user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
+    transaction_type = models.CharField(max_length=20, choices=TRANSACTION_TYPE_CHOICES)
+    quantity_change = models.IntegerField()  # positive for add, negative for subtract
+    old_quantity = models.IntegerField()
+    new_quantity = models.IntegerField()
+    supplier = models.CharField(max_length=255, blank=True)  # for restock transactions
+    unit_cost = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
+    total_cost = models.DecimalField(max_digits=12, decimal_places=2, null=True, blank=True)  # quantity_change * unit_cost
+    reason = models.TextField(blank=True)  # reason for adjustment/change
+    timestamp = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        ordering = ['-timestamp']
+        verbose_name_plural = 'Product History'
+    
+    def __str__(self):
+        return f"{self.product.name} - {self.transaction_type} (+{self.quantity_change}) on {self.timestamp.strftime('%Y-%m-%d %H:%M')}"

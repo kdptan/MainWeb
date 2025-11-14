@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FaShoppingBag, FaBox, FaCheckCircle, FaTimesCircle, FaClock, FaChevronDown, FaChevronUp } from 'react-icons/fa';
+import { FaShoppingBag, FaBox, FaCheckCircle, FaTimesCircle, FaClock, FaChevronDown, FaChevronUp, FaArrowLeft } from 'react-icons/fa';
 import { useAuth } from '../hooks/useAuth';
 import { useToast } from '../hooks/useToast';
 import { orderService } from '../services/orderService';
 import Toast from '../components/Toast';
+import { formatOrderId } from '../utils/formatters';
 
 export default function MyOrdersPage() {
   const navigate = useNavigate();
@@ -89,13 +90,8 @@ export default function MyOrdersPage() {
   };
 
   const generateOrderId = (order) => {
-    // Generate unique order ID: ORD-YYYYMMDD-000X
-    const date = new Date(order.created_at);
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const day = String(date.getDate()).padStart(2, '0');
-    const orderId = String(order.id).padStart(4, '0');
-    return `ORD-${year}${month}${day}-${orderId}`;
+    // Use the professional serial number format
+    return formatOrderId(order.order_id || order.id);
   };
 
   const filteredOrders = filterStatus === 'all' 
@@ -116,10 +112,18 @@ export default function MyOrdersPage() {
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <Toast {...toast} />
+
+      {/* Back Button */}
+      <button
+        onClick={() => navigate('/products')}
+        className="flex items-center gap-2 bg-primary-dark text-white px-4 py-2 rounded-lg hover:bg-primary-darker transition-colors font-semibold mb-6"
+      >
+        <FaArrowLeft /> Back to Products
+      </button>
       
       {/* Header */}
       <div className="mb-8">
-        <h1 className="text-4xl font-bold text-accent-cream mb-2">My Orders</h1>
+        <h1 className="display-md text-accent-cream mb-2">My Orders</h1>
         <p className="text-accent-cream">Track and manage your purchase history</p>
       </div>
 
@@ -173,7 +177,7 @@ export default function MyOrdersPage() {
       {filteredOrders.length === 0 ? (
         <div className="text-center py-20 bg-white rounded-lg shadow-sm">
           <FaShoppingBag className="mx-auto text-6xl text-gray-300 mb-4" />
-          <h2 className="text-2xl font-bold text-gray-700 mb-2">
+          <h2 className="heading-card text-gray-700 mb-2">
             {filterStatus === 'all' ? 'No orders yet' : `No ${filterStatus} orders`}
           </h2>
           <p className="text-gray-500 mb-6">
@@ -210,7 +214,7 @@ export default function MyOrdersPage() {
                   <div className="flex items-center gap-4">
                     <div className="text-right">
                       <p className="text-sm text-gray-500">Total Amount</p>
-                      <p className="text-2xl font-bold text-gray-900">
+                      <p className="price price-large text-gray-900">
                         ₱{Number(order.total_price).toFixed(2)}
                       </p>
                     </div>
@@ -350,6 +354,8 @@ export default function MyOrdersPage() {
           ))}
         </div>
       )}
+
+      <Toast />
     </div>
   );
 }

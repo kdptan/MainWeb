@@ -5,6 +5,7 @@ import { useAuth } from '../hooks/useAuth';
 import { useToast } from '../hooks/useToast';
 import { orderService } from '../services/orderService';
 import Toast from '../components/Toast';
+import { formatOrderId } from '../utils/formatters';
 
 export default function FeedbackPage() {
   const navigate = useNavigate();
@@ -53,12 +54,7 @@ export default function FeedbackPage() {
   };
 
   const generateOrderId = (order) => {
-    const date = new Date(order.created_at);
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const day = String(date.getDate()).padStart(2, '0');
-    const orderId = String(order.id).padStart(4, '0');
-    return `ORD-${year}${month}${day}-${orderId}`;
+    return formatOrderId(order.order_id || order.id);
   };
 
   const handleSelectOrder = (order) => {
@@ -160,18 +156,18 @@ export default function FeedbackPage() {
         <div className="mb-8">
           <button
             onClick={() => setSelectedOrder(null)}
-            className="flex items-center gap-2 text-blue-600 hover:text-blue-700 mb-4"
+            className="flex items-center gap-2 px-4 py-2 bg-secondary text-accent-cream rounded-lg hover:bg-secondary-light transition-colors font-semibold"
           >
             <FaArrowLeft /> Back to Orders
           </button>
-          <h1 className="text-4xl font-bold text-gray-900 mb-2">Leave Feedback</h1>
-          <p className="text-gray-600">Order ID: {generateOrderId(selectedOrder)}</p>
+          <h1 className="display-md text-white mb-2">Leave Feedback</h1>
+          <p className="text-white">Order ID: {generateOrderId(selectedOrder)}</p>
         </div>
 
         {/* Purchase Feedback - Admin Only */}
         <div className="bg-white rounded-lg shadow-md p-6 mb-6">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-xl font-bold text-gray-900">Purchase Feedback</h2>
+            <h2 className="heading-card text-gray-900">Purchase Feedback</h2>
             <span className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded">Admin Only</span>
           </div>
           <p className="text-sm text-gray-600 mb-4">Your overall purchase experience feedback</p>
@@ -198,7 +194,7 @@ export default function FeedbackPage() {
         {/* Product Feedback - Public Display */}
         <div className="bg-white rounded-lg shadow-md p-6 mb-6">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-xl font-bold text-gray-900">Product Feedback</h2>
+            <h2 className="heading-card text-gray-900">Product Feedback</h2>
             <span className="text-xs bg-green-100 text-green-800 px-2 py-1 rounded">Public Display</span>
           </div>
           <p className="text-sm text-gray-600 mb-4">Help other customers by rating individual products. These reviews will be displayed on the products page.</p>
@@ -234,7 +230,7 @@ export default function FeedbackPage() {
         <div className="flex gap-4">
           <button
             onClick={() => setSelectedOrder(null)}
-            className="px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 font-semibold transition-colors"
+            className="px-6 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 font-semibold transition-colors"
           >
             Cancel
           </button>
@@ -258,9 +254,17 @@ export default function FeedbackPage() {
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <Toast {...toast} />
 
+      {/* Back Button */}
+      <button
+        onClick={() => navigate('/products')}
+        className="flex items-center gap-2 bg-primary-dark text-white px-4 py-2 rounded-lg hover:bg-primary-darker transition-colors font-semibold mb-6"
+      >
+        <FaArrowLeft /> Back to Products
+      </button>
+
       {/* Header */}
       <div className="mb-8">
-        <h1 className="text-4xl font-bold text-accent-cream mb-2">Give Feedback</h1>
+        <h1 className="display-md text-accent-cream mb-2">Give Feedback</h1>
         <p className="text-accent-cream">Rate your completed orders and help us improve</p>
       </div>
 
@@ -268,7 +272,7 @@ export default function FeedbackPage() {
       {completedOrders.length === 0 ? (
         <div className="text-center py-12 bg-white rounded-lg shadow-md">
           <FaCheckCircle className="mx-auto text-6xl text-gray-300 mb-4" />
-          <h3 className="text-xl font-semibold text-gray-600 mb-2">No Orders to Review</h3>
+          <h3 className="heading-card text-gray-600 mb-2">No Orders to Review</h3>
           <p className="text-gray-500 mb-4">
             You don't have any completed orders that need feedback
           </p>
@@ -300,7 +304,7 @@ export default function FeedbackPage() {
                   </p>
                 </div>
                 <div className="text-right">
-                  <p className="text-2xl font-bold text-gray-900">
+                  <p className="price price-large text-gray-900">
                     ₱{parseFloat(order.total_price).toFixed(2)}
                   </p>
                   <p className="text-sm text-gray-500">{order.items.length} items</p>
@@ -333,6 +337,8 @@ export default function FeedbackPage() {
           ))}
         </div>
       )}
+
+      <Toast />
     </div>
   );
 }

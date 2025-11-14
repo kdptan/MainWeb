@@ -6,6 +6,13 @@ module.exports = {
   ],
   theme: {
     extend: {
+      fontFamily: {
+        // Cute and clean fonts
+        'display': ['Poppins', 'sans-serif'],      // Main headings - Bold and modern
+        'heading': ['Quicksand', 'sans-serif'],     // Section headings - Soft and friendly
+        'body': ['Comfortaa', 'sans-serif'],        // Body text - Rounded and comfortable
+        'sans': ['Poppins', 'sans-serif'],          // Default fallback
+      },
       colors: {
         // Primary - Main background (from logo)
         primary: {

@@ -1,14 +1,16 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useNavigate, useParams } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import logo from '../assets/ChonkyLogo.png';
+import { FaCheckCircle } from 'react-icons/fa';
 
 export default function RegisterPage() {
-  const navigate = useNavigate();
   const params = useParams();
   const [role, setRole] = useState('user');
   const [form, setForm] = useState({ username: '', email: '', password: '', confirmPassword: '' });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [registrationSuccess, setRegistrationSuccess] = useState(false);
+  const [registeredEmail, setRegisteredEmail] = useState('');
 
   function onChange(e) {
     setForm(prev => ({ ...prev, [e.target.name]: e.target.value }));
@@ -63,8 +65,10 @@ export default function RegisterPage() {
         return;
       }
 
-      // On success, backend may have sent a confirmation email. Redirect to signin or show success.
-      navigate('/signin');
+      // On success, show verification message
+      await res.json();
+      setRegisteredEmail(form.email);
+      setRegistrationSuccess(true);
     } catch (err) {
       setError('Network error.');
     } finally {
@@ -86,13 +90,48 @@ export default function RegisterPage() {
           <img src={logo} alt="Chonky Boi Logo" className="h-24 w-auto" />
         </div>
         
-        <h2 className="text-3xl font-extrabold text-primary-darker mb-2">Create account</h2>
-        <p className="text-sm text-primary-dark mb-6">Create an account to start shopping for your pets.</p>
-        {role === 'admin' && (
-          <div className="mb-4 text-sm text-red-600 font-medium bg-red-50 border border-red-200 rounded-lg p-3">
-            Note: Registering on this URL will create an admin account.
-          </div>
-        )}
+        {registrationSuccess ? (
+          <>
+            {/* Success Message */}
+            <div className="flex justify-center mb-4">
+              <div className="bg-green-100 rounded-full p-4">
+                <FaCheckCircle className="text-green-600 text-6xl" />
+              </div>
+            </div>
+            <h2 className="heading-card text-green-700 mb-2">Account Created!</h2>
+            <p className="text-gray-700 mb-4">
+              Please verify your email address to activate your account.
+            </p>
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
+              <p className="text-sm text-blue-900 mb-2">
+                📧 Verification email sent to:
+              </p>
+              <p className="text-base font-semibold text-blue-800 break-all">
+                {registeredEmail}
+              </p>
+              <p className="text-xs text-blue-700 mt-2">
+                Check your inbox and click the verification link.
+              </p>
+            </div>
+            <p className="text-xs text-gray-600 mb-4">
+              Didn't receive the email? Check your spam folder.
+            </p>
+            <Link
+              to="/signin"
+              className="inline-block px-6 py-2 bg-secondary text-white rounded-lg hover:bg-secondary-light transition-colors font-medium"
+            >
+              Go to Login
+            </Link>
+          </>
+        ) : (
+          <>
+            <h2 className="heading-main text-primary-darker mb-2">Create account</h2>
+            <p className="text-sm text-primary-dark mb-6">Create an account to start shopping for your pets.</p>
+            {role === 'admin' && (
+              <div className="mb-4 text-sm text-red-600 font-medium bg-red-50 border border-red-200 rounded-lg p-3">
+                Note: Registering on this URL will create an admin account.
+              </div>
+            )}
 
         <form onSubmit={onSubmit} className="space-y-4 text-left">
           <div>
@@ -162,6 +201,8 @@ export default function RegisterPage() {
         <div className="mt-6 text-sm text-primary-dark">
           Already have an account? <Link to="/signin" className="text-secondary hover:text-secondary-light font-semibold">Sign in</Link>
         </div>
+          </>
+        )}
       </div>
     </div>
   );

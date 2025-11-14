@@ -3,6 +3,8 @@ from rest_framework.permissions import IsAuthenticated, IsAdminUser, AllowAny
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from django.utils import timezone
+from decimal import Decimal
+from inventory.models import ProductHistory
 from django.db import transaction
 from django.db.models import Avg, Count
 from .models import Order, OrderItem, PurchaseFeedback, ProductFeedback
@@ -52,14 +54,16 @@ class CreateOrderView(APIView):
                             status=status.HTTP_400_BAD_REQUEST
                         )
                     
-                    price = float(product.unit_cost) * quantity
+                    # Store unit price, not total price
+                    unit_price = float(product.unit_cost)
+                    total_item_price = unit_price * quantity
                     order_items.append({
                         'item_type': 'product',
                         'product': product,
                         'quantity': quantity,
-                        'price': price
+                        'price': unit_price  # Store only unit price
                     })
-                    total_price += price
+                    total_price += total_item_price
                 except Product.DoesNotExist:
                     return Response(
                         {'error': f'Product with id {item_id} not found'},
@@ -69,14 +73,16 @@ class CreateOrderView(APIView):
             elif item_type == 'service':
                 try:
                     service = Service.objects.get(id=item_id)
-                    price = float(service.price) * quantity
+                    # Store unit price, not total price
+                    unit_price = float(service.price)
+                    total_item_price = unit_price * quantity
                     order_items.append({
                         'item_type': 'service',
                         'service': service,
                         'quantity': quantity,
-                        'price': price
+                        'price': unit_price  # Store only unit price
                     })
-                    total_price += price
+                    total_price += total_item_price
                 except Service.DoesNotExist:
                     return Response(
                         {'error': f'Service with id {item_id} not found'},
@@ -88,6 +94,8 @@ class CreateOrderView(APIView):
             user=request.user,
             branch=validated_data['branch'],
             total_price=total_price,
+            amount_paid=validated_data.get('amount_paid', 0),
+            change=validated_data.get('change', 0),
             notes=validated_data.get('notes', ''),
             status='pending'
         )
@@ -106,8 +114,24 @@ class CreateOrderView(APIView):
             # Deduct stock for products
             if item['item_type'] == 'product' and item.get('product'):
                 product = item['product']
+                old_quantity = product.quantity
                 product.quantity -= item['quantity']
                 product.save()
+                
+                # Create ProductHistory entry for sale
+                total_cost = Decimal(str(product.unit_cost)) * Decimal(str(item['quantity']))
+                ProductHistory.objects.create(
+                    product=product,
+                    user=request.user,
+                    transaction_type='sale',
+                    quantity_change=-item['quantity'],
+                    old_quantity=old_quantity,
+                    new_quantity=product.quantity,
+                    supplier=product.supplier,
+                    unit_cost=product.unit_cost,
+                    total_cost=total_cost,
+                    reason=f'Sold in order {order.order_id}'
+                )
         
         # Return created order
         order_serializer = OrderSerializer(order)
@@ -167,7 +191,9 @@ class OrderDetailView(generics.RetrieveAPIView):
     permission_classes = [IsAuthenticated]
     
     def get_queryset(self):
-        # All users (including admins) can ONLY see their own orders
+        # Admins can see all orders, regular users can only see their own
+        if self.request.user.is_staff:
+            return Order.objects.all()
         return Order.objects.filter(user=self.request.user)
 
 
@@ -198,8 +224,24 @@ class UpdateOrderStatusView(APIView):
             for order_item in order_items:
                 if order_item.product:
                     product = order_item.product
+                    old_quantity = product.quantity
                     product.quantity += order_item.quantity
                     product.save()
+                    
+                    # Create ProductHistory entry for cancellation
+                    total_cost = Decimal(str(product.unit_cost)) * Decimal(str(order_item.quantity))
+                    ProductHistory.objects.create(
+                        product=product,
+                        user=request.user,
+                        transaction_type='restock',
+                        quantity_change=order_item.quantity,
+                        old_quantity=old_quantity,
+                        new_quantity=product.quantity,
+                        supplier=product.supplier,
+                        unit_cost=product.unit_cost,
+                        total_cost=total_cost,
+                        reason=f'Order {order.order_id} cancelled - stock restored'
+                    )
             
             order.status = new_status
             order.save()
@@ -225,6 +267,10 @@ class AdminUpdateOrderStatusView(APIView):
                 status=status.HTTP_404_NOT_FOUND
             )
         
+        print(f"DEBUG: Request data received: {request.data}")
+        print(f"DEBUG: amount_paid in request: {'amount_paid' in request.data}")
+        print(f"DEBUG: change in request: {'change' in request.data}")
+        
         new_status = request.data.get('status')
         if new_status not in ['pending', 'available_for_pickup', 'completed', 'cancelled']:
             return Response(
@@ -241,8 +287,24 @@ class AdminUpdateOrderStatusView(APIView):
             for order_item in order_items:
                 if order_item.product:
                     product = order_item.product
+                    old_quantity = product.quantity
                     product.quantity += order_item.quantity
                     product.save()
+                    
+                    # Create ProductHistory entry for cancellation
+                    total_cost = Decimal(str(product.unit_cost)) * Decimal(str(order_item.quantity))
+                    ProductHistory.objects.create(
+                        product=product,
+                        user=request.user,
+                        transaction_type='restock',
+                        quantity_change=order_item.quantity,
+                        old_quantity=old_quantity,
+                        new_quantity=product.quantity,
+                        supplier=product.supplier,
+                        unit_cost=product.unit_cost,
+                        total_cost=total_cost,
+                        reason=f'Order {order.order_id} cancelled - stock restored'
+                    )
         
         # If un-cancelling an order (changing from cancelled to pending/completed), deduct stock again
         elif old_status == 'cancelled' and new_status in ['pending', 'completed']:
@@ -261,13 +323,41 @@ class AdminUpdateOrderStatusView(APIView):
             for order_item in order_items:
                 if order_item.product:
                     product = order_item.product
+                    old_quantity = product.quantity
                     product.quantity -= order_item.quantity
                     product.save()
+                    
+                    # Create ProductHistory entry for sale
+                    total_cost = Decimal(str(product.unit_cost)) * Decimal(str(order_item.quantity))
+                    ProductHistory.objects.create(
+                        product=product,
+                        user=request.user,
+                        transaction_type='sale',
+                        quantity_change=-order_item.quantity,
+                        old_quantity=old_quantity,
+                        new_quantity=product.quantity,
+                        supplier=product.supplier,
+                        unit_cost=product.unit_cost,
+                        total_cost=total_cost,
+                        reason=f'Order {order.order_id} un-cancelled - stock deducted'
+                    )
+        
+        # Update payment information if provided
+        if 'amount_paid' in request.data:
+            amount_paid_value = request.data.get('amount_paid', 0)
+            print(f"DEBUG: Setting amount_paid to {amount_paid_value}")
+            order.amount_paid = amount_paid_value
+        if 'change' in request.data:
+            change_value = request.data.get('change', 0)
+            print(f"DEBUG: Setting change to {change_value}")
+            order.change = change_value
         
         order.status = new_status
         if new_status == 'completed':
             order.completed_at = timezone.now()
+        print(f"DEBUG: Before save - order.amount_paid={order.amount_paid}, order.change={order.change}")
         order.save()
+        print(f"DEBUG: After save - order.amount_paid={order.amount_paid}, order.change={order.change}")
         
         serializer = OrderSerializer(order)
         return Response(serializer.data)

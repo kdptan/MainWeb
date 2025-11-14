@@ -61,7 +61,7 @@ class OrderSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = Order
-        fields = ['id', 'user', 'username', 'branch', 'status', 'total_price', 'notes',
+        fields = ['id', 'user', 'username', 'branch', 'status', 'total_price', 'amount_paid', 'change', 'notes',
                   'created_at', 'completed_at', 'items', 'feedback', 'has_feedback']
         read_only_fields = ['created_at', 'completed_at']
     
@@ -82,6 +82,8 @@ class CreateOrderSerializer(serializers.Serializer):
     branch = serializers.ChoiceField(choices=[('Matina', 'Matina'), ('Toril', 'Toril')])
     notes = serializers.CharField(required=False, allow_blank=True)
     items = serializers.ListField(child=serializers.DictField())
+    amount_paid = serializers.DecimalField(required=False, max_digits=10, decimal_places=2, default=0)
+    change = serializers.DecimalField(required=False, max_digits=10, decimal_places=2, default=0)
     
     def validate_items(self, items):
         if not items:

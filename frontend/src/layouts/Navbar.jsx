@@ -3,8 +3,9 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { FaBell, FaFileAlt } from 'react-icons/fa';
 import logo from '../assets/ChonkyLogo.png';
 import { useAuth } from '../hooks/useAuth';
-import { API_BASE_URL } from '../services/api';
+import { API_BASE_URL, fetchWithAuth } from '../services/api';
 import UpdateProfileModal from '../components/UpdateProfileModal';
+import { formatOrderId } from '../utils/formatters';
 
 export default function Navbar() {
   // Hooks must be called unconditionally
@@ -37,12 +38,7 @@ export default function Navbar() {
 
     const fetchNotifications = async () => {
       try {
-        const token = localStorage.getItem('access') || sessionStorage.getItem('access');
-        const response = await fetch(`${API_BASE_URL}/orders/`, {
-          headers: {
-            Authorization: `Bearer ${token}`
-          }
-        });
+        const response = await fetchWithAuth(`${API_BASE_URL}/orders/`);
         
         if (!response.ok) {
           console.error('Failed to fetch notifications:', response.status);
@@ -68,7 +64,7 @@ export default function Navbar() {
 
   // Hide navbar on auth pages
   const path = location.pathname || '';
-  if (path === '/signin' || path === '/forgot-password' || path.startsWith('/register')) return null;
+  if (path === '/signin' || path === '/forgot-password' || path.startsWith('/register') || path.startsWith('/reset-password') || path.startsWith('/verify-email')) return null;
 
   return (
     <nav className="bg-accent-cream shadow-lg border-b-4 border-secondary">
@@ -79,43 +75,43 @@ export default function Navbar() {
             <Link to="/" className="flex items-center space-x-3">
               <img src={logo} alt="Chonky Boi Logo" className="h-12 w-auto" />
               <div className="flex flex-col items-center leading-tight">
-                <span className="font-bold text-lg text-primary-darker">Chonky Boi Pet Store</span>
-                <span className="font-bold text-base text-primary-darker">& Grooming Salon</span>
+                <span className="font-display font-bold text-xl text-primary-darker" style={{fontFamily: 'Poppins, sans-serif', letterSpacing: '-0.02em'}}>Chonky Boi Pet Store</span>
+                <span className="font-display font-semibold text-sm text-primary-darker" style={{fontFamily: 'Poppins, sans-serif', letterSpacing: '-0.01em'}}>& Grooming Salon</span>
               </div>
             </Link>
           </div>
 
           {/* Right: Navigation links */}
           <div className="flex items-center space-x-6">
-            <div className="hidden sm:flex space-x-4">
+            <div className="hidden sm:flex space-x-2">
               <Link 
                 to="/home" 
-                className={`text-primary-darker hover:text-secondary px-3 py-2 rounded-md text-sm font-medium border-b-2 transition-colors ${
-                  path === '/home' || path === '/' ? 'border-secondary text-secondary' : 'border-transparent'
+                className={`btn btn-nav transition-all duration-200 ${
+                  path === '/home' || path === '/' ? 'bg-secondary text-accent-cream shadow-md scale-105' : 'text-primary-darker hover:bg-accent-peach'
                 }`}
               >
                 Home
               </Link>
               <Link 
                 to="/services" 
-                className={`text-primary-darker hover:text-secondary px-3 py-2 rounded-md text-sm font-medium border-b-2 transition-colors ${
-                  path === '/services' ? 'border-secondary text-secondary' : 'border-transparent'
+                className={`btn btn-nav transition-all duration-200 ${
+                  path === '/services' ? 'bg-secondary text-accent-cream shadow-md scale-105' : 'text-primary-darker hover:bg-accent-peach'
                 }`}
               >
                 Services
               </Link>
               <Link 
                 to="/products" 
-                className={`text-primary-darker hover:text-secondary px-3 py-2 rounded-md text-sm font-medium border-b-2 transition-colors ${
-                  path === '/products' ? 'border-secondary text-secondary' : 'border-transparent'
+                className={`btn btn-nav transition-all duration-200 ${
+                  path === '/products' ? 'bg-secondary text-accent-cream shadow-md scale-105' : 'text-primary-darker hover:bg-accent-peach'
                 }`}
               >
                 Products
               </Link>
               <Link 
                 to="/appointment" 
-                className={`text-primary-darker hover:text-secondary px-3 py-2 rounded-md text-sm font-medium border-b-2 transition-colors ${
-                  path === '/appointment' || path.startsWith('/admin/appointments') || path.startsWith('/my-appointments') ? 'border-secondary text-secondary' : 'border-transparent'
+                className={`btn btn-nav transition-all duration-200 ${
+                  path === '/appointment' || path.startsWith('/admin/appointments') || path.startsWith('/my-appointments') ? 'bg-secondary text-accent-cream shadow-md scale-105' : 'text-primary-darker hover:bg-accent-peach'
                 }`}
               >
                 Appointment
@@ -136,16 +132,17 @@ export default function Navbar() {
                 <>
                   <div className="relative" ref={managementRef}>
                     {((user.role || '').toLowerCase() === 'admin') && (
-                      <button onClick={() => setManagementOpen(s => !s)} className="text-primary-darker hover:text-secondary px-3 py-2 rounded-md text-sm font-medium transition-colors">Management</button>
+                      <button onClick={() => setManagementOpen(s => !s)} className={`text-primary-darker px-3 py-2 rounded-md text-sm font-semibold transition-all border-b-2 hover:bg-accent-peach ${managementOpen ? 'border-secondary bg-accent-peach' : 'border-transparent'}`}>Management</button>
                     )}
 
                     {managementOpen && (
                       <div className="absolute left-0 top-full mt-1 w-56 bg-accent-peach border border-secondary rounded-md shadow-xl py-2 z-20 dropdown-menu">
                         <div className="px-2 py-1">
+                          <a href="/admin/sales" className="block px-4 py-2 text-sm text-primary-darker hover:bg-accent-cream hover:text-secondary transition-colors rounded">Point of Sale</a>
                           <a href="/management/inventory" className="block px-4 py-2 text-sm text-primary-darker hover:bg-accent-cream hover:text-secondary transition-colors rounded">Inventory</a>
                           <a href="/management/products" className="block px-4 py-2 text-sm text-primary-darker hover:bg-accent-cream hover:text-secondary transition-colors rounded">Products</a>
                           <a href="/management/services" className="block px-4 py-2 text-sm text-primary-darker hover:bg-accent-cream hover:text-secondary transition-colors rounded">Services</a>
-                          <a href="/management/petprofile" className="block px-4 py-2 text-sm text-primary-darker hover:bg-accent-cream hover:text-secondary transition-colors rounded">PetProfile</a>
+                          <a href="/management/petprofile" className="block px-4 py-2 text-sm text-primary-darker hover:bg-accent-cream hover:text-secondary transition-colors rounded">Pet Profile</a>
                           <a href="/management/activity-log" className="block px-4 py-2 text-sm text-primary-darker hover:bg-accent-cream hover:text-secondary transition-colors rounded">Activity Log</a>
                           <a href="/management/staff-management" className="block px-4 py-2 text-sm text-primary-darker hover:bg-accent-cream hover:text-secondary transition-colors rounded">Staff Management</a>
                           <a href="/admin/feedback" className="block px-4 py-2 text-sm text-primary-darker hover:bg-accent-cream hover:text-secondary transition-colors rounded">Purchase Feedback</a>
@@ -217,7 +214,7 @@ export default function Navbar() {
                           notifications.map((notification) => (
                             <div key={notification.id} className="px-4 py-3 border-b border-secondary hover:bg-accent-cream transition-colors">
                               <div className="text-sm font-medium text-primary-darker">
-                                Order #{notification.id} is available for pickup!
+                                Order {formatOrderId(notification.id)} is available for pickup!
                               </div>
                               <div className="text-xs text-primary-dark mt-1">
                                 Branch: {notification.branch}

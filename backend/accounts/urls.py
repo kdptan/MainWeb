@@ -2,7 +2,8 @@ from django.urls import path
 from .views import (
     RegisterView, ProfileView, LoginActivityListView, DeactivateUserView, 
     CustomTokenObtainPairView, DeactivatedUsersView, ReactivateUserView,
-    StaffListView, UpdateStaffLocationView
+    StaffListView, UpdateStaffLocationView, PasswordResetRequestView,
+    PasswordResetConfirmView, VerifyEmailView
 )
 
 urlpatterns = [
@@ -15,5 +16,8 @@ urlpatterns = [
     path('api/staff/', StaffListView.as_view(), name='api-staff-list'),
     path('api/staff/<int:user_id>/location/', UpdateStaffLocationView.as_view(), name='api-update-staff-location'),
     path('api/token/', CustomTokenObtainPairView.as_view(), name='token_obtain_pair'),
+    path('api/password-reset/', PasswordResetRequestView.as_view(), name='api-password-reset'),
+    path('api/password-reset-confirm/', PasswordResetConfirmView.as_view(), name='api-password-reset-confirm'),
+    path('api/verify-email/', VerifyEmailView.as_view(), name='api-verify-email'),
 ]
 

@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     'pets',
     'orders',
     'appointments',
+    'sales',
 ]
 
 
@@ -151,7 +152,28 @@ MEDIA_ROOT = BASE_DIR / 'media'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# Development email backend - prints emails to console. Replace/configure for production.
+# Email Configuration
+# TEMPORARY: Using console backend for development/testing
+# The email will be printed in the Django terminal
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
-DEFAULT_FROM_EMAIL = 'no-reply@localhost'
+DEFAULT_FROM_EMAIL = 'Chonky Boi Pet Store <no-reply@localhost>'
+
+# To enable Gmail SMTP, uncomment the lines below and add your credentials:
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'chonkyboii067@gmail.com'  # Replace with your Gmail address
+EMAIL_HOST_PASSWORD = 'dpfxpeobqljiwupz'  # Replace with your Gmail App Password (16 chars, no spaces)
+DEFAULT_FROM_EMAIL = 'Chonky Boi Pet Store <chonkyboii067@gmail.com>'
+
+# NOTE: To use Gmail:
+# 1. Go to your Google Account settings
+# 2. Enable 2-Step Verification
+# 3. Generate an App Password: https://myaccount.google.com/apppasswords
+# 4. Replace the EMAIL_HOST_USER and EMAIL_HOST_PASSWORD above
+# 5. Uncomment the SMTP settings and comment out the console backend
+# 
+# See GMAIL_SETUP.md for detailed instructions
+
 # NOTE: admin invite code removed — admin accounts are created when registration is posted to /register with role='admin'.

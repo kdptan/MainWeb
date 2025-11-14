@@ -6,6 +6,7 @@ import { useToast } from '../hooks/useToast';
 import { orderService } from '../services/orderService';
 import Toast from '../components/Toast';
 import managementBg from '../assets/Management.png';
+import { formatOrderId } from '../utils/formatters';
 
 export default function AdminFeedbackPage() {
   const navigate = useNavigate();
@@ -49,15 +50,7 @@ export default function AdminFeedbackPage() {
   };
 
   const generateOrderId = (feedback) => {
-    if (!feedback.order_created_at) {
-      return `Order #${feedback.order_id || feedback.order}`;
-    }
-    const date = new Date(feedback.order_created_at);
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const day = String(date.getDate()).padStart(2, '0');
-    const orderId = String(feedback.order_id || feedback.order).padStart(4, '0');
-    return `ORD-${year}${month}${day}-${orderId}`;
+    return formatOrderId(feedback.order_id || feedback.order);
   };
 
   const formatDate = (dateString) => {
@@ -98,7 +91,7 @@ export default function AdminFeedbackPage() {
 
       {/* Header */}
       <div className="mb-8">
-        <h1 className="text-4xl font-bold text-accent-cream mb-2">Purchase Feedback</h1>
+        <h1 className="display-md text-accent-cream mb-2">Purchase Feedback</h1>
         <p className="text-accent-cream">Overall order experience feedback from customers</p>
       </div>
 

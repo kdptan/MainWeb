@@ -6,7 +6,11 @@ from rest_framework_simplejwt.views import TokenObtainPairView
 from django.core.mail import send_mail
 from django.conf import settings
 from django.contrib.auth.models import User
+from django.contrib.auth.tokens import default_token_generator
+from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
+from django.utils.encoding import force_bytes, force_str
 import logging
+import secrets
 
 from .serializers import RegisterSerializer, ProfileSerializer, LoginActivitySerializer
 from .models import LoginActivity, Profile
@@ -77,15 +81,45 @@ class RegisterView(APIView):
 		# Create the user. Role (user/admin) is handled by the serializer.create() which creates a Profile and sets is_staff for admin.
 		role = serializer.validated_data.get('role', 'user')
 		user = serializer.save()
+		
+		# Set user as inactive until email is verified
+		user.is_active = False
+		user.save()
 
-		# send welcome email (console backend in development)
-		subject = "Welcome to Petstore"
-		message = f"Hi {user.first_name or user.username},\n\nThank you for registering at Petstore!"
+		# Generate verification token
+		verification_token = secrets.token_urlsafe(32)
+		
+		# Get or create profile and store verification token
+		profile, created = Profile.objects.get_or_create(user=user)
+		profile.verification_token = verification_token
+		profile.email_verified = False
+		profile.save()
+		
+		# Build verification URL
+		verification_url = f"http://localhost:3000/verify-email/{verification_token}"
+
+		# Send verification email
+		subject = "Verify Your Email - Chonky Boi Pet Store"
+		message = f"""Hi {user.first_name or user.username},
+
+Welcome to Chonky Boi Pet Store!
+
+Please verify your email address by clicking the link below:
+{verification_url}
+
+This link will expire in 24 hours.
+
+If you didn't create this account, please ignore this email.
+
+Best regards,
+Chonky Boi Pet Store Team
+"""
 		from_email = getattr(settings, 'DEFAULT_FROM_EMAIL', 'no-reply@example.com')
 		try:
 			send_mail(subject, message, from_email, [user.email], fail_silently=False)
+			logger.info(f"Verification email sent to {user.email}")
 		except Exception:
-			logger.exception('Failed to send welcome email')
+			logger.exception('Failed to send verification email')
 
 		# Return created username and role for client-side convenience
 		user_role = role
@@ -95,7 +129,12 @@ class RegisterView(APIView):
 		except Exception:
 			pass
 
-		return Response({'detail': 'Account created', 'username': user.username, 'role': user_role}, status=status.HTTP_201_CREATED)
+		return Response({
+			'detail': 'Account created! Please check your email to verify your account.',
+			'username': user.username,
+			'role': user_role,
+			'email_verification_required': True
+		}, status=status.HTTP_201_CREATED)
 
 
 class ProfileView(APIView):
@@ -357,3 +396,151 @@ class UpdateStaffLocationView(APIView):
 			return Response({'detail': 'Location updated successfully', 'location': location}, status=status.HTTP_200_OK)
 		except User.DoesNotExist:
 			return Response({'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
+
+
+class PasswordResetRequestView(APIView):
+	"""Request a password reset email"""
+	
+	def post(self, request):
+		email = request.data.get('email')
+		
+		if not email:
+			return Response({'error': 'Email is required'}, status=status.HTTP_400_BAD_REQUEST)
+		
+		# Check if user exists with this email
+		try:
+			user = User.objects.get(email=email)
+		except User.DoesNotExist:
+			return Response({'error': 'No account found with this email address. Please check and try again.'}, status=status.HTTP_404_NOT_FOUND)
+		
+		# Check if user account is active
+		if not user.is_active:
+			return Response({'error': 'This account has been deactivated. Please contact support.'}, status=status.HTTP_403_FORBIDDEN)
+		
+		# Generate password reset token
+		token = default_token_generator.make_token(user)
+		uid = urlsafe_base64_encode(force_bytes(user.pk))
+		
+		# Build reset URL - use frontend URL
+		reset_url = f"http://localhost:3000/reset-password/{uid}/{token}"
+		
+		# Send email
+		subject = "Password Reset Request"
+		message = f"""Hi {user.first_name or user.username},
+
+You requested a password reset for your Chonky Boi Pet Store account.
+
+Click the link below to reset your password:
+{reset_url}
+
+This link will expire in 24 hours.
+
+If you didn't request this, please ignore this email.
+
+Best regards,
+Chonky Boi Pet Store Team
+"""
+		from_email = getattr(settings, 'DEFAULT_FROM_EMAIL', 'no-reply@localhost')
+		
+		try:
+			send_mail(subject, message, from_email, [user.email], fail_silently=False)
+			logger.info(f"Password reset email sent to {email}")
+		except Exception as e:
+			logger.exception(f'Failed to send password reset email: {e}')
+			return Response({'error': 'Failed to send email. Please try again later.'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+		
+		# Get profile picture if available
+		profile_picture_url = None
+		try:
+			if hasattr(user, 'profile') and user.profile.profile_picture:
+				from django.http import HttpRequest
+				request_obj = request._request if hasattr(request, '_request') else request
+				profile_picture_url = request_obj.build_absolute_uri(user.profile.profile_picture.url)
+		except Exception:
+			pass
+		
+		response_data = {
+			'detail': 'Password reset email sent successfully! Check your email for the reset link.',
+			'username': user.username,
+			'email': user.email,
+			'first_name': user.first_name or '',
+			'last_name': user.last_name or ''
+		}
+		
+		if profile_picture_url:
+			response_data['profile_picture'] = profile_picture_url
+		
+		return Response(response_data, status=status.HTTP_200_OK)
+
+
+class PasswordResetConfirmView(APIView):
+	"""Reset password with token"""
+	
+	def post(self, request):
+		uid = request.data.get('uid')
+		token = request.data.get('token')
+		new_password = request.data.get('new_password')
+		
+		if not all([uid, token, new_password]):
+			return Response({'error': 'Missing required fields'}, status=status.HTTP_400_BAD_REQUEST)
+		
+		if len(new_password) < 8:
+			return Response({'error': 'Password must be at least 8 characters long'}, status=status.HTTP_400_BAD_REQUEST)
+		
+		try:
+			# Decode the user ID
+			user_id = force_str(urlsafe_base64_decode(uid))
+			user = User.objects.get(pk=user_id)
+			
+			# Verify the token
+			if not default_token_generator.check_token(user, token):
+				return Response({'error': 'Invalid or expired reset link'}, status=status.HTTP_400_BAD_REQUEST)
+			
+			# Set the new password
+			user.set_password(new_password)
+			user.save()
+			
+			logger.info(f"Password reset successful for user: {user.username}")
+			
+			return Response({'detail': 'Password has been reset successfully'}, status=status.HTTP_200_OK)
+			
+		except (TypeError, ValueError, OverflowError, User.DoesNotExist):
+			return Response({'error': 'Invalid reset link'}, status=status.HTTP_400_BAD_REQUEST)
+
+
+class VerifyEmailView(APIView):
+	"""Verify user email with token"""
+	
+	def post(self, request):
+		token = request.data.get('token')
+		
+		if not token:
+			return Response({'error': 'Verification token is required'}, status=status.HTTP_400_BAD_REQUEST)
+		
+		try:
+			# Find profile with this verification token
+			profile = Profile.objects.get(verification_token=token)
+			user = profile.user
+			
+			# Check if already verified
+			if profile.email_verified:
+				return Response({'detail': 'Email already verified. You can now log in.'}, status=status.HTTP_200_OK)
+			
+			# Verify the email
+			profile.email_verified = True
+			profile.verification_token = None  # Clear the token
+			profile.save()
+			
+			# Activate the user account
+			user.is_active = True
+			user.save()
+			
+			logger.info(f"Email verified for user: {user.username}")
+			
+			return Response({
+				'detail': 'Email verified successfully! You can now log in.',
+				'username': user.username
+			}, status=status.HTTP_200_OK)
+			
+		except Profile.DoesNotExist:
+			return Response({'error': 'Invalid or expired verification link'}, status=status.HTTP_400_BAD_REQUEST)

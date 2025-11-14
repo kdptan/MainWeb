@@ -13,7 +13,6 @@ export default function EndOfDayReportsPage() {
   
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
   const [selectedBranch, setSelectedBranch] = useState('all');
-  const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(false);
   const [reportData, setReportData] = useState({
     totalOrders: 0,
@@ -42,6 +41,7 @@ export default function EndOfDayReportsPage() {
     }
 
     fetchReportData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user, selectedDate, selectedBranch]);
 
   const fetchReportData = async () => {
@@ -56,8 +56,6 @@ export default function EndOfDayReportsPage() {
         const matchesBranch = selectedBranch === 'all' || order.branch === selectedBranch;
         return matchesDate && matchesBranch;
       });
-
-      setOrders(filteredOrders);
 
       // Calculate report metrics
       const completed = filteredOrders.filter(o => o.status === 'completed');
@@ -82,12 +80,12 @@ export default function EndOfDayReportsPage() {
       
       filteredOrders.forEach(order => {
         order.items.forEach(item => {
-          if (item.item_type === 'product' && item.product) {
-            const key = item.product.name;
-            productCount[key] = (productCount[key] || 0) + item.quantity;
-          } else if (item.item_type === 'service' && item.service) {
-            const key = item.service.name;
-            serviceCount[key] = (serviceCount[key] || 0) + item.quantity;
+          if (item.item_type === 'product' && item.product_details) {
+            const productName = item.product_details.name;
+            productCount[productName] = (productCount[productName] || 0) + item.quantity;
+          } else if (item.item_type === 'service' && item.service_details) {
+            const serviceName = item.service_details.name;
+            serviceCount[serviceName] = (serviceCount[serviceName] || 0) + item.quantity;
           }
         });
       });
@@ -138,15 +136,23 @@ export default function EndOfDayReportsPage() {
         <div className="bg-white rounded-lg shadow-md p-6 mb-6 print:shadow-none">
           <div className="flex items-center justify-between mb-4 print:mb-2">
             <div>
-              <h1 className="text-3xl font-bold text-primary-darker">End of Day Report</h1>
+              <h1 className="heading-main text-primary-darker">End of Day Report</h1>
               <p className="text-sm text-gray-600 mt-1">Daily Sales and Operations Summary</p>
             </div>
-            <button
-              onClick={handlePrint}
-              className="flex items-center gap-2 px-4 py-2 bg-secondary text-accent-cream rounded-lg hover:bg-secondary-light font-medium text-sm transition-colors print:hidden"
-            >
-              <FaPrint /> Print Report
-            </button>
+            <div className="flex gap-2 print:hidden">
+              <button
+                onClick={handlePrint}
+                className="flex items-center gap-2 px-4 py-2 bg-secondary text-accent-cream rounded-lg hover:bg-secondary-light font-medium text-sm transition-colors"
+              >
+                <FaPrint /> Print Report
+              </button>
+              <button
+                onClick={() => navigate('/admin/sales-report')}
+                className="flex items-center gap-2 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 font-medium text-sm transition-colors"
+              >
+                <FaChartLine /> Sales Report
+              </button>
+            </div>
           </div>
 
           {/* Filters */}

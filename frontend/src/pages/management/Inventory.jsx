@@ -1,9 +1,11 @@
 import React, { useEffect, useState, useMemo, useCallback } from 'react';
 import { useAuth } from '../../hooks/useAuth';
-import { FaTrash, FaPencilAlt } from 'react-icons/fa';
+import { FaTrash, FaPencilAlt, FaBox, FaHistory } from 'react-icons/fa';
 import { useToast } from '../../hooks/useToast';
 import Toast from '../../components/Toast';
 import ConfirmDialog from '../../components/ConfirmDialog';
+import RestockingModal from '../../components/RestockingModal';
+import ProductHistoryModal from '../../components/ProductHistoryModal';
 
 // eslint-disable-next-line no-unused-vars
 const categories = [
@@ -26,13 +28,12 @@ export default function Inventory(){
   // default sort: by id ascending (least number on top)
   const [sortBy, setSortBy] = useState({ field: 'id', dir: 'asc' });
   const [branch, setBranch] = useState('Matina');
+  const [activeTab, setActiveTab] = useState('inventory');
 
   const [showEditModal, setShowEditModal] = useState(false);
   const [editForm, setEditForm] = useState({});
   const [showConfirmEdit, setShowConfirmEdit] = useState(false);
 
-  const [showAuditLog, setShowAuditLog] = useState(false);
-  const [auditLogs, setAuditLogs] = useState([]);
   const [editReason, setEditReason] = useState('');
 
   const [selectedField, setSelectedField] = useState('');
@@ -70,6 +71,7 @@ export default function Inventory(){
           description: d.description,
           supplier: d.supplier,
           unitCost: Number(d.unit_cost || d.unitCost || 0),
+          retailPrice: Number(d.retail_price || 0),
           quantity: qty,
           reorderLevel: rlevel,
           reorderQuantity: Number(d.reorder_quantity || d.reorderQuantity || 0),
@@ -87,7 +89,9 @@ export default function Inventory(){
     }
   }, [token, branch]);
 
-  useEffect(() => { fetchInventory(); }, [fetchInventory]);
+  useEffect(() => { 
+    fetchInventory(); 
+  }, [fetchInventory]);
 
   const displayedRows = useMemo(() => {
     let rows = [...inventory];
@@ -276,39 +280,47 @@ export default function Inventory(){
     saveEdit();
   };
 
-  const fetchAuditLogs = async () => {
-    try {
-      const res = await fetch('http://127.0.0.1:8000/api/inventory/audit-logs/', {
-        headers: {
-          ...(token ? { Authorization: `Bearer ${token}` } : {}),
-        },
-      });
-      if (!res.ok) throw new Error(await res.text());
-      const data = await res.json();
-      setAuditLogs(data);
-    } catch (err) {
-      console.error(err);
-      showToast('Failed to fetch audit logs.', 'error');
-    }
-  };
-
-  useEffect(() => {
-    if (showAuditLog) {
-      fetchAuditLogs();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [showAuditLog]);
-
   return (
     <div className="p-6 min-h-screen bg-accent-cream">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-primary-darker">Inventory — {branch}</h1>
-        <div className="flex items-center gap-2">
-          <button onClick={fetchInventory} className="px-3 py-1 border border-primary rounded bg-white text-primary-darker hover:bg-accent-peach">Refresh</button>
-          <button onClick={() => setShowAuditLog(true)} className="px-3 py-1 border border-primary rounded ml-2 bg-white text-primary-darker hover:bg-accent-peach">Audit Log</button>
-        </div>
+      <div className="mb-6">
       </div>
 
+      {/* Tab Navigation */}
+      <div className="flex gap-2 mb-6 border-b-2 border-primary">
+        <button
+          onClick={() => setActiveTab('inventory')}
+          className={`px-6 py-3 font-semibold transition-colors ${
+            activeTab === 'inventory'
+              ? 'border-b-4 border-primary text-primary-darker bg-white'
+              : 'text-gray-600 hover:text-primary-darker'
+          }`}
+        >
+          Inventory
+        </button>
+        <button
+          onClick={() => setActiveTab('stock-flow')}
+          className={`px-6 py-3 font-semibold transition-colors ${
+            activeTab === 'stock-flow'
+              ? 'border-b-4 border-primary text-primary-darker bg-white'
+              : 'text-gray-600 hover:text-primary-darker'
+          }`}
+        >
+          <FaBox className="inline mr-2" />Stock Flow
+        </button>
+        <button
+          onClick={() => setActiveTab('product-history')}
+          className={`px-6 py-3 font-semibold transition-colors ${
+            activeTab === 'product-history'
+              ? 'border-b-4 border-primary text-primary-darker bg-white'
+              : 'text-gray-600 hover:text-primary-darker'
+          }`}
+        >
+          <FaHistory className="inline mr-2" />Product History
+        </button>
+      </div>
+
+      {/* Tab Content */}
+      {activeTab === 'inventory' && (
       <div className="mt-4 bg-white rounded shadow p-4 border-2 border-primary">
         <div className="flex items-center gap-3 mb-3">
           <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search name, category, supplier" className="border border-primary rounded px-2 py-1 w-64 text-primary-darker" />
@@ -348,6 +360,7 @@ export default function Inventory(){
                   <th className="p-2">Description</th>
                   <th className="p-2">Supplier</th>
                   <th className="p-2">Unit Cost (₱)</th>
+                  <th className="p-2">Retail Price (₱)</th>
                   <th className="p-2">Quantity in Stock</th>
                   <th className="p-2">Reorder Level</th>
                   <th className="p-2">Reorder Quantity</th>
@@ -357,17 +370,18 @@ export default function Inventory(){
               </thead>
               <tbody>
                 {displayedRows.map(item => (
-                  <tr key={item.id} className="border-b">
-                    <td className="p-2 align-top">{item.formattedId || formatItemId(item.itemNumber ?? item.id, item.branch, item.category)}</td>
-                    <td className="p-2 align-top">{item.name}</td>
-                    <td className="p-2 align-top">{item.category}</td>
-                    <td className="p-2 align-top">{item.description}</td>
-                    <td className="p-2 align-top">{item.supplier}</td>
-                    <td className="p-2 align-top">₱{Number(item.unitCost).toFixed(2)}</td>
-                    <td className="p-2 align-top">{item.quantity}</td>
-                    <td className="p-2 align-top">{item.reorderLevel}</td>
-                    <td className="p-2 align-top">{item.reorderQuantity}</td>
-                    <td className="p-2 align-top">
+                  <tr key={item.id} className="border-b hover:bg-gray-50 h-12">
+                    <td className="px-2 py-1 align-middle whitespace-nowrap">{item.formattedId || formatItemId(item.itemNumber ?? item.id, item.branch, item.category)}</td>
+                    <td className="px-2 py-1 align-middle">{item.name}</td>
+                    <td className="px-2 py-1 align-middle">{item.category}</td>
+                    <td className="px-2 py-1 align-middle">{item.description}</td>
+                    <td className="px-2 py-1 align-middle">{item.supplier}</td>
+                    <td className="px-2 py-1 align-middle">₱{Number(item.unitCost).toFixed(2)}</td>
+                    <td className="px-2 py-1 align-middle font-semibold text-blue-600">₱{Number(item.retailPrice).toFixed(2)}</td>
+                    <td className="px-2 py-1 align-middle">{item.quantity}</td>
+                    <td className="px-2 py-1 align-middle">{item.reorderLevel}</td>
+                    <td className="px-2 py-1 align-middle">{item.reorderQuantity}</td>
+                    <td className="px-2 py-1 align-middle whitespace-nowrap pr-6">
                       {item.remarks === 'In Stock' && (
                         <span className="inline-block px-2 py-1 text-xs font-medium text-green-800 bg-green-100 rounded">In Stock</span>
                       )}
@@ -381,8 +395,8 @@ export default function Inventory(){
                         <span className="inline-block px-2 py-1 text-xs font-medium text-gray-800 bg-gray-100 rounded">{item.remarks}</span>
                       )}
                     </td>
-                    <td className="p-2 align-top text-center">
-                      <button onClick={() => openEditModal(item)} className="text-blue-600 hover:text-blue-800 mr-2">
+                    <td className="px-2 py-1 align-middle text-center pl-6 flex justify-center gap-2">
+                      <button onClick={() => openEditModal(item)} className="text-blue-600 hover:text-blue-800">
                         <FaPencilAlt />
                       </button>
                       <button onClick={() => setConfirmDeleteDialog({ isOpen: true, productId: item.id })} className="text-red-600 hover:text-red-800">
@@ -396,6 +410,37 @@ export default function Inventory(){
           </div>
         )}
       </div>
+      )}
+
+      {/* Stock Flow Tab */}
+      {activeTab === 'stock-flow' && (
+        <div className="bg-white rounded shadow p-4 border-2 border-primary max-h-[80vh] overflow-y-auto">
+          <RestockingModal
+            isOpen={true}
+            onClose={() => setActiveTab('inventory')}
+            products={displayedRows}
+            onRestockSuccess={(message) => {
+              showToast(message, 'success');
+              setActiveTab('inventory');
+              fetchInventory();
+            }}
+            token={token}
+            embedded={true}
+          />
+        </div>
+      )}
+
+      {/* Product History Tab */}
+      {activeTab === 'product-history' && (
+        <div className="bg-white rounded shadow p-4 border-2 border-primary">
+          <ProductHistoryModal
+            isOpen={true}
+            onClose={() => setActiveTab('inventory')}
+            token={token}
+            embedded={true}
+          />
+        </div>
+      )}
 
       {showEditModal && (
         <div className="fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center">
@@ -446,51 +491,6 @@ export default function Inventory(){
             <div className="mt-4 flex justify-end gap-2">
               <button onClick={() => setShowConfirmEdit(false)} className="bg-gray-200 px-4 py-2 rounded">Cancel</button>
               <button onClick={handleConfirmEdit} className="bg-blue-600 text-white px-4 py-2 rounded">Yes, Edit</button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {showAuditLog && (
-        <div className="fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center p-4">
-          <div className="bg-white p-6 rounded shadow-lg w-full max-w-6xl max-h-[90vh] flex flex-col">
-            <h2 className="text-lg font-semibold mb-4">Audit Log</h2>
-            <div className="overflow-auto flex-1">
-              <table className="min-w-full text-sm">
-                <thead className="sticky top-0 bg-white">
-                  <tr className="text-left border-b">
-                    <th className="p-2 whitespace-nowrap">Date & Time</th>
-                    <th className="p-2 whitespace-nowrap">User / Employee</th>
-                    <th className="p-2 whitespace-nowrap">Item ID</th>
-                    <th className="p-2 whitespace-nowrap">Field Changed</th>
-                    <th className="p-2 whitespace-nowrap">Old Value</th>
-                    <th className="p-2 whitespace-nowrap">New Value</th>
-                    <th className="p-2 whitespace-nowrap">Remarks / Reason</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {auditLogs.length === 0 ? (
-                    <tr>
-                      <td colSpan="7" className="text-center text-gray-500 p-4">No audit logs available.</td>
-                    </tr>
-                  ) : (
-                    auditLogs.map((log, index) => (
-                      <tr key={index} className="border-b hover:bg-gray-50">
-                        <td className="p-2 whitespace-nowrap">{new Date(log.timestamp).toLocaleString()}</td>
-                        <td className="p-2 whitespace-nowrap">{log.username}</td>
-                        <td className="p-2 whitespace-nowrap">{log.item_id}</td>
-                        <td className="p-2 whitespace-nowrap">{log.field_changed}</td>
-                        <td className="p-2 whitespace-nowrap">{log.old_value}</td>
-                        <td className="p-2 whitespace-nowrap">{log.new_value}</td>
-                        <td className="p-2">{log.remarks}</td>
-                      </tr>
-                    ))
-                  )}
-                </tbody>
-              </table>
-            </div>
-            <div className="mt-4 flex justify-end border-t pt-4">
-              <button onClick={() => setShowAuditLog(false)} className="bg-gray-200 px-4 py-2 rounded hover:bg-gray-300">Close</button>
             </div>
           </div>
         </div>

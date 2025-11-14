@@ -121,7 +121,7 @@ export default function MyAppointmentsPage() {
   );
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-primary-darker py-8 px-4 sm:px-6 lg:px-8">
       <Toast {...toast} />
       
       <div className="max-w-6xl mx-auto">
@@ -129,63 +129,63 @@ export default function MyAppointmentsPage() {
         <div className="mb-8">
           <button
             onClick={() => navigate('/')}
-            className="text-blue-600 hover:text-blue-700 mb-4 flex items-center gap-2"
+            className="mb-4 flex items-center gap-2 font-medium px-4 py-2 rounded-lg bg-secondary text-white hover:bg-orange-500 transition-colors shadow-md"
           >
             ← Back to Home
           </button>
-          <h1 className="text-3xl font-bold text-gray-900">My Appointments</h1>
-          <p className="text-gray-600 mt-2">View and manage your appointment bookings</p>
+          <h1 className="display-md text-accent-cream mb-2">My Appointments</h1>
+          <p className="text-white">View and manage your appointment bookings</p>
         </div>
 
         {/* Filter Tabs */}
-        <div className="bg-white rounded-lg shadow-sm p-4 mb-6">
+        <div className="bg-white rounded-lg shadow-md p-4 mb-6 border border-gray-300">
           <div className="flex flex-wrap gap-2">
             <button
               onClick={() => setStatusFilter('all')}
-              className={`px-4 py-2 rounded-lg transition-colors ${
+              className={`px-4 py-2 rounded-lg transition-all font-medium ${
                 statusFilter === 'all'
-                  ? 'bg-blue-600 text-white'
-                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                  ? 'bg-secondary text-white shadow-lg'
+                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200 border border-gray-300'
               }`}
             >
               All Appointments
             </button>
             <button
               onClick={() => setStatusFilter('pending')}
-              className={`px-4 py-2 rounded-lg transition-colors ${
+              className={`px-4 py-2 rounded-lg transition-all font-medium ${
                 statusFilter === 'pending'
-                  ? 'bg-yellow-600 text-white'
-                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                  ? 'bg-yellow-500 text-white shadow-lg'
+                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200 border border-gray-300'
               }`}
             >
               Pending
             </button>
             <button
               onClick={() => setStatusFilter('confirmed')}
-              className={`px-4 py-2 rounded-lg transition-colors ${
+              className={`px-4 py-2 rounded-lg transition-all font-medium ${
                 statusFilter === 'confirmed'
-                  ? 'bg-blue-600 text-white'
-                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                  ? 'bg-secondary text-white shadow-lg'
+                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200 border border-gray-300'
               }`}
             >
               Confirmed
             </button>
             <button
               onClick={() => setStatusFilter('completed')}
-              className={`px-4 py-2 rounded-lg transition-colors ${
+              className={`px-4 py-2 rounded-lg transition-all font-medium ${
                 statusFilter === 'completed'
-                  ? 'bg-green-600 text-white'
-                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                  ? 'bg-green-500 text-white shadow-lg'
+                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200 border border-gray-300'
               }`}
             >
               Completed
             </button>
             <button
               onClick={() => setStatusFilter('cancelled')}
-              className={`px-4 py-2 rounded-lg transition-colors ${
+              className={`px-4 py-2 rounded-lg transition-all font-medium ${
                 statusFilter === 'cancelled'
-                  ? 'bg-red-600 text-white'
-                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                  ? 'bg-red-500 text-white shadow-lg'
+                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200 border border-gray-300'
               }`}
             >
               Cancelled
@@ -195,43 +195,43 @@ export default function MyAppointmentsPage() {
 
         {loading ? (
           <div className="flex justify-center items-center h-64">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-secondary"></div>
           </div>
         ) : (
           <>
             {/* Upcoming Appointments */}
             {(statusFilter === 'all' || ['pending', 'confirmed'].includes(statusFilter)) && upcomingAppointments.length > 0 && (
               <div className="mb-8">
-                <h2 className="text-2xl font-bold text-gray-900 mb-4">Upcoming Appointments</h2>
+                <h2 className="heading-main text-accent-cream mb-4">Upcoming Appointments</h2>
                 <div className="space-y-4">
                   {upcomingAppointments.map((appointment) => (
-                    <div key={appointment.id} className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow">
+                    <div key={appointment.id} className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow border border-gray-300">
                       <div className="flex justify-between items-start mb-4">
                         <div>
-                          <h3 className="text-xl font-bold text-gray-900">{appointment.service_details?.service_name}</h3>
-                          <p className="text-sm text-gray-600 mt-1">{appointment.service_details?.description}</p>
+                          <h3 className="heading-card text-gray-900">{appointment.service_details?.service_name}</h3>
+                          <p className="text-sm text-gray-700 mt-1">{appointment.service_details?.description}</p>
                         </div>
                         {getStatusBadge(appointment.status)}
                       </div>
 
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                        <div className="flex items-center gap-2 text-gray-700">
-                          <FaCalendar className="text-blue-600" />
+                        <div className="flex items-center gap-2 text-gray-900">
+                          <FaCalendar className="text-gray-500" />
                           <span>{formatDate(appointment.appointment_date)}</span>
                         </div>
-                        <div className="flex items-center gap-2 text-gray-700">
-                          <FaClock className="text-blue-600" />
+                        <div className="flex items-center gap-2 text-gray-900">
+                          <FaClock className="text-gray-500" />
                           <span>{formatTime(appointment.start_time)} - {formatTime(appointment.end_time)}</span>
-                          <span className="text-sm text-gray-500">({formatDuration(appointment.duration_minutes)})</span>
+                          <span className="text-sm text-gray-600">({formatDuration(appointment.duration_minutes)})</span>
                         </div>
-                        <div className="flex items-center gap-2 text-gray-700">
-                          <FaMapMarkerAlt className="text-blue-600" />
+                        <div className="flex items-center gap-2 text-gray-900">
+                          <FaMapMarkerAlt className="text-gray-500" />
                           <span>{appointment.branch} Branch</span>
                         </div>
                       </div>
 
                       {appointment.pet_details && (
-                        <div className="border-t pt-4 mb-4">
+                        <div className="border-t border-gray-300 pt-4 mb-4">
                           <div className="flex items-center gap-3">
                             <PetAvatar imageUrl={appointment.pet_details.pet_picture} size="small" />
                             <div>
@@ -239,7 +239,7 @@ export default function MyAppointmentsPage() {
                                 <span className="font-medium text-gray-900">{appointment.pet_details.pet_name}</span>
                                 <GenderIcon gender={appointment.pet_details.gender} size={14} />
                               </div>
-                              <p className="text-sm text-gray-600">
+                              <p className="text-sm text-gray-700">
                                 {appointment.pet_details.breed} • {formatAge(appointment.pet_details.age_value, appointment.pet_details.age_unit)} • {appointment.pet_details.weight_lbs} lbs
                               </p>
                             </div>
@@ -248,8 +248,8 @@ export default function MyAppointmentsPage() {
                       )}
 
                       {appointment.notes && (
-                        <div className="bg-gray-50 rounded p-3 mb-4">
-                          <p className="text-sm text-gray-700">
+                        <div className="bg-gray-100 rounded p-3 mb-4 border border-gray-300">
+                          <p className="text-sm text-gray-900">
                             <span className="font-medium">Notes:</span> {appointment.notes}
                           </p>
                         </div>
@@ -259,7 +259,7 @@ export default function MyAppointmentsPage() {
                         <div className="flex justify-end">
                           <button
                             onClick={() => setConfirmDialog({ isOpen: true, appointmentId: appointment.id })}
-                            className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 flex items-center gap-2"
+                            className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg flex items-center gap-2 transition-colors font-medium"
                           >
                             <FaTimes />
                             Cancel Appointment
@@ -275,35 +275,35 @@ export default function MyAppointmentsPage() {
             {/* Past Appointments */}
             {(statusFilter === 'all' || ['completed', 'cancelled'].includes(statusFilter)) && pastAppointments.length > 0 && (
               <div>
-                <h2 className="text-2xl font-bold text-gray-900 mb-4">Past Appointments</h2>
+                <h2 className="heading-main text-accent-cream mb-4">Past Appointments</h2>
                 <div className="space-y-4">
                   {pastAppointments.map((appointment) => (
-                    <div key={appointment.id} className="bg-white rounded-lg shadow-md p-6 opacity-90">
+                    <div key={appointment.id} className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow border border-gray-300">
                       <div className="flex justify-between items-start mb-4">
                         <div>
-                          <h3 className="text-xl font-bold text-gray-900">{appointment.service_details?.service_name}</h3>
-                          <p className="text-sm text-gray-600 mt-1">{appointment.service_details?.description}</p>
+                          <h3 className="heading-card text-gray-900">{appointment.service_details?.service_name}</h3>
+                          <p className="text-sm text-gray-700 mt-1">{appointment.service_details?.description}</p>
                         </div>
                         {getStatusBadge(appointment.status)}
                       </div>
 
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div className="flex items-center gap-2 text-gray-700">
-                          <FaCalendar className="text-gray-400" />
+                        <div className="flex items-center gap-2 text-gray-900">
+                          <FaCalendar className="text-gray-500" />
                           <span>{formatDate(appointment.appointment_date)}</span>
                         </div>
-                        <div className="flex items-center gap-2 text-gray-700">
-                          <FaClock className="text-gray-400" />
+                        <div className="flex items-center gap-2 text-gray-900">
+                          <FaClock className="text-gray-500" />
                           <span>{formatTime(appointment.start_time)} - {formatTime(appointment.end_time)}</span>
                         </div>
-                        <div className="flex items-center gap-2 text-gray-700">
-                          <FaMapMarkerAlt className="text-gray-400" />
+                        <div className="flex items-center gap-2 text-gray-900">
+                          <FaMapMarkerAlt className="text-gray-500" />
                           <span>{appointment.branch} Branch</span>
                         </div>
                       </div>
 
                       {appointment.pet_details && (
-                        <div className="border-t pt-4 mt-4">
+                        <div className="border-t border-gray-300 pt-4 mt-4">
                           <div className="flex items-center gap-3">
                             <PetAvatar imageUrl={appointment.pet_details.pet_picture} size="small" />
                             <div>
@@ -311,7 +311,7 @@ export default function MyAppointmentsPage() {
                                 <span className="font-medium text-gray-900">{appointment.pet_details.pet_name}</span>
                                 <GenderIcon gender={appointment.pet_details.gender} size={14} />
                               </div>
-                              <p className="text-sm text-gray-600">
+                              <p className="text-sm text-gray-700">
                                 {appointment.pet_details.breed}
                               </p>
                             </div>
@@ -326,13 +326,13 @@ export default function MyAppointmentsPage() {
 
             {/* Empty State */}
             {appointments.length === 0 && !loading && (
-              <div className="bg-white rounded-lg shadow-md p-12 text-center">
+              <div className="bg-white rounded-lg shadow-md p-12 text-center border border-gray-300">
                 <FaCalendar className="mx-auto text-gray-400 mb-4" size={64} />
-                <h3 className="text-xl font-bold text-gray-900 mb-2">No Appointments Found</h3>
+                <h3 className="heading-card text-gray-900 mb-2">No Appointments Found</h3>
                 <p className="text-gray-600 mb-6">You haven't booked any appointments yet.</p>
                 <button
                   onClick={() => navigate('/appointment')}
-                  className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                  className="px-6 py-3 bg-secondary hover:bg-secondary-light text-white rounded-lg transition-colors font-medium"
                 >
                   Book an Appointment
                 </button>

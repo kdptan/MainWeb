@@ -1,7 +1,7 @@
 import { API_BASE_URL } from './api';
 
 const getAuthHeaders = () => {
-  const token = localStorage.getItem('access');
+  const token = localStorage.getItem('access') || sessionStorage.getItem('access');
   return {
     'Content-Type': 'application/json',
     ...(token ? { Authorization: `Bearer ${token}` } : {}),
@@ -95,12 +95,20 @@ export const appointmentService = {
     return await response.json();
   },
 
-  // Admin: Update appointment status
-  adminUpdateAppointmentStatus: async (appointmentId, status) => {
+  // Admin: Update appointment status and payment info
+  adminUpdateAppointmentStatus: async (appointmentId, status, paymentData = {}) => {
+    const body = { status };
+    if (paymentData.amount_paid !== undefined) {
+      body.amount_paid = paymentData.amount_paid;
+    }
+    if (paymentData.change !== undefined) {
+      body.change = paymentData.change;
+    }
+    
     const response = await fetch(`${API_BASE_URL}/appointments/admin/${appointmentId}/status/`, {
       method: 'PATCH',
       headers: getAuthHeaders(),
-      body: JSON.stringify({ status }),
+      body: JSON.stringify(body),
     });
     
     if (!response.ok) {

@@ -2,8 +2,17 @@ from django.db import models
 from django.contrib.auth.models import User
 from inventory.models import Product
 from services.models import Service
+import random
+import string
 
 # Create your models here.
+
+def generate_unique_order_id():
+    """Generate a unique 8-digit order ID"""
+    while True:
+        order_id = str(random.randint(10000000, 99999999))  # 8-digit random number
+        if not Order.objects.filter(order_id=order_id).exists():
+            return order_id
 
 class Order(models.Model):
     STATUS_CHOICES = [
@@ -18,10 +27,13 @@ class Order(models.Model):
         ('Toril', 'Toril'),
     ]
     
+    order_id = models.CharField(max_length=8, unique=True, db_index=True, null=True, blank=True)  # Unique 8-digit order ID
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='orders')
     branch = models.CharField(max_length=20, choices=BRANCH_CHOICES)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
     total_price = models.DecimalField(max_digits=10, decimal_places=2)
+    amount_paid = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    change = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     notes = models.TextField(blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     completed_at = models.DateTimeField(blank=True, null=True)
@@ -29,8 +41,18 @@ class Order(models.Model):
     class Meta:
         ordering = ['-created_at']
     
+    def save(self, *args, **kwargs):
+        # Generate unique 8-digit order ID if not already set
+        if not self.order_id:
+            while True:
+                order_id = str(random.randint(10000000, 99999999))  # 8-digit random number
+                if not Order.objects.filter(order_id=order_id).exists():
+                    self.order_id = order_id
+                    break
+        super().save(*args, **kwargs)
+    
     def __str__(self):
-        return f"Order #{self.id} - {self.user.username} - {self.status}"
+        return f"Order #{self.order_id} - {self.user.username} - {self.status}"
 
 
 class OrderItem(models.Model):

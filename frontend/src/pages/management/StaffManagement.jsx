@@ -40,7 +40,7 @@ export default function StaffManagement() {
 
   return (
     <div className="container mx-auto p-6 min-h-screen bg-accent-cream">
-      <h1 className="text-3xl font-bold text-primary-darker mb-6">Staff Management</h1>
+      <h1 className="heading-main text-primary-darker mb-6">Staff Management</h1>
 
       {loading ? (
         <div className="flex justify-center items-center h-64">
@@ -58,6 +58,9 @@ export default function StaffManagement() {
                   <th className="px-6 py-3 text-left text-xs font-medium text-primary-darker uppercase tracking-wider">
                     Email
                   </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-primary-darker uppercase tracking-wider">
+                    Branch
+                  </th>
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-primary">
@@ -65,6 +68,9 @@ export default function StaffManagement() {
                   <tr key={staff.id} className="hover:bg-accent-peach transition-colors">
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-primary-darker">
                       {staff.username}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-primary-darker">
+                      {staff.email}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-primary-darker">
                       <select

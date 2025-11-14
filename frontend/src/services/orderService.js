@@ -97,11 +97,11 @@ export const orderService = {
   },
 
   // Admin: Update order status (mark as completed/cancelled)
-  adminUpdateOrderStatus: async (orderId, status) => {
+  adminUpdateOrderStatus: async (orderId, status, paymentData = {}) => {
     const response = await fetch(`${API_BASE_URL}/orders/admin/${orderId}/status/`, {
       method: 'PATCH',
       headers: getAuthHeaders(),
-      body: JSON.stringify({ status }),
+      body: JSON.stringify({ status, ...paymentData }),
     });
     
     if (!response.ok) {

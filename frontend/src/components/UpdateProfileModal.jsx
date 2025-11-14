@@ -1,6 +1,7 @@
 import React, { useState, useRef } from 'react';
 import { useAuth } from '../hooks/useAuth';
 import placeholder from '../assets/placeholder-avatar.svg';
+import { FaPencilAlt } from 'react-icons/fa';
 
 export default function UpdateProfileModal({ onClose }) {
   const { user, updateProfile } = useAuth();
@@ -9,6 +10,35 @@ export default function UpdateProfileModal({ onClose }) {
   const fileRef = useRef();
   const [error, setError] = useState('');
   const [saving, setSaving] = useState(false);
+  const [editingUsername, setEditingUsername] = useState(false);
+  const [editingEmail, setEditingEmail] = useState(false);
+
+  // Format error messages into clean, formal text
+  const formatErrorMessage = (err) => {
+    if (!err) return '';
+    
+    if (err.errors && typeof err.errors === 'object') {
+      // Handle nested error object like {"new_password":["Ensure this field has at least 8 characters."]}
+      const messages = [];
+      for (const [field, fieldErrors] of Object.entries(err.errors)) {
+        if (Array.isArray(fieldErrors)) {
+          fieldErrors.forEach(msg => {
+            // Format field name (e.g., "new_password" -> "New Password")
+            const fieldLabel = field
+              .split('_')
+              .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+              .join(' ');
+            messages.push(`${fieldLabel}: ${msg}`);
+          });
+        } else {
+          messages.push(`${field}: ${fieldErrors}`);
+        }
+      }
+      return messages.join('\n');
+    }
+    
+    return err.detail || 'Update failed';
+  };
 
   function onChange(e) {
     const { name, value } = e.target;
@@ -39,7 +69,7 @@ export default function UpdateProfileModal({ onClose }) {
       }
       onClose();
     } catch (err) {
-      setError((err && err.errors) ? JSON.stringify(err.errors) : (err.detail || 'Update failed'));
+      setError(formatErrorMessage(err));
     } finally {
       setSaving(false);
     }
@@ -64,12 +94,58 @@ export default function UpdateProfileModal({ onClose }) {
             </div>
           </div>
           <div>
-            <label className="block text-sm text-gray-700">Username</label>
-            <input name="username" value={form.username} onChange={onChange} className="mt-1 block w-full rounded-md border-gray-300 break-words" />
+            <label className="block text-sm text-gray-700 mb-1">Username</label>
+            <div className="relative">
+              <input 
+                name="username" 
+                value={form.username} 
+                onChange={onChange} 
+                readOnly={!editingUsername}
+                className={`mt-1 block w-full rounded-md border-gray-300 pr-10 ${!editingUsername ? 'bg-gray-50 cursor-not-allowed' : ''}`}
+              />
+              <button
+                type="button"
+                onClick={() => setEditingUsername(!editingUsername)}
+                className={`absolute right-2 top-1/2 transform -translate-y-1/2 p-2 rounded-md transition-colors ${
+                  editingUsername 
+                    ? 'text-secondary hover:text-secondary-light bg-secondary/10' 
+                    : 'text-gray-400 hover:text-gray-600 hover:bg-gray-100'
+                }`}
+                title={editingUsername ? "Lock username" : "Edit username"}
+              >
+                <FaPencilAlt className="text-sm" />
+              </button>
+            </div>
+            {editingUsername && (
+              <p className="text-xs text-secondary mt-1">✏️ Username editing enabled</p>
+            )}
           </div>
           <div>
-            <label className="block text-sm text-gray-700">Email</label>
-            <input name="email" value={form.email} onChange={onChange} className="mt-1 block w-full rounded-md border-gray-300 break-words" />
+            <label className="block text-sm text-gray-700 mb-1">Email</label>
+            <div className="relative">
+              <input 
+                name="email" 
+                value={form.email} 
+                onChange={onChange}
+                readOnly={!editingEmail}
+                className={`mt-1 block w-full rounded-md border-gray-300 pr-10 ${!editingEmail ? 'bg-gray-50 cursor-not-allowed' : ''}`}
+              />
+              <button
+                type="button"
+                onClick={() => setEditingEmail(!editingEmail)}
+                className={`absolute right-2 top-1/2 transform -translate-y-1/2 p-2 rounded-md transition-colors ${
+                  editingEmail 
+                    ? 'text-secondary hover:text-secondary-light bg-secondary/10' 
+                    : 'text-gray-400 hover:text-gray-600 hover:bg-gray-100'
+                }`}
+                title={editingEmail ? "Lock email" : "Edit email"}
+              >
+                <FaPencilAlt className="text-sm" />
+              </button>
+            </div>
+            {editingEmail && (
+              <p className="text-xs text-secondary mt-1">✏️ Email editing enabled</p>
+            )}
           </div>
           <div>
             <label className="block text-sm text-gray-700">New password</label>
