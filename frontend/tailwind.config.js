@@ -8,10 +8,10 @@ module.exports = {
     extend: {
       fontFamily: {
         // Cute and clean fonts
-        'display': ['Poppins', 'sans-serif'],      // Main headings - Bold and modern
-        'heading': ['Quicksand', 'sans-serif'],     // Section headings - Soft and friendly
-        'body': ['Comfortaa', 'sans-serif'],        // Body text - Rounded and comfortable
-        'sans': ['Poppins', 'sans-serif'],          // Default fallback
+        'display': ['Montserrat', 'sans-serif'],      // Main headings - Bold and modern
+        'heading': ['Martel Sans', 'sans-serif'],     // Section headings - Soft and friendly
+        'body': ['Mallanna', 'sans-serif'],        // Body text - Rounded and comfortable
+        'sans': ['Martel Sans', 'sans-serif'],          // Default fallback
       },
       colors: {
         // Primary - Main background (from logo)
@@ -30,7 +30,7 @@ module.exports = {
         // Accent - Light tones (from logo)
         accent: {
           cream: '#fef0e8',      // Bridesmaid (lightest cream)
-          peach: '#e9c0a8',      // Zinnwaldite (peachy beige)
+          peach: '#D3A084',      // Zinnwaldite (peachy beige)
           tan: '#98745e',        // Beaver (medium tan)
           brown: '#81522c',      // Nutmeg (medium brown)
         },
@@ -44,6 +44,24 @@ module.exports = {
           sand: '#e9c0a8',       // Zinnwaldite
           mocha: '#98745e',      // Beaver
           coffee: '#81522c',     // Nutmeg
+        },
+        // Chonky Color Palette - Main System Colors
+        chonky: {
+          brown: '#542A10',      // chonkybrown - Deep dark brown
+          poop: '#7D4826',       // chonkypoop - Medium brown
+          khaki: '#96725B',       // chonkykhaki - Light brown/khaki
+          white: '#E9E4DA',
+          offwhite: '#DECBB1'      // chonkywhite - Off-white/cream
+        },
+        // Navigation & UI Colors
+        nav: {
+          orange: '#B37544',     // nav-orange - Navigation accent
+        },
+        footer: {
+          orange: '#D78D43',     // footer-orange - Footer accent
+        },
+        btn: {
+          yellow: '#FFC162',     // btn-yellow - Button highlight
         }
       },
     },

@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useParams, useNavigate } from 'react-router-dom';
 import logo from '../assets/ChonkyLogo.png';
-import { FaCheckCircle } from 'react-icons/fa';
+import { FaCheckCircle, FaArrowLeft } from 'react-icons/fa';
 
 export default function RegisterPage() {
+  const navigate = useNavigate();
   const params = useParams();
   const [role, setRole] = useState('user');
   const [form, setForm] = useState({ username: '', email: '', password: '', confirmPassword: '' });
@@ -85,6 +86,15 @@ export default function RegisterPage() {
   return (
     <div className="min-h-[80vh] flex items-center justify-center px-4 py-8 bg-primary-darker">
       <div className="w-full max-w-md bg-accent-cream shadow-2xl rounded-xl p-8 text-center border-4 border-secondary">
+        {/* Back Button - Top of card */}
+        <button
+          onClick={() => navigate('/home')}
+          className="flex items-center gap-2 text-sm text-primary-dark hover:text-secondary transition-colors mb-4 group"
+        >
+          <FaArrowLeft className="group-hover:-translate-x-1 transition-transform" />
+          <span className="font-medium">Back to Home</span>
+        </button>
+
         {/* Logo */}
         <div className="flex justify-center mb-6">
           <img src={logo} alt="Chonky Boi Logo" className="h-24 w-auto" />

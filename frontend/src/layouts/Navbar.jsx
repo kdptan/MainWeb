@@ -67,7 +67,7 @@ export default function Navbar() {
   if (path === '/signin' || path === '/forgot-password' || path.startsWith('/register') || path.startsWith('/reset-password') || path.startsWith('/verify-email')) return null;
 
   return (
-    <nav className="bg-accent-cream shadow-lg border-b-4 border-secondary">
+    <nav className="navbar bg-chonky-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16 items-center">
           {/* Left: Logo */}
@@ -75,8 +75,7 @@ export default function Navbar() {
             <Link to="/" className="flex items-center space-x-3">
               <img src={logo} alt="Chonky Boi Logo" className="h-12 w-auto" />
               <div className="flex flex-col items-center leading-tight">
-                <span className="font-display font-bold text-xl text-primary-darker" style={{fontFamily: 'Poppins, sans-serif', letterSpacing: '-0.02em'}}>Chonky Boi Pet Store</span>
-                <span className="font-display font-semibold text-sm text-primary-darker" style={{fontFamily: 'Poppins, sans-serif', letterSpacing: '-0.01em'}}>& Grooming Salon</span>
+                <span className="font-display font-bold text-xl text-chonky-brown" style={{fontFamily: 'Martel Sans, sans-serif', letterSpacing: '-0.02em'}}>Chonky Boi</span>
               </div>
             </Link>
           </div>
@@ -87,7 +86,7 @@ export default function Navbar() {
               <Link 
                 to="/home" 
                 className={`btn btn-nav transition-all duration-200 ${
-                  path === '/home' || path === '/' ? 'bg-secondary text-accent-cream shadow-md scale-105' : 'text-primary-darker hover:bg-accent-peach'
+                  path === '/home' || path === '/' ? 'bg-secondary shadow-md scale-105' : ''
                 }`}
               >
                 Home
@@ -95,7 +94,7 @@ export default function Navbar() {
               <Link 
                 to="/services" 
                 className={`btn btn-nav transition-all duration-200 ${
-                  path === '/services' ? 'bg-secondary text-accent-cream shadow-md scale-105' : 'text-primary-darker hover:bg-accent-peach'
+                  path === '/services' ? 'bg-secondary shadow-md scale-105' : ''
                 }`}
               >
                 Services
@@ -103,7 +102,7 @@ export default function Navbar() {
               <Link 
                 to="/products" 
                 className={`btn btn-nav transition-all duration-200 ${
-                  path === '/products' ? 'bg-secondary text-accent-cream shadow-md scale-105' : 'text-primary-darker hover:bg-accent-peach'
+                  path === '/products' ? 'bg-secondary shadow-md scale-105' : ''
                 }`}
               >
                 Products
@@ -111,7 +110,7 @@ export default function Navbar() {
               <Link 
                 to="/appointment" 
                 className={`btn btn-nav transition-all duration-200 ${
-                  path === '/appointment' || path.startsWith('/admin/appointments') || path.startsWith('/my-appointments') ? 'bg-secondary text-accent-cream shadow-md scale-105' : 'text-primary-darker hover:bg-accent-peach'
+                  path === '/appointment' || path.startsWith('/admin/appointments') || path.startsWith('/my-appointments') ? 'bg-secondary shadow-md scale-105' : ''
                 }`}
               >
                 Appointment
@@ -124,7 +123,7 @@ export default function Navbar() {
               {!user && (
                 <>
                   <Link to="/register/user" className="text-sm text-primary-darker hover:text-secondary transition-colors">Sign up</Link>
-                  <Link to="/signin" className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-accent-cream bg-secondary hover:bg-secondary-light transition-colors">Sign in</Link>
+                  <Link to="/signin" className="btn-signin">Sign in</Link>
                 </>
               )}
 

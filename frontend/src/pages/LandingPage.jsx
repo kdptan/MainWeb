@@ -1,106 +1,157 @@
 import React from 'react';
-import dog from '../assets/dog.svg';
-import cat from '../assets/cat.svg';
-import parrot from '../assets/parrot.svg';
+import dog1 from '../assets/DOG1.png';
+import dog2 from '../assets/DOG2.png';
+import dog3 from '../assets/DOG3.png';
+import shop1 from '../assets/home_shop.png';
+import services1 from '../assets/home_services.png';
 import DecorativeBackground from '../components/DecorativeBackground';
 
 export default function LandingPage() {
   return (
     <DecorativeBackground variant="default">
-      <div className="bg-primary-darker">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Hero Section */}
-        <section className="py-16 text-center bg-primary-dark rounded-xl shadow-2xl my-8 border-2 border-primary">
-          <h1 className="display-lg text-accent-cream mb-4">
-            Welcome to ChonkyWeb Petstore
-          </h1>
-          <p className="mt-4 text-body-lg text-accent-cream max-w-3xl mx-auto leading-relaxed">
-            Your trusted partner for premium pet supplies. Find toys, food, grooming essentials, 
-            and everything your furry, feathered, or scaly friends need to thrive.
-          </p>
-          <div className="mt-10 flex justify-center gap-4 flex-wrap">
-            <a 
-              href="/products" 
-              className="inline-flex items-center px-8 py-4 text-lg font-semibold rounded-lg bg-secondary text-accent-cream hover:bg-secondary-light transition-colors duration-200 shadow-lg"
-            >
-              Shop Products
-            </a>
-            <a 
-              href="/services" 
-              className="inline-flex items-center px-8 py-4 text-lg font-semibold rounded-lg bg-secondary text-accent-cream hover:bg-secondary-light transition-colors duration-200 shadow-lg"
-            >
-              Explore Services
-            </a>
+      <div className="bg-chonky-white min-h-screen">
+        {/* Hero Section - Full Width */}
+        <section className="bg-chonky-brown pt-16 pb-0">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+              {/* Left Side: Title and Tagline */}
+              <div className="text-left">
+                <h1 className="hero-title mb-4">
+                  Chonky Boi Pet Store and Grooming Salon
+                </h1>
+                <p className="text-body-lg text-accent-cream leading-relaxed mb-6">
+                  Your FURiendly neighborhood Pet Store and Grooming Salon!
+                </p>
+                <div className="flex flex-col sm:flex-row gap-4">
+                  <a 
+                    href="/products" 
+                    className="inline-flex items-center justify-center px-8 py-4 text-lg font-semibold rounded-3xl bg-secondary text-chonky-white hover:bg-btn-yellow hover:text-chonky-brown transition-colors duration-200 shadow-lg"
+                  >
+                    Shop Products
+                  </a>
+                  <a 
+                    href="/services" 
+                    className="inline-flex items-center justify-center px-8 py-4 text-lg font-semibold rounded-3xl bg-secondary text-chonky-white hover:bg-btn-yellow hover:text-chonky-brown transition-colors duration-200 shadow-lg"
+                  >
+                    Explore Services
+                  </a>
+                </div>
+              </div>
+              
+              {/* Center: Dog Image */}
+              <div className="flex justify-center items-center">
+                <img 
+                  src={dog1} 
+                  alt="Happy Golden Retriever" 
+                  className="max-w-full h-auto object-contain"
+                />
+              </div>
+            </div>
           </div>
         </section>
 
         {/* Featured Categories */}
-        <section className="py-12">
-          <h2 className="display-md text-accent-cream text-center mb-10">
-            Featured Categories
-          </h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8">
-            {/* Dog Supplies Card */}
-            <article className="bg-primary-dark rounded-xl shadow-xl overflow-hidden transform hover:scale-105 transition-transform duration-200 border-2 border-primary">
-              <div className="bg-accent-brown p-6">
-                <img src={dog} alt="Dog Supplies" className="w-full h-48 object-contain filter drop-shadow-lg" />
-              </div>
-              <div className="p-6">
-                <h3 className="heading-card text-accent-cream mb-3">Dog Supplies</h3>
-                <p className="text-body text-accent-cream mb-6">
-                  Premium food, durable toys, grooming tools, and comfortable accessories for dogs of all breeds and sizes.
-                </p>
-                <a 
-                  href="/products?category=dog" 
-                  className="inline-block px-6 py-3 bg-secondary hover:bg-secondary-light text-accent-cream font-medium rounded-lg transition-colors duration-200 shadow-md"
-                >
-                  Explore Dog Items
-                </a>
-              </div>
-            </article>
+        <section className="py-12 bg-chonky-khaki">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+            {/* Home Card */}
+            <div>
+              <h3 className="text-chonky-brown font-heading font-extrabold text-3xl mb-4 text-center">Home</h3>
+              <article className="bg-chonky-white rounded-t-3xl rounded-b-xl shadow-xl overflow-hidden transform hover:scale-105 transition-transform duration-200">
+                <div className="bg-chonky-brown h-48 overflow-hidden">
+                  <img src={dog2} alt="Home" className="w-full h-full object-cover" />
+                </div>
+                <div className="p-6 bg-chonky-white">
+                  <p className="text-body text-chonky-brown mb-4 text-center">
+                    Lorem ipsum dolor sit amet, consectetur adipiscing elit,
+                  </p>
+                  <div className="flex justify-center">
+                    <a 
+                      href="/home" 
+                      className="inline-block px-6 py-3 bg-chonky-brown hover:bg-chonky-poop text-chonky-white font-bold rounded-3xl transition-colors duration-200 border-chonky-brown"
+                    >
+                      Back to Top
+                    </a>
+                  </div>
+                </div>
+              </article>
+            </div>
 
-            {/* Cat Corner Card */}
-            <article className="bg-primary-dark rounded-xl shadow-xl overflow-hidden transform hover:scale-105 transition-transform duration-200 border-2 border-primary">
-              <div className="bg-accent-peach p-6">
-                <img src={cat} alt="Cat Corner" className="w-full h-48 object-contain filter drop-shadow-lg" />
-              </div>
-              <div className="p-6">
-                <h3 className="heading-card text-accent-cream mb-3">Cat Corner</h3>
-                <p className="text-body text-accent-cream mb-6">
-                  Comfort items, interactive toys, scratching posts, and nutritious treats curated for your feline companions.
-                </p>
-                <a 
-                  href="/products?category=cat" 
-                  className="inline-block px-6 py-3 bg-secondary hover:bg-secondary-light text-accent-cream font-medium rounded-lg transition-colors duration-200 shadow-md"
-                >
-                  Explore Cat Items
-                </a>
-              </div>
-            </article>
+            {/* Shop Card */}
+            <div>
+              <h3 className="text-chonky-brown font-heading font-extrabold text-3xl mb-4 text-center">Shop</h3>
+              <article className="bg-chonky-white rounded-t-3xl rounded-b-xl shadow-xl overflow-hidden transform hover:scale-105 transition-transform duration-200">
+                <div className="bg-accent-peach h-48 overflow-hidden">
+                  <img src={shop1} alt="Shop" className="w-full h-full object-cover" />
+                </div>
+                <div className="p-6 bg-chonky-white">
+                  <p className="text-body text-chonky-brown mb-4 text-center">
+                    Lorem ipsum dolor sit amet, consectetur adipiscing elit,
+                  </p>
+                  <div className="flex justify-center">
+                    <a 
+                      href="/products" 
+                      className="inline-block px-6 py-3 bg-accent-peach hover:bg-accent-tan text-chonky-white font-bold rounded-3xl transition-colors duration-200 border-chonky-brown"
+                    >
+                      Shop Now
+                    </a>
+                  </div>
+                </div>
+              </article>
+            </div>
 
-            {/* Bird Care Card */}
-            <article className="bg-primary-dark rounded-xl shadow-xl overflow-hidden transform hover:scale-105 transition-transform duration-200 border-2 border-primary">
-              <div className="bg-secondary-light p-6">
-                <img src={parrot} alt="Bird Care" className="w-full h-48 object-contain filter drop-shadow-lg" />
-              </div>
-              <div className="p-6">
-                <h3 className="heading-card text-accent-cream mb-3">Bird Care</h3>
-                <p className="text-body text-accent-cream mb-6">
-                  Nutritional seeds, engaging toys, comfortable perches, and cage accessories for parrots, canaries, and more.
-                </p>
-                <a 
-                  href="/products?category=bird" 
-                  className="inline-block px-6 py-3 bg-secondary hover:bg-secondary-light text-accent-cream font-medium rounded-lg transition-colors duration-200 shadow-md"
-                >
-                  Explore Bird Items
-                </a>
-              </div>
-            </article>
+            {/* Services Card */}
+            <div>
+              <h3 className="text-chonky-brown font-heading font-extrabold text-3xl mb-4 text-center">Services</h3>
+              <article className="bg-chonky-white rounded-t-3xl rounded-b-xl shadow-xl overflow-hidden transform hover:scale-105 transition-transform duration-200">
+                <div className="bg-btn-yellow h-48 overflow-hidden">
+                  <img src={services1} alt="Services" className="w-full h-full object-cover" />
+                </div>
+                <div className="p-6 bg-chonky-white">
+                  <p className="text-body text-chonky-brown mb-4 text-center">
+                    Lorem ipsum dolor sit amet, consectetur adipiscing elit,
+                  </p>
+                  <div className="flex justify-center">
+                    <a 
+                      href="/services" 
+                      className="inline-block px-6 py-3 bg-nav-orange hover:bg-chonky-poop text-chonky-white font-bold rounded-3xl transition-colors duration-200 border-chonky-brown"
+                    >
+                      View Deals
+                    </a>
+                  </div>
+                </div>
+              </article>
+            </div>
+
+            {/* About Us Card */}
+            <div>
+              <h3 className="text-chonky-brown font-heading font-extrabold text-3xl mb-4 text-center">About Us</h3>
+              <article className="bg-chonky-white rounded-t-3xl rounded-b-xl shadow-xl overflow-hidden transform hover:scale-105 transition-transform duration-200">
+                <div className="bg-chonky-poop h-48 overflow-hidden">
+                  <img src={dog3} alt="About Us" className="w-full h-full object-cover" />
+                </div>
+                <div className="p-6 bg-chonky-white">
+                  <p className="text-body text-chonky-brown mb-4 text-center">
+                    Lorem ipsum dolor sit amet, consectetur adipiscing elit,
+                  </p>
+                  <div className="flex justify-center">
+                    <a 
+                      href="/about" 
+                      className="inline-block px-6 py-3 bg-chonky-poop hover:bg-chonky-brown text-chonky-white font-bold rounded-3xl transition-colors duration-200 border-chonky-brown"
+                    >
+                      Learn More
+                    </a>
+                  </div>
+                </div>
+              </article>
+            </div>
+          </div>
           </div>
         </section>
 
         {/* Why Choose Us */}
-        <section className="py-12 bg-primary-dark rounded-xl shadow-2xl my-8 border-2 border-primary">
+        <section className="py-12 bg-chonky-khaki">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <h2 className="display-md text-accent-cream text-center mb-10">
             Why Choose ChonkyWeb?
           </h2>
@@ -127,9 +178,9 @@ export default function LandingPage() {
               </p>
             </div>
           </div>
+          </div>
         </section>
       </div>
-    </div>
     </DecorativeBackground>
   );
 }

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import './App.css';
 import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import Navbar from './layouts/Navbar';
+import Footer from './layouts/Footer';
 import PageTransition from './components/PageTransition';
 import ProtectedRoute from './components/ProtectedRoute';
 import FloatingActionButtons from './components/FloatingActionButtons';
@@ -185,6 +186,7 @@ function AppContent() {
           showCart={true}
         />
       )}
+      <Footer />
     </div>
   );
 }

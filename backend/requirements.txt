@@ -10,7 +10,7 @@ PyJWT
 python-decouple==3.8
 
 # File Handling & Image Processing
-Pillow==10.1.0
+Pillow==12.0.0
 
 # Email
 django-anymail==10.0
