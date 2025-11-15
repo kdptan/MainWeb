@@ -24,12 +24,26 @@ function SelectProductsModal({ isOpen, onClose, onProceed, token, embedded = fal
     }
   }, [token]);
 
+  const modalRef = React.useRef(null);
+
   useEffect(() => {
     if (isOpen) {
       fetchAllProducts();
       setError('');
     }
   }, [isOpen, fetchAllProducts]);
+
+  useEffect(() => {
+    if (!isOpen) return;
+    const handler = (e) => {
+      if (!modalRef.current) return;
+      if (!modalRef.current.contains(e.target)) {
+        onClose();
+      }
+    };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, [isOpen, onClose]);
 
   const toggleProductForRestock = (product) => {
     const newSelected = new Set(selectedProductsForRestock);
@@ -167,8 +181,8 @@ function SelectProductsModal({ isOpen, onClose, onProceed, token, embedded = fal
   if (!isOpen) return null;
 
   return embedded ? renderModalContent() : (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="w-[90vw] max-w-5xl max-h-[90vh]">
+    <div className="fixed inset-0 bg-black bg-opacity-50 z-40 pointer-events-none flex items-center justify-center">
+      <div ref={modalRef} className="w-[90vw] max-w-5xl max-h-[90vh] pointer-events-auto">
         {renderModalContent()}
       </div>
     </div>
@@ -184,15 +198,10 @@ export default function BatchRestockingModal({ isOpen, onClose, products, token,
   useEffect(() => {
     if (isOpen) {
       setSelectModalOpen(true);
-      document.body.style.overflow = 'hidden';
     } else {
       setSelectModalOpen(false);
       setSelectedProducts([]);
-      document.body.style.overflow = 'unset';
     }
-    return () => {
-      document.body.style.overflow = 'unset';
-    };
   }, [isOpen]);
 
   const handleProceedToConfirm = (products) => {
@@ -250,6 +259,19 @@ function StockAdjustmentModal({ isOpen, onClose, selectedProducts, token, onAdju
   const currentProduct = selectedProducts[currentIndex];
   const isFirstProduct = currentIndex === 0;
   const isLastProduct = currentIndex === selectedProducts.length - 1;
+  const modalRef = React.useRef(null);
+
+  useEffect(() => {
+    if (!isOpen) return;
+    const handler = (e) => {
+      if (!modalRef.current) return;
+      if (!modalRef.current.contains(e.target)) {
+        onClose();
+      }
+    };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, [isOpen, onClose]);
 
   const handleApplyAdjustment = async () => {
     if (!quantity || quantity === '0') {
@@ -329,8 +351,8 @@ function StockAdjustmentModal({ isOpen, onClose, selectedProducts, token, onAdju
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-start justify-center z-50 pt-4">
-      <div className="bg-white rounded-lg shadow-2xl w-[90vw] max-w-lg max-h-[80vh] flex flex-col">
+    <div className="fixed inset-0 bg-black bg-opacity-50 z-40 pointer-events-none flex items-start justify-center pt-4">
+      <div ref={modalRef} className="bg-white rounded-lg shadow-2xl w-[90vw] max-w-lg max-h-[80vh] flex flex-col pointer-events-auto">
         {/* Header */}
         <div className="bg-gradient-to-r from-amber-600 to-amber-700 text-white p-4 flex justify-between items-center flex-shrink-0">
           <div className="flex items-center gap-3">

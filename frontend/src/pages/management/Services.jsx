@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { FaEye, FaEdit, FaTrash, FaPlus, FaMinus } from 'react-icons/fa';
 import { useToast } from '../../hooks/useToast';
 import { fetchWithAuth } from '../../services/api';
@@ -44,17 +44,21 @@ export default function Services() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Disable scrolling when any modal is open
-  useEffect(() => {
-    if (showViewModal || showEditModal || showSoloModal) {
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = 'unset';
-    }
+  const modalRef = useRef(null);
 
-    return () => {
-      document.body.style.overflow = 'unset';
+  // Close modals when clicking outside — keep body scrollable
+  useEffect(() => {
+    if (!(showViewModal || showEditModal || showSoloModal)) return;
+    const handler = (e) => {
+      if (!modalRef.current) return;
+      if (!modalRef.current.contains(e.target)) {
+        setShowViewModal(false);
+        setShowEditModal(false);
+        setShowSoloModal(false);
+      }
     };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
   }, [showViewModal, showEditModal, showSoloModal]);
 
   const formatDuration = (minutes) => {
@@ -679,8 +683,8 @@ export default function Services() {
 
       {/* View Modal */}
       {showViewModal && selectedService && (
-        <div className="fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <div className="bg-accent-cream rounded-lg shadow-2xl w-full max-w-7xl h-fit">
+        <div className="fixed inset-0 bg-gray-800 bg-opacity-50 z-40 pointer-events-none flex items-center justify-center p-4">
+          <div ref={modalRef} className="bg-accent-cream rounded-lg shadow-2xl w-full max-w-7xl h-fit pointer-events-auto">
             {/* Header with primary color */}
             <div className="bg-gradient-to-r from-primary-darker to-primary-dark p-5 text-accent-cream rounded-t-lg">
               <h2 className="heading-main">{selectedService.service_name}</h2>
@@ -795,8 +799,8 @@ export default function Services() {
 
       {/* Edit Modal */}
       {showEditModal && editForm && (
-        <div className="fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center p-4">
-          <div className="bg-white p-6 rounded shadow-lg w-full max-w-lg">
+        <div className="fixed inset-0 bg-gray-800 bg-opacity-50 z-40 pointer-events-none flex items-center justify-center p-4">
+          <div ref={modalRef} className="bg-white p-6 rounded shadow-lg w-full max-w-lg pointer-events-auto">
             <h2 className="text-lg font-semibold mb-4">Edit Service</h2>
             <div className="grid grid-cols-1 gap-3">
               <div>
@@ -995,8 +999,8 @@ export default function Services() {
       
       {/* Solo Service Modal */}
       {showSoloModal && (
-        <div className="fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-lg shadow-2xl w-full max-w-md">
+        <div className="fixed inset-0 bg-gray-800 bg-opacity-50 z-40 pointer-events-none flex items-center justify-center p-4">
+          <div ref={modalRef} className="bg-white rounded-lg shadow-2xl w-full max-w-md pointer-events-auto">
             {/* Header */}
             <div className="bg-gradient-to-r from-green-600 to-green-700 p-4 text-white rounded-t-lg">
               <h2 className="text-lg font-bold">Add Solo Service</h2>

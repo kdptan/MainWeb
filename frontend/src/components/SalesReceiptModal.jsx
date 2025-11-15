@@ -5,10 +5,11 @@ import AppointmentReceipt from './AppointmentReceipt';
 
 export default function SalesReceiptModal({ isOpen, onClose, receiptData }) {
   const receiptRef = useRef(null);
+  const modalRef = useRef(null);
 
   useEffect(() => {
     if (isOpen) {
-      document.body.style.overflow = 'hidden';
+      // Don't hide overflow - let page scroll
     } else {
       document.body.style.overflow = 'unset';
     }
@@ -16,6 +17,19 @@ export default function SalesReceiptModal({ isOpen, onClose, receiptData }) {
       document.body.style.overflow = 'unset';
     };
   }, [isOpen]);
+
+  useEffect(() => {
+    if (!isOpen) return;
+    const handler = (e) => {
+      if (!modalRef.current) return;
+      if (!modalRef.current.contains(e.target)) {
+        onClose();
+      }
+    };
+
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, [isOpen, onClose]);
 
   if (!isOpen || !receiptData) return null;
 
@@ -27,6 +41,7 @@ export default function SalesReceiptModal({ isOpen, onClose, receiptData }) {
       printWindow.print();
     }
   };
+
 
   // Determine the receipt title based on type
   const getReceiptTitle = () => {
@@ -168,49 +183,59 @@ export default function SalesReceiptModal({ isOpen, onClose, receiptData }) {
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-lg shadow-2xl max-w-xs w-full max-h-[80vh] overflow-hidden flex flex-col">
-        <div className="sticky top-0 bg-white border-b p-2 flex justify-between items-center flex-shrink-0">
-          <h2 className="text-sm font-bold text-gray-900">{getReceiptTitle()}</h2>
-          <div className="flex gap-2">
-            <button
-              onClick={handlePrint}
-              className="flex items-center gap-1 px-2 py-1 text-xs bg-secondary text-white rounded hover:bg-orange-500 transition-colors"
-            >
-              <FaPrint size={14} /> Print
-            </button>
+    <>
+      {/* Black Overlay - fixed to viewport, doesn't scroll with page */}
+      <div className="fixed inset-0 bg-black bg-opacity-70 z-40 pointer-events-none" />
+
+      {/* Receipt Modal - fixed to viewport center, doesn't scroll with page */}
+      <div
+        ref={modalRef}
+        className="fixed z-50 left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-xs p-4"
+        style={{ maxHeight: '90vh' }}
+      >
+        <div className="bg-white rounded-lg shadow-2xl overflow-hidden flex flex-col h-full min-h-0">
+          <div className="sticky top-0 bg-white border-b p-3 flex justify-between items-center flex-shrink-0 z-10">
+            <h2 className="text-sm font-bold text-gray-900">{getReceiptTitle()}</h2>
+            <div className="flex gap-2">
+              <button
+                onClick={handlePrint}
+                className="flex items-center gap-1 px-2 py-1 text-xs bg-secondary text-white rounded hover:bg-orange-500 transition-colors"
+              >
+                <FaPrint size={14} /> Print
+              </button>
+              <button
+                onClick={onClose}
+                className="text-gray-400 hover:text-gray-600 transition-colors"
+              >
+                <FaTimes size={20} />
+              </button>
+            </div>
+          </div>
+
+          <div ref={receiptRef} className="overflow-y-auto flex-1">
+            {receiptData.type === 'sale' && (
+              <TransactionReceipt transaction={formatSaleForReceipt(receiptData.data)} />
+            )}
+            
+            {receiptData.type === 'order' && (
+              <TransactionReceipt transaction={formatOrderForReceipt(receiptData.data)} />
+            )}
+            
+            {receiptData.type === 'appointment' && (
+              <AppointmentReceipt appointment={formatAppointmentForReceipt(receiptData.data)} />
+            )}
+          </div>
+
+          <div className="border-t p-3 flex justify-end gap-2 flex-shrink-0 bg-white">
             <button
               onClick={onClose}
-              className="text-gray-400 hover:text-gray-600"
+              className="px-4 py-2 text-sm bg-gray-200 text-gray-700 rounded hover:bg-gray-300 transition-colors font-medium"
             >
-              <FaTimes size={18} />
+              Close
             </button>
           </div>
         </div>
-
-        <div ref={receiptRef} className="overflow-auto flex-1">
-          {receiptData.type === 'sale' && (
-            <TransactionReceipt transaction={formatSaleForReceipt(receiptData.data)} />
-          )}
-          
-          {receiptData.type === 'order' && (
-            <TransactionReceipt transaction={formatOrderForReceipt(receiptData.data)} />
-          )}
-          
-          {receiptData.type === 'appointment' && (
-            <AppointmentReceipt appointment={formatAppointmentForReceipt(receiptData.data)} />
-          )}
-        </div>
-
-        <div className="border-t p-2 flex justify-end gap-1 flex-shrink-0">
-          <button
-            onClick={onClose}
-            className="px-2 py-1 text-xs bg-gray-200 text-gray-700 rounded hover:bg-gray-300 transition-colors"
-          >
-            Close
-          </button>
-        </div>
       </div>
-    </div>
+    </>
   );
 }

@@ -84,15 +84,32 @@ export default function AdminOrdersPage() {
   };
 
   const handleViewReceipt = (orderId) => {
-    // Get transaction data from localStorage
-    const transactions = JSON.parse(localStorage.getItem('orderTransactions') || '{}');
-    const transaction = transactions[orderId];
+    // Find the order from the orders list
+    const order = orders.find(o => o.id === orderId);
     
-    if (transaction) {
+    if (order) {
+      // Format order data as a transaction object for ReceiptModal
+      const transaction = {
+        referenceNumber: formatOrderId(order.order_id || order.id),
+        orderId: order.id,
+        customerName: `${order.user.first_name} ${order.user.last_name}`,
+        paymentDate: order.completed_at || order.created_at,
+        paymentTime: new Date(order.completed_at || order.created_at).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }),
+        branch: order.branch,
+        paymentMethod: 'Online Order',
+        items: order.items || [],
+        subtotal: parseFloat(order.total_price) || 0,
+        tax: 0,
+        total: parseFloat(order.total_price) || 0,
+        amountPaid: parseFloat(order.amount_paid) || parseFloat(order.total_price) || 0,
+        change: parseFloat(order.change) || 0,
+        status: order.status,
+      };
+      
       setSelectedReceipt(transaction);
       setReceiptModalOpen(true);
     } else {
-      toast.showToast('No receipt found for this order', 'error');
+      toast.showToast('Order not found', 'error');
     }
   };
 

@@ -4,6 +4,7 @@ import { FaShoppingCart, FaPlus, FaMinus, FaCheckCircle, FaBox, FaClock, FaTrash
 import { useAuth } from '../hooks/useAuth';
 import { useToast } from '../hooks/useToast';
 import Toast from '../components/Toast';
+import SalesReceiptModal from '../components/SalesReceiptModal';
 
 const API_BASE_URL = 'http://127.0.0.1:8000/api';
 
@@ -221,17 +222,7 @@ export default function SalesPage() {
     }
   }, [salesHistory]);
 
-  // Disable body scroll when receipt modal is open
-  useEffect(() => {
-    if (receiptModalOpen) {
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = 'unset';
-    }
-    return () => {
-      document.body.style.overflow = 'unset';
-    };
-  }, [receiptModalOpen]);
+  // Receipt modal is implemented to not block body scroll; no body overflow changes needed
 
   // Handler for filter changes
   const handleHistoryFilterChange = (date, branch) => {
@@ -448,74 +439,6 @@ export default function SalesPage() {
     } finally {
       setSubmitting(false);
     }
-  };
-
-  const printReceipt = (sale) => {
-    const receiptWindow = window.open('', '', 'height=600,width=400');
-    receiptWindow.document.write(`
-      <!DOCTYPE html>
-      <html>
-      <head>
-        <style>
-          body { font-family: monospace; margin: 0; padding: 10px; font-size: 12px; }
-          .header { text-align: center; border-bottom: 1px solid #000; padding-bottom: 10px; font-weight: bold; }
-          .content { margin: 10px 0; }
-          .item { display: flex; justify-content: space-between; padding: 5px 0; }
-          .footer { border-top: 1px solid #000; padding-top: 10px; text-align: center; }
-          .total { font-size: 14px; font-weight: bold; }
-        </style>
-      </head>
-      <body>
-        <div class="header">CHONKY'S PET SALON</div>
-        <div class="content">
-          <div>Sale #: ${sale.sale_number}</div>
-          <div>Date: ${new Date(sale.sale_date).toLocaleString()}</div>
-          <div>Customer: ${sale.customer_name}</div>
-          <div>Branch: ${sale.branch}</div>
-        </div>
-        <div style="border-bottom: 1px solid #000; padding: 10px 0;">
-          ${sale.items.map(item => `
-            <div class="item">
-              <span>${item.item_name} x${item.quantity}</span>
-              <span>₱${parseFloat(item.subtotal).toFixed(2)}</span>
-            </div>
-          `).join('')}
-        </div>
-        <div class="footer">
-          <div class="item">
-            <span>Subtotal:</span>
-            <span>₱${parseFloat(sale.subtotal).toFixed(2)}</span>
-          </div>
-          <div class="item">
-            <span>Discount:</span>
-            <span>-₱${parseFloat(sale.discount).toFixed(2)}</span>
-          </div>
-          <div class="item">
-            <span>Tax (12%):</span>
-            <span>₱${parseFloat(sale.tax).toFixed(2)}</span>
-          </div>
-          <div class="item total">
-            <span>Total:</span>
-            <span>₱${parseFloat(sale.total).toFixed(2)}</span>
-          </div>
-          <div class="item">
-            <span>Amount Paid:</span>
-            <span>₱${parseFloat(sale.amount_paid).toFixed(2)}</span>
-          </div>
-          <div class="item">
-            <span>Change:</span>
-            <span>₱${parseFloat(sale.change).toFixed(2)}</span>
-          </div>
-          <div style="margin-top: 10px; font-size: 10px;">
-            Payment: ${sale.payment_method}<br>
-            Thank you for your business!
-          </div>
-        </div>
-      </body>
-      </html>
-    `);
-    receiptWindow.document.close();
-    receiptWindow.print();
   };
 
   const { subtotal, discountAmount, tax, total, change } = calculateTotals();
@@ -1036,148 +959,14 @@ export default function SalesPage() {
         )}
 
         {/* Receipt Modal */}
-        {receiptModalOpen && receiptData && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-            <div className="bg-white rounded-lg shadow-2xl p-0 max-w-xs w-full" style={{ maxHeight: '80vh' }}>
-              {/* Receipt Content - Receipt Style */}
-              <div className="bg-white p-6 text-gray-900 font-mono text-xs overflow-y-auto" style={{ lineHeight: '1.6', maxHeight: 'calc(80vh - 80px)' }}>
-                {/* Header */}
-                <div className="text-center border-b-2 border-gray-400 pb-3 mb-3">
-                  <h1 className="font-bold text-sm">CHONKY PET STORE</h1>
-                  <p className="text-xs">{receiptData.branch} Branch</p>
-                  <p className="text-xs mt-1">Point of Sale Receipt</p>
-                </div>
-
-                {/* Sale Number & Date */}
-                <div className="border-b border-dashed border-gray-400 pb-2 mb-2">
-                  <div className="flex justify-between">
-                    <span className="font-semibold">Sale #:</span>
-                    <span>{receiptData.sale_number}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="font-semibold">Date:</span>
-                    <span>{new Date(receiptData.sale_date).toLocaleDateString()}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="font-semibold">Time:</span>
-                    <span>{new Date(receiptData.sale_date).toLocaleTimeString()}</span>
-                  </div>
-                </div>
-
-                {/* Customer Info */}
-                <div className="border-b border-dashed border-gray-400 pb-2 mb-2">
-                  <div className="flex justify-between">
-                    <span className="font-semibold">Customer:</span>
-                    <span>{receiptData.customer_name}</span>
-                  </div>
-                  {receiptData.customer_phone && (
-                    <div className="flex justify-between">
-                      <span className="font-semibold">Phone:</span>
-                      <span>{receiptData.customer_phone}</span>
-                    </div>
-                  )}
-                  {receiptData.customer_email && (
-                    <div className="flex justify-between">
-                      <span className="font-semibold">Email:</span>
-                      <span className="truncate">{receiptData.customer_email}</span>
-                    </div>
-                  )}
-                </div>
-
-                {/* Items */}
-                <div className="border-b border-dashed border-gray-400 pb-2 mb-2">
-                  <div className="font-semibold text-center mb-2 pb-1 border-b border-gray-300 text-xs">
-                    ITEMS PURCHASED
-                  </div>
-                  {receiptData.items && receiptData.items.map((item, idx) => (
-                    <div key={idx}>
-                      <div className="flex justify-between">
-                        <span>{item.item_name}</span>
-                        <span>x{item.quantity}</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="text-xs">₱{parseFloat(item.unit_price).toFixed(2)} each</span>
-                        <span className="font-semibold">₱{parseFloat(item.subtotal).toFixed(2)}</span>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-
-                {/* Totals */}
-                <div className="border-b border-dashed border-gray-400 pb-2 mb-2">
-                  <div className="flex justify-between">
-                    <span>Subtotal:</span>
-                    <span>₱{parseFloat(receiptData.subtotal).toFixed(2)}</span>
-                  </div>
-                  {parseFloat(receiptData.discount) > 0 && (
-                    <div className="flex justify-between text-red-600">
-                      <span>Discount:</span>
-                      <span>-₱{parseFloat(receiptData.discount).toFixed(2)}</span>
-                    </div>
-                  )}
-                  <div className="flex justify-between">
-                    <span>Tax (12%):</span>
-                    <span>₱{parseFloat(receiptData.tax).toFixed(2)}</span>
-                  </div>
-                  <div className="flex justify-between font-bold border-t border-gray-300 pt-2">
-                    <span>TOTAL:</span>
-                    <span>₱{parseFloat(receiptData.total).toFixed(2)}</span>
-                  </div>
-                </div>
-
-                {/* Payment Info */}
-                <div className="border-b border-dashed border-gray-400 pb-2 mb-2">
-                  <div className="flex justify-between">
-                    <span>Payment Method:</span>
-                    <span className="font-semibold capitalize">{receiptData.payment_method}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span>Amount Paid:</span>
-                    <span className="font-semibold">₱{parseFloat(receiptData.amount_paid).toFixed(2)}</span>
-                  </div>
-                  {parseFloat(receiptData.change) > 0 && (
-                    <div className="flex justify-between font-bold bg-green-50 px-2 py-1 rounded">
-                      <span>Change:</span>
-                      <span>₱{parseFloat(receiptData.change).toFixed(2)}</span>
-                    </div>
-                  )}
-                </div>
-
-                {/* Notes */}
-                {receiptData.notes && (
-                  <div className="border-b border-dashed border-gray-400 pb-2 mb-2">
-                    <div className="font-semibold text-center text-xs mb-1">NOTES</div>
-                    <p className="text-xs whitespace-pre-wrap">{receiptData.notes}</p>
-                  </div>
-                )}
-
-                {/* Footer */}
-                <div className="text-center text-xs border-t-2 border-gray-400 pt-2">
-                  <p className="font-semibold">Thank you for your purchase!</p>
-                  <p className="text-xs mt-1">CHONKY PET STORE</p>
-                </div>
-              </div>
-
-              {/* Modal Actions */}
-              <div className="flex gap-3 p-4 bg-gray-50 border-t">
-                <button
-                  onClick={() => setReceiptModalOpen(false)}
-                  className="flex-1 px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 font-semibold transition-all text-sm"
-                >
-                  Close
-                </button>
-                <button
-                  onClick={() => {
-                    printReceipt(receiptData);
-                  }}
-                  className="flex-1 px-4 py-2 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-lg hover:shadow-lg font-bold transition-all text-sm"
-                >
-                  Print Receipt
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
+        <SalesReceiptModal 
+          isOpen={receiptModalOpen}
+          onClose={() => {
+            setReceiptModalOpen(false);
+            setReceiptData(null);
+          }}
+          receiptData={receiptData && { type: 'sale', data: receiptData }}
+        />
       </div>
     </div>
   );

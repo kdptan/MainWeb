@@ -18,7 +18,7 @@ export default function AdminAppointmentsPage() {
   
   const [appointments, setAppointments] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [statusFilter, setStatusFilter] = useState('upcoming'); // upcoming, all
+  const [statusFilter, setStatusFilter] = useState('all'); // upcoming, all
   const [branchFilter, setBranchFilter] = useState('all');
   const [dateFilter, setDateFilter] = useState('');
   const [paymentModalOpen, setPaymentModalOpen] = useState(false);
@@ -219,8 +219,8 @@ export default function AdminAppointmentsPage() {
                 onChange={(e) => setStatusFilter(e.target.value)}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg bg-white text-gray-900 focus:ring-2 focus:ring-secondary focus:border-transparent"
               >
-                <option value="upcoming" className="bg-white text-gray-900">Upcoming Only</option>
                 <option value="all" className="bg-white text-gray-900">All Appointments</option>
+                <option value="upcoming" className="bg-white text-gray-900">Upcoming Only</option>
               </select>
             </div>
 
