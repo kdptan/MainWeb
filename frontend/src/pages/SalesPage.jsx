@@ -455,7 +455,7 @@ export default function SalesPage() {
       {/* Service Type Selection Modal */}
       {serviceTypeModal.isOpen && serviceTypeModal.service && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-start justify-center pt-4 z-50">
-          <div className="bg-white rounded-lg p-8 max-w-md w-full shadow-2xl">
+          <div className="bg-white rounded-3xl p-8 max-w-md w-full shadow-2xl">
             <h2 className="text-2xl font-bold text-primary-darker mb-4">
               How would you like to add {serviceTypeModal.service.service_name}?
             </h2>
@@ -465,7 +465,7 @@ export default function SalesPage() {
               {parseFloat(serviceTypeModal.service.standalone_price) > 0 && (
                 <button
                   onClick={() => handleServiceTypeSelection('solo')}
-                  className="w-full p-4 border-2 border-blue-300 rounded-lg hover:bg-blue-50 transition-colors text-left"
+                  className="w-full p-4 border-2 border-blue-300 rounded-3xl hover:bg-blue-50 transition-colors text-left"
                 >
                   <p className="font-bold text-primary-darker">Solo Service</p>
                   <p className="text-lg text-blue-600 font-semibold">{formatCurrency(parseFloat(serviceTypeModal.service.standalone_price))}</p>
@@ -475,7 +475,7 @@ export default function SalesPage() {
               {parseFloat(serviceTypeModal.service.addon_price) > 0 && (
                 <button
                   onClick={() => handleServiceTypeSelection('addon')}
-                  className="w-full p-4 border-2 border-purple-300 rounded-lg hover:bg-purple-50 transition-colors text-left"
+                  className="w-full p-4 border-2 border-purple-300 rounded-3xl hover:bg-purple-50 transition-colors text-left"
                 >
                   <p className="font-bold text-primary-darker">Add-on</p>
                   <p className="text-lg text-purple-600 font-semibold">{formatCurrency(parseFloat(serviceTypeModal.service.addon_price))}</p>
@@ -485,7 +485,7 @@ export default function SalesPage() {
 
             <button
               onClick={() => setServiceTypeModal({ isOpen: false, service: null, serviceType: null })}
-              className="w-full mt-6 px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 transition-colors font-semibold"
+              className="w-full mt-6 px-4 py-2 bg-gray-300 text-gray-700 rounded-3xl hover:bg-gray-400 transition-colors font-semibold"
             >
               Cancel
             </button>
@@ -503,7 +503,7 @@ export default function SalesPage() {
           <div className="flex gap-3">
             <button
               onClick={() => setCurrentView('pos')}
-              className={`px-6 py-3 rounded-lg font-semibold transition-all ${
+              className={`px-6 py-3 rounded-3xl font-semibold transition-all ${
                 currentView === 'pos'
                   ? 'bg-secondary text-accent-cream shadow-lg'
                   : 'bg-white text-gray-700 hover:bg-gray-100'
@@ -513,7 +513,7 @@ export default function SalesPage() {
             </button>
             <button
               onClick={() => setCurrentView('history')}
-              className={`px-6 py-3 rounded-lg font-semibold transition-all ${
+              className={`px-6 py-3 rounded-3xl font-semibold transition-all ${
                 currentView === 'history'
                   ? 'bg-secondary text-accent-cream shadow-lg'
                   : 'bg-white text-gray-700 hover:bg-gray-100'
@@ -533,13 +533,13 @@ export default function SalesPage() {
               {/* Left Side: Products, Package Services, Solo Services & Add-ons */}
               <div className="space-y-6">
                 {/* Products */}
-                <div className="bg-white rounded-lg p-6 shadow-lg">
+                <div className="bg-white rounded-3xl p-6 shadow-lg">
                   <div className="flex items-center mb-4 gap-2">
                     <h2 className="text-2xl font-bold text-primary-darker flex items-center gap-2">
                       <FaBox className="text-secondary" /> Products
                     </h2>
                     <select
-                      className="ml-2 px-3 py-1 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-secondary"
+                      className="ml-2 px-3 py-1 border border-gray-300 rounded-3xl text-sm focus:ring-2 focus:ring-secondary"
                       value={selectedCategory}
                       onChange={e => setSelectedCategory(e.target.value)}
                     >
@@ -556,7 +556,7 @@ export default function SalesPage() {
                         <button
                           key={product.id}
                           onClick={() => addToCart(product, 'product')}
-                          className="p-2 border border-gray-200 rounded-lg hover:border-secondary hover:bg-gray-50 transition-all text-left"
+                          className="p-2 border border-gray-200 rounded-3xl hover:border-secondary hover:bg-gray-50 transition-all text-left"
                         >
                           <p className="font-semibold text-primary-darker text-xs">{product.name}</p>
                           <p className="text-xs text-gray-500">Stock: {product.quantity}</p>
@@ -567,7 +567,7 @@ export default function SalesPage() {
                 </div>
 
                 {/* Package Services */}
-                <div className="bg-white rounded-lg p-6 shadow-lg">
+                <div className="bg-white rounded-3xl p-6 shadow-lg">
                   <h2 className="text-2xl font-bold text-primary-darker mb-4">📦 Package Services</h2>
                   <div className="grid grid-cols-3 gap-2 max-h-96 overflow-y-auto">
                     {services
@@ -578,7 +578,7 @@ export default function SalesPage() {
                           <button
                             key={service.id}
                             onClick={() => addToCart(service, 'service')}
-                            className="p-2 border border-brand-gold rounded-lg hover:border-secondary hover:bg-yellow-50 transition-all text-left"
+                            className="p-2 border border-brand-gold rounded-3xl hover:border-secondary hover:bg-yellow-50 transition-all text-left"
                           >
                             <p className="font-semibold text-primary-darker text-xs">{service.service_name}</p>
                             {service.has_sizes && <p className="text-xs text-gray-500">Medium</p>}
@@ -590,7 +590,7 @@ export default function SalesPage() {
                 </div>
 
                 {/* Solo Services & Add-ons */}
-                <div className="bg-white rounded-lg p-6 shadow-lg">
+                <div className="bg-white rounded-3xl p-6 shadow-lg">
                   <h2 className="text-2xl font-bold text-primary-darker mb-4">✨ Solo Services & Add-ons</h2>
                   <div className="grid grid-cols-3 gap-2 max-h-96 overflow-y-auto">
                     {services
@@ -603,7 +603,7 @@ export default function SalesPage() {
                           <button
                             key={service.id}
                             onClick={() => addToCart(service, 'service')}
-                            className="p-2 border border-blue-300 rounded-lg hover:border-secondary hover:bg-blue-50 transition-all text-left"
+                            className="p-2 border border-blue-300 rounded-3xl hover:border-secondary hover:bg-blue-50 transition-all text-left"
                           >
                             <p className="font-semibold text-primary-darker text-xs">{service.service_name}</p>
                             <div className="text-xs mt-0.5 space-y-0.5">
@@ -622,13 +622,13 @@ export default function SalesPage() {
               </div>
 
               {/* Right Side: Cart & Checkout */}
-              <div className="bg-white rounded-lg shadow-2xl p-4 space-y-4 lg:max-w-xs lg:w-full">
+              <div className="bg-white rounded-3xl shadow-2xl p-4 space-y-4 lg:max-w-xs lg:w-full">
                 <h2 className="text-2xl font-bold text-primary-darker flex items-center gap-2">
                   <FaShoppingCart /> Cart ({cart.length})
                 </h2>
 
                 {/* Cart Items List */}
-                <div className="bg-gray-50 rounded-lg p-4 max-h-96 overflow-y-auto space-y-2">
+                <div className="bg-gray-50 rounded-3xl p-4 max-h-96 overflow-y-auto space-y-2">
                   {cart.length === 0 ? (
                     <p className="text-gray-500 text-center py-8">Cart is empty</p>
                   ) : (
@@ -670,7 +670,7 @@ export default function SalesPage() {
                 </div>
 
                 {/* Totals */}
-                <div className="bg-gradient-to-r from-gray-100 to-gray-50 rounded-lg p-4 space-y-2">
+                <div className="bg-gradient-to-r from-gray-100 to-gray-50 rounded-3xl p-4 space-y-2">
                   <div className="flex justify-between text-sm">
                     <span>Subtotal:</span>
                     <span className="font-semibold">{formatCurrency(subtotal)}</span>
@@ -699,7 +699,7 @@ export default function SalesPage() {
                 <button
                   onClick={handleCheckout}
                   disabled={submitting || cart.length === 0}
-                  className="w-full px-4 py-3 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-lg hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed font-bold text-lg transition-all flex items-center justify-center gap-2"
+                  className="w-full px-4 py-3 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-3xl hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed font-bold text-lg transition-all flex items-center justify-center gap-2"
                 >
                   <FaCheckCircle /> {submitting ? 'Processing...' : 'Complete Sale'}
                 </button>
@@ -716,7 +716,7 @@ export default function SalesPage() {
             </h2>
             
             {/* Filters */}
-            <div className="bg-white rounded-lg p-6 shadow-lg">
+            <div className="bg-white rounded-3xl p-6 shadow-lg">
               <p className="text-sm text-gray-600 mb-4">Filter transactions (optional)</p>
               <div className="flex gap-4 flex-wrap">
                 <div>
@@ -725,7 +725,7 @@ export default function SalesPage() {
                     type="date"
                     value={historyDate}
                     onChange={(e) => handleHistoryFilterChange(e.target.value, historyBranch)}
-                    className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-secondary"
+                    className="px-4 py-2 border border-gray-300 rounded-3xl focus:ring-2 focus:ring-secondary"
                   />
                 </div>
                 <div>
@@ -733,7 +733,7 @@ export default function SalesPage() {
                   <select
                     value={historyBranch}
                     onChange={(e) => handleHistoryFilterChange(historyDate, e.target.value)}
-                    className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-secondary"
+                    className="px-4 py-2 border border-gray-300 rounded-3xl focus:ring-2 focus:ring-secondary"
                   >
                     <option value="all">All Branches</option>
                     <option value="Matina">Matina</option>
@@ -746,7 +746,7 @@ export default function SalesPage() {
                       onClick={() => {
                         handleHistoryFilterChange('', 'all');
                       }}
-                      className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 font-semibold"
+                      className="px-4 py-2 bg-red-500 text-white rounded-3xl hover:bg-red-600 font-semibold"
                     >
                       Clear Filters
                     </button>
@@ -768,13 +768,13 @@ export default function SalesPage() {
                   Sales history count: {salesHistory.length}
                 </div>
                 {salesHistory.length === 0 ? (
-                  <div className="bg-white rounded-lg p-12 text-center">
+                  <div className="bg-white rounded-3xl p-12 text-center">
                     <p className="text-gray-500 text-lg">No sales found</p>
                     <p className="text-gray-400 text-sm mt-2">Try adjusting your filters or check back later</p>
                   </div>
                 ) : (
                   salesHistory.map(sale => (
-                    <div key={sale.id} className="bg-white rounded-lg p-6 shadow-lg hover:shadow-xl transition-shadow">
+                    <div key={sale.id} className="bg-white rounded-3xl p-6 shadow-lg hover:shadow-xl transition-shadow">
                       <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
                         <div>
                           <p className="text-xs text-gray-600">Sale #</p>
@@ -804,7 +804,7 @@ export default function SalesPage() {
                             setReceiptData(sale);
                             setReceiptModalOpen(true);
                           }}
-                          className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 font-semibold text-sm transition-colors"
+                          className="px-4 py-2 bg-blue-500 text-white rounded-3xl hover:bg-blue-600 font-semibold text-sm transition-colors"
                         >
                           View Receipt
                         </button>
@@ -820,13 +820,13 @@ export default function SalesPage() {
         {/* Checkout Modal */}
         {checkoutModalOpen && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-start justify-center pt-4 z-50">
-            <div className="bg-white rounded-lg shadow-2xl p-8 max-w-md w-full h-[95vh] max-h-[95vh] flex flex-col overflow-hidden">
+            <div className="bg-white rounded-3xl shadow-2xl p-8 max-w-md w-full h-[95vh] max-h-[95vh] flex flex-col overflow-hidden">
               <h2 className="text-2xl font-bold text-primary-darker mb-6 flex-shrink-0">Payment Details</h2>
 
               {/* Scrollable Content */}
               <div className="flex-1 overflow-y-auto space-y-6 pr-2">
               {/* Cart Summary */}
-              <div className="bg-gray-50 rounded-lg p-4 space-y-2">
+              <div className="bg-gray-50 rounded-3xl p-4 space-y-2">
                 <div className="flex justify-between text-sm">
                   <span>Subtotal:</span>
                   <span className="font-semibold">{formatCurrency(subtotal)}</span>
@@ -854,7 +854,7 @@ export default function SalesPage() {
                     placeholder="Enter customer name"
                     value={customerName}
                     onChange={(e) => setCustomerName(e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-secondary text-sm"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-3xl focus:ring-2 focus:ring-secondary text-sm"
                   />
                 </div>
                 <div>
@@ -864,7 +864,7 @@ export default function SalesPage() {
                     placeholder="Phone number"
                     value={customerPhone}
                     onChange={(e) => setCustomerPhone(e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-secondary text-sm"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-3xl focus:ring-2 focus:ring-secondary text-sm"
                   />
                 </div>
                 <div>
@@ -874,7 +874,7 @@ export default function SalesPage() {
                     placeholder="Email address"
                     value={customerEmail}
                     onChange={(e) => setCustomerEmail(e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-secondary text-sm"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-3xl focus:ring-2 focus:ring-secondary text-sm"
                   />
                 </div>
               </div>
@@ -886,7 +886,7 @@ export default function SalesPage() {
                   <select
                     value={selectedBranch}
                     onChange={(e) => setSelectedBranch(e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-secondary text-sm"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-3xl focus:ring-2 focus:ring-secondary text-sm"
                   >
                     <option value="Matina">Matina</option>
                     <option value="Toril">Toril</option>
@@ -897,7 +897,7 @@ export default function SalesPage() {
                   <select
                     value={paymentMethod}
                     onChange={(e) => setPaymentMethod(e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-secondary text-sm"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-3xl focus:ring-2 focus:ring-secondary text-sm"
                   >
                     <option value="cash">Cash</option>
                     <option value="card">Card</option>
@@ -912,7 +912,7 @@ export default function SalesPage() {
                     value={amountPaid}
                     onChange={(e) => setAmountPaid(e.target.value)}
                     step="0.01"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-secondary text-sm font-bold"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-3xl focus:ring-2 focus:ring-secondary text-sm font-bold"
                   />
                 </div>
                 <div>
@@ -923,7 +923,7 @@ export default function SalesPage() {
                     value={discount}
                     onChange={(e) => setDiscount(e.target.value)}
                     step="0.01"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-secondary text-sm"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-3xl focus:ring-2 focus:ring-secondary text-sm"
                   />
                 </div>
                 <div>
@@ -933,7 +933,7 @@ export default function SalesPage() {
                     value={notes}
                     onChange={(e) => setNotes(e.target.value)}
                     rows="2"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-secondary text-sm"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-3xl focus:ring-2 focus:ring-secondary text-sm"
                   />
                 </div>
               </div>
@@ -943,14 +943,14 @@ export default function SalesPage() {
               <div className="flex gap-3 pt-4 mt-auto border-t flex-shrink-0">
                 <button
                   onClick={() => setCheckoutModalOpen(false)}
-                  className="flex-1 px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 font-semibold transition-all"
+                  className="flex-1 px-4 py-2 bg-gray-300 text-gray-700 rounded-3xl hover:bg-gray-400 font-semibold transition-all"
                 >
                   Cancel
                 </button>
                 <button
                   onClick={handleCheckoutSubmit}
                   disabled={submitting}
-                  className="flex-1 px-4 py-3 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-lg hover:shadow-lg disabled:opacity-50 font-bold transition-all flex items-center justify-center gap-2"
+                  className="flex-1 px-4 py-3 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-3xl hover:shadow-lg disabled:opacity-50 font-bold transition-all flex items-center justify-center gap-2"
                 >
                   <FaCheckCircle /> {submitting ? 'Processing...' : 'Pay'}
                 </button>

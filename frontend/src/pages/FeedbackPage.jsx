@@ -157,7 +157,7 @@ export default function FeedbackPage() {
         <div className="mb-8">
           <button
             onClick={() => setSelectedOrder(null)}
-            className="flex items-center gap-2 px-4 py-2 bg-secondary text-accent-cream rounded-lg hover:bg-secondary-light transition-colors font-semibold"
+            className="flex items-center gap-2 px-4 py-2 bg-secondary text-chonky-white rounded-3xl hover:bg-secondary-light transition-colors font-semibold"
           >
             <FaArrowLeft /> Back to Orders
           </button>
@@ -166,9 +166,9 @@ export default function FeedbackPage() {
         </div>
 
         {/* Purchase Feedback - Admin Only */}
-        <div className="bg-white rounded-lg shadow-md p-6 mb-6">
+        <div className="bg-white rounded-3xl shadow-md p-6 mb-6">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="heading-card text-gray-900">Purchase Feedback</h2>
+            <h2 className="heading-card text-chonky-brown">Purchase Feedback</h2>
             <span className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded">Admin Only</span>
           </div>
           <p className="text-sm text-gray-600 mb-4">Your overall purchase experience feedback</p>
@@ -186,16 +186,16 @@ export default function FeedbackPage() {
               value={orderComment}
               onChange={(e) => setOrderComment(e.target.value)}
               rows="4"
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full px-4 py-2 border border-gray-300 rounded-3xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               placeholder="Tell us about your experience..."
             />
           </div>
         </div>
 
         {/* Product Feedback - Public Display */}
-        <div className="bg-white rounded-lg shadow-md p-6 mb-6">
+        <div className="bg-white rounded-3xl shadow-md p-6 mb-6">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="heading-card text-gray-900">Product Feedback</h2>
+            <h2 className="heading-card text-chonky-brown">Product Feedback</h2>
             <span className="text-xs bg-green-100 text-green-800 px-2 py-1 rounded">Public Display</span>
           </div>
           <p className="text-sm text-gray-600 mb-4">Help other customers by rating individual products. These reviews will be displayed on the products page.</p>
@@ -204,8 +204,8 @@ export default function FeedbackPage() {
             {selectedOrder.items
               .filter(item => item.item_type === 'product')
               .map((item) => (
-                <div key={item.id} className="border border-gray-200 rounded-lg p-4">
-                  <h3 className="font-semibold text-gray-900 mb-2">
+                <div key={item.id} className="border border-gray-200 rounded-3xl p-4">
+                  <h3 className="font-semibold text-chonky-brown mb-2">
                     {item.product_details?.name || item.item_name}
                   </h3>
                   <div className="mb-3">
@@ -219,7 +219,7 @@ export default function FeedbackPage() {
                     value={productComments[item.id] || ''}
                     onChange={(e) => setProductComments({ ...productComments, [item.id]: e.target.value })}
                     rows="2"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-3xl focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
                     placeholder="Share your thoughts on this product..."
                   />
                 </div>
@@ -231,17 +231,17 @@ export default function FeedbackPage() {
         <div className="flex gap-4">
           <button
             onClick={() => setSelectedOrder(null)}
-            className="px-6 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 font-semibold transition-colors"
+            className="px-6 py-3 bg-red-500 text-white rounded-3xl hover:bg-red-700 font-semibold transition-colors"
           >
             Cancel
           </button>
           <button
             onClick={handleSubmitFeedback}
             disabled={submitting || orderRating === 0}
-            className={`flex-1 px-6 py-3 rounded-lg font-semibold transition-colors ${
+            className={`flex-1 px-6 py-3 rounded-3xl font-semibold transition-colors ${
               submitting || orderRating === 0
                 ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                : 'bg-blue-600 text-white hover:bg-blue-700'
+                : 'bg-btn-yellow text-chonky-brown hover:bg-secondary hover:text-chonky-white'
             }`}
           >
             {submitting ? 'Submitting...' : 'Submit Feedback'}
@@ -258,28 +258,28 @@ export default function FeedbackPage() {
       {/* Back Button */}
       <button
         onClick={() => navigate('/products')}
-        className="flex items-center gap-2 bg-primary-dark text-white px-4 py-2 rounded-lg hover:bg-primary-darker transition-colors font-semibold mb-6"
+        className="flex items-center gap-2 bg-secondary text-white px-4 py-2 rounded-3xl hover:bg-btn-yellow hover:text-chonky-brown transition-colors font-semibold mb-6"
       >
         <FaArrowLeft /> Back to Products
       </button>
 
       {/* Header */}
-      <div className="mb-8">
-        <h1 className="display-md text-accent-cream mb-2">Give Feedback</h1>
-        <p className="text-accent-cream">Rate your completed orders and help us improve</p>
+      <div className="mb-8 text-center">
+        <h1 className="display-md text-chonky-white mb-2">Give Feedback</h1>
+        <p className="text-chonky-white">Rate your completed orders and help us improve</p>
       </div>
 
       {/* Completed Orders List */}
       {completedOrders.length === 0 ? (
-        <div className="text-center py-12 bg-white rounded-lg shadow-md">
-          <FaCheckCircle className="mx-auto text-6xl text-gray-300 mb-4" />
-          <h3 className="heading-card text-gray-600 mb-2">No Orders to Review</h3>
-          <p className="text-gray-500 mb-4">
-            You don't have any completed orders that need feedback
+        <div className="text-center py-12 bg-white rounded-3xl shadow-md">
+          <FaCheckCircle className="mx-auto text-6xl text-chonky-poop mb-4" />
+          <h3 className="heading-card text-chonky-brown mb-2">No Orders to Review</h3>
+          <p className="text-chonky-brown mb-4">
+            You don't have any completed orders that need feedback.
           </p>
           <button
             onClick={() => navigate('/my-orders')}
-            className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors"
+            className="bg-secondary text-chonky-white px-6 py-3 rounded-3xl hover:bg-btn-yellow hover:text-chonky-brown transition-colors"
           >
             View My Orders
           </button>
@@ -289,14 +289,14 @@ export default function FeedbackPage() {
           {completedOrders.map((order) => (
             <div
               key={order.id}
-              className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow"
+              className="bg-white rounded-3xl shadow-md p-6 hover:shadow-lg transition-shadow"
             >
               <div className="flex justify-between items-start mb-4">
                 <div>
-                  <h3 className="text-lg font-bold text-gray-900 mb-1">
+                  <h3 className="text-lg font-bold text-chonky-brown mb-1">
                     {generateOrderId(order)}
                   </h3>
-                  <p className="text-sm text-gray-500">
+                  <p className="text-sm text-chonky-poop">
                     {new Date(order.completed_at).toLocaleDateString('en-US', {
                       year: 'numeric',
                       month: 'long',
@@ -305,10 +305,10 @@ export default function FeedbackPage() {
                   </p>
                 </div>
                 <div className="text-right">
-                  <p className="price price-large text-gray-900">
+                  <p className="price price-large text-chonky-brown">
                     {formatCurrency(order.total_price)}
                   </p>
-                  <p className="text-sm text-gray-500">{order.items.length} items</p>
+                  <p className="text-sm text-chonky-poop">{order.items.length} items</p>
                 </div>
               </div>
 
@@ -316,12 +316,12 @@ export default function FeedbackPage() {
               <div className="mb-4">
                 <div className="flex flex-wrap gap-2">
                   {order.items.slice(0, 3).map((item, index) => (
-                    <span key={index} className="text-sm bg-gray-100 px-3 py-1 rounded-full text-gray-700">
+                    <span key={index} className="text-sm bg-accent-tan px-3 py-1 rounded-full text-chonky-white">
                       {item.product_details?.name || item.service_details?.service_name || item.item_name}
                     </span>
                   ))}
                   {order.items.length > 3 && (
-                    <span className="text-sm bg-gray-100 px-3 py-1 rounded-full text-gray-700">
+                    <span className="text-sm bg-accent-tan px-3 py-1 rounded-full text-chonky-white">
                       +{order.items.length - 3} more
                     </span>
                   )}
@@ -330,7 +330,7 @@ export default function FeedbackPage() {
 
               <button
                 onClick={() => handleSelectOrder(order)}
-                className="w-full py-2 px-4 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-semibold transition-colors flex items-center justify-center gap-2"
+                className="w-full py-2 px-4 bg-secondary text-chonky-white rounded-3xl hover:bg-btn-yellow hover:text-chonky-brown font-semibold transition-colors flex items-center justify-center gap-2"
               >
                 <FaStar /> Leave Feedback
               </button>

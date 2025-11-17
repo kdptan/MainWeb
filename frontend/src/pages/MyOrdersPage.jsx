@@ -56,13 +56,13 @@ export default function MyOrdersPage() {
   const getStatusColor = (status) => {
     switch (status.toLowerCase()) {
       case 'pending':
-        return 'bg-yellow-100 text-yellow-800 border-yellow-200';
+        return 'bg-brand-sand text-chonky-brown border-yellow-400';
       case 'completed':
-        return 'bg-green-100 text-green-800 border-green-200';
+        return 'bg-green-200 text-green-800 border-green-400';
       case 'cancelled':
-        return 'bg-red-100 text-red-800 border-red-200';
+        return 'bg-red-200 text-red-800 border-red-400';
       default:
-        return 'bg-gray-100 text-gray-800 border-gray-200';
+        return 'bg-gray-200 text-gray-800 border-gray-400';
     }
   };
 
@@ -117,56 +117,56 @@ export default function MyOrdersPage() {
       {/* Back Button */}
       <button
         onClick={() => navigate('/products')}
-        className="flex items-center gap-2 bg-primary-dark text-white px-4 py-2 rounded-lg hover:bg-primary-darker transition-colors font-semibold mb-6"
+        className="flex items-center gap-2 bg-secondary text-white px-4 py-2 rounded-3xl hover:bg-btn-yellow hover:text-chonky-brown transition-colors font-semibold mb-6"
       >
         <FaArrowLeft /> Back to Products
       </button>
       
       {/* Header */}
-      <div className="mb-8">
+      <div className="mb-8 text-center">
         <h1 className="display-md text-accent-cream mb-2">My Orders</h1>
         <p className="text-accent-cream">Track and manage your purchase history</p>
       </div>
 
       {/* Filters */}
-      <div className="bg-white rounded-lg shadow-sm p-4 mb-6">
+      <div className="bg-chonky-brown-light rounded-3xl shadow-sm p-4 mb-6">
         <div className="flex flex-wrap gap-2">
           <button
             onClick={() => setFilterStatus('all')}
-            className={`px-4 py-2 rounded-lg font-semibold transition-colors ${
+            className={`px-4 py-2 rounded-3xl font-semibold transition-colors ${
               filterStatus === 'all'
-                ? 'bg-blue-600 text-white'
-                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                ? 'bg-secondary text-chonky-white shadow-md'
+                : 'bg-chonky-white text-chonky-brown hover:bg-accent-tan'
             }`}
           >
             All Orders ({orders.length})
           </button>
           <button
             onClick={() => setFilterStatus('pending')}
-            className={`px-4 py-2 rounded-lg font-semibold transition-colors ${
+            className={`px-4 py-2 rounded-3xl font-semibold transition-colors ${
               filterStatus === 'pending'
-                ? 'bg-yellow-600 text-white'
-                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                ? 'bg-yellow-500 text-white shadow-md'
+                : 'bg-chonky-white text-chonky-brown hover:bg-accent-tan'
             }`}
           >
             Pending ({orders.filter(o => o.status === 'pending').length})
           </button>
           <button
             onClick={() => setFilterStatus('completed')}
-            className={`px-4 py-2 rounded-lg font-semibold transition-colors ${
+            className={`px-4 py-2 rounded-3xl font-semibold transition-colors ${
               filterStatus === 'completed'
-                ? 'bg-green-600 text-white'
-                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                ? 'bg-green-600 text-white shadow-md'
+                : 'bg-chonky-white text-chonky-brown hover:bg-accent-tan'
             }`}
           >
             Completed ({orders.filter(o => o.status === 'completed').length})
           </button>
           <button
             onClick={() => setFilterStatus('cancelled')}
-            className={`px-4 py-2 rounded-lg font-semibold transition-colors ${
+            className={`px-4 py-2 rounded-3xl font-semibold transition-colors ${
               filterStatus === 'cancelled'
-                ? 'bg-red-600 text-white'
-                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                ? 'bg-red-600 text-white shadow-md'
+                : 'bg-chonky-white text-chonky-brown hover:bg-accent-tan'
             }`}
           >
             Cancelled ({orders.filter(o => o.status === 'cancelled').length})
@@ -176,7 +176,7 @@ export default function MyOrdersPage() {
 
       {/* Orders List */}
       {filteredOrders.length === 0 ? (
-        <div className="text-center py-20 bg-white rounded-lg shadow-sm">
+        <div className="text-center py-20 bg-chonky-white rounded-3xl shadow-sm">
           <FaShoppingBag className="mx-auto text-6xl text-gray-300 mb-4" />
           <h2 className="heading-card text-gray-700 mb-2">
             {filterStatus === 'all' ? 'No orders yet' : `No ${filterStatus} orders`}
@@ -188,7 +188,7 @@ export default function MyOrdersPage() {
           </p>
           <button
             onClick={() => navigate('/products')}
-            className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors"
+            className="bg-secondary text-chonky-white px-6 py-3 rounded-3xl hover:bg-btn-yellow hover:text-chonky-brown transition-colors"
           >
             Browse Products
           </button>
@@ -198,24 +198,24 @@ export default function MyOrdersPage() {
           {filteredOrders.map((order) => (
             <div
               key={order.id}
-              className="bg-white rounded-lg shadow-md overflow-hidden"
+              className="bg-chonky-white rounded-3xl shadow-md overflow-hidden"
             >
               {/* Order Header */}
               <div className="p-6">
                 <div className="flex flex-wrap items-center justify-between gap-4 mb-4">
                   <div className="flex-1 min-w-[200px]">
-                    <h3 className="text-lg font-bold text-gray-900 mb-1">
+                    <h3 className="text-lg font-bold text-chonky-brown mb-1">
                       Order ID: {generateOrderId(order)}
                     </h3>
-                    <p className="text-sm text-gray-500">
+                    <p className="text-sm text-chonky-poop">
                       {formatDate(order.created_at)}
                     </p>
                   </div>
                   
                   <div className="flex items-center gap-4">
                     <div className="text-right">
-                      <p className="text-sm text-gray-500">Total Amount</p>
-                      <p className="price price-large text-gray-900">
+                      <p className="text-sm text-chonky-poop">Total Amount</p>
+                      <p className="price price-large text-chonky-brown">
                         {formatCurrency(order.total_price)}
                       </p>
                     </div>
@@ -232,18 +232,18 @@ export default function MyOrdersPage() {
                 {/* Order Summary */}
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
                   <div>
-                    <p className="text-xs text-gray-500 uppercase">Branch</p>
-                    <p className="text-sm font-semibold text-gray-900">{order.branch}</p>
+                    <p className="text-xs text-chonky-poop uppercase">Branch</p>
+                    <p className="text-sm font-semibold text-chonky-brown">{order.branch}</p>
                   </div>
                   <div>
-                    <p className="text-xs text-gray-500 uppercase">Items</p>
-                    <p className="text-sm font-semibold text-gray-900">
+                    <p className="text-xs text-chonky-poop uppercase">Items</p>
+                    <p className="text-sm font-semibold text-chonky-brown">
                       {order.items?.length || 0} item(s)
                     </p>
                   </div>
                   <div>
-                    <p className="text-xs text-gray-500 uppercase">Order Date</p>
-                    <p className="text-sm font-semibold text-gray-900">
+                    <p className="text-xs text-chonky-poop uppercase">Order Date</p>
+                    <p className="text-sm font-semibold text-chonky-brown">
                       {new Date(order.created_at).toLocaleDateString()}
                     </p>
                   </div>
@@ -252,7 +252,7 @@ export default function MyOrdersPage() {
                 {/* Toggle Details Button */}
                 <button
                   onClick={() => toggleOrderDetails(order.id)}
-                  className="w-full py-2 px-4 bg-gray-50 hover:bg-gray-100 rounded-lg flex items-center justify-center gap-2 text-gray-700 font-semibold transition-colors"
+                  className="w-full py-2 px-4 bg-chonky-khaki hover:bg-accent-tan rounded-3xl flex items-center justify-center gap-2 text-chonky-brown font-semibold transition-colors"
                 >
                   {expandedOrder === order.id ? (
                     <>
@@ -268,27 +268,27 @@ export default function MyOrdersPage() {
 
               {/* Order Details (Expandable) */}
               {expandedOrder === order.id && (
-                <div className="border-t border-gray-200 bg-gray-50 p-6">
-                  <h4 className="font-bold text-gray-900 mb-4">Order Items</h4>
+                <div className="border-t border-chonky-brown-light bg-chonky-white p-6">
+                  <h4 className="font-bold text-chonky-brown mb-4">Order Items</h4>
                   <div className="space-y-3">
                     {order.items?.map((item, index) => (
                       <div
                         key={index}
-                        className="bg-white rounded-lg p-4 flex items-start gap-4 border border-gray-200"
+                        className="bg-chonky-white rounded-3xl p-4 flex items-start gap-4 border border-chonky-brown-light"
                       >
-                        <div className="bg-gradient-to-br from-blue-50 to-indigo-100 w-16 h-16 rounded-lg flex items-center justify-center flex-shrink-0">
+                        <div className="bg-gradient-to-br from-accent-tan to-chonky-brown-light w-16 h-16 rounded-3xl flex items-center justify-center flex-shrink-0">
                           <span className="text-2xl">
                             {item.item_type === 'product' ? '🐾' : '✨'}
                           </span>
                         </div>
                         <div className="flex-1">
-                          <h5 className="font-semibold text-gray-900 mb-1">
+                          <h5 className="font-semibold text-chonky-brown mb-1">
                             {item.product_details?.name || 
                              item.service_details?.service_name || 
                              item.item_name || 
                              'Unknown Item'}
                           </h5>
-                          <div className="flex flex-wrap gap-2 text-sm text-gray-600">
+                          <div className="flex flex-wrap gap-2 text-sm text-chonky-poop">
                             <span className={`px-2 py-1 rounded text-xs font-medium ${
                               item.item_type === 'product' 
                                 ? 'bg-blue-100 text-blue-800' 
@@ -301,12 +301,12 @@ export default function MyOrdersPage() {
                             {item.item_type === 'product' && item.product_details && (
                               <>
                                 {item.product_details.category && (
-                                  <span className="text-gray-500">
+                                  <span className="text-chonky-poop">
                                     {item.product_details.category}
                                   </span>
                                 )}
                                 {item.product_details.supplier && (
-                                  <span className="text-gray-500">
+                                  <span className="text-chonky-poop">
                                     Supplier: {item.product_details.supplier}
                                   </span>
                                 )}
@@ -315,15 +315,15 @@ export default function MyOrdersPage() {
                             
                             {/* Show service description */}
                             {item.item_type === 'service' && item.service_details?.description && (
-                              <span className="text-gray-500 block mt-1">
+                              <span className="text-chonky-poop block mt-1">
                                 {item.service_details.description}
                               </span>
                             )}
                           </div>
                         </div>
                         <div className="text-right">
-                          <p className="text-sm text-gray-500">Qty: {item.quantity}</p>
-                          <p className="font-bold text-gray-900">
+                          <p className="text-sm text-chonky-poop">Qty: {item.quantity}</p>
+                          <p className="font-bold text-chonky-brown">
                             {formatCurrency(item.price)}
                           </p>
                         </div>
@@ -334,8 +334,8 @@ export default function MyOrdersPage() {
                   {/* Notes */}
                   {order.notes && (
                     <div className="mt-4">
-                      <h4 className="font-bold text-gray-900 mb-2">Order Notes</h4>
-                      <p className="text-sm text-gray-600 bg-white rounded-lg p-4">
+                      <h4 className="font-bold text-chonky-brown mb-2">Order Notes</h4>
+                      <p className="text-sm text-chonky-poop bg-chonky-white rounded-3xl p-4">
                         {order.notes}
                       </p>
                     </div>
@@ -344,7 +344,7 @@ export default function MyOrdersPage() {
                   {/* Completed Date */}
                   {order.completed_at && (
                     <div className="mt-4">
-                      <p className="text-sm text-gray-500">
+                      <p className="text-sm text-chonky-poop">
                         Completed on: {formatDate(order.completed_at)}
                       </p>
                     </div>

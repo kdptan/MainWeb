@@ -433,7 +433,7 @@ export default function SalesReportPage() {
       <Toast />
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
-        <div className="bg-white rounded-lg shadow-md p-6 mb-6 print:shadow-none">
+        <div className="bg-white rounded-3xl shadow-md p-6 mb-6 print:shadow-none">
           <div className="flex items-center justify-between mb-4 print:mb-2">
             <div>
               <h1 className="heading-main text-primary-darker">Sales Report</h1>
@@ -442,13 +442,13 @@ export default function SalesReportPage() {
             <div className="flex gap-2 print:hidden">
               <button
                 onClick={handlePrint}
-                className="flex items-center gap-2 px-4 py-2 bg-secondary text-accent-cream rounded-lg hover:bg-secondary-light font-medium text-sm transition-colors"
+                className="flex items-center gap-2 px-4 py-2 bg-secondary text-accent-cream rounded-3xl hover:bg-secondary-light font-medium text-sm transition-colors"
               >
                 <FaPrint /> Print Report
               </button>
               <button
                 onClick={() => navigate('/admin/end-of-day-reports')}
-                className="flex items-center gap-2 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 font-medium text-sm transition-colors"
+                className="flex items-center gap-2 px-4 py-2 bg-blue-500 text-white rounded-3xl hover:bg-blue-600 font-medium text-sm transition-colors"
               >
                 <FaCalendar /> End of Day Reports
               </button>
@@ -465,7 +465,7 @@ export default function SalesReportPage() {
                 type="month"
                 value={selectedMonth}
                 onChange={(e) => setSelectedMonth(e.target.value)}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-secondary focus:border-transparent"
+                className="w-full px-4 py-2 border border-gray-300 rounded-3xl focus:ring-2 focus:ring-secondary focus:border-transparent"
               />
             </div>
             <div>
@@ -473,7 +473,7 @@ export default function SalesReportPage() {
               <select
                 value={selectedBranch}
                 onChange={(e) => setSelectedBranch(e.target.value)}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-secondary focus:border-transparent"
+                className="w-full px-4 py-2 border border-gray-300 rounded-3xl focus:ring-2 focus:ring-secondary focus:border-transparent"
               >
                 <option value="all">All Branches</option>
                 {branches.map(branch => (
@@ -494,7 +494,7 @@ export default function SalesReportPage() {
         ) : (
           <>
             {/* Tab Navigation */}
-            <div className="bg-white rounded-lg shadow-md p-6 mb-6">
+            <div className="bg-white rounded-3xl shadow-md p-6 mb-6">
               <div className="flex gap-4 border-b border-gray-200 print:hidden">
                 <button
                   onClick={() => setActiveTab('analytics')}
@@ -521,12 +521,12 @@ export default function SalesReportPage() {
 
             {/* Analytics Tab */}
             {activeTab === 'analytics' && (
-            <div className="bg-white rounded-lg shadow-md p-6">
+            <div className="bg-white rounded-3xl shadow-md p-6">
             <div className="space-y-8 mb-8">
               {/* Key Performance Indicators */}
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 print:grid-cols-4">
                 {/* Total Revenue */}
-                <div className="bg-gradient-to-br from-purple-50 to-purple-100 rounded-lg p-6 border-l-4 border-purple-600 shadow-md">
+                <div className="bg-gradient-to-br from-purple-50 to-purple-100 rounded-3xl p-6 border-l-4 border-purple-600 shadow-md">
                   <div className="flex items-center justify-between">
                     <div>
                       <p className="text-gray-600 text-sm font-medium">Total Revenue</p>
@@ -539,7 +539,7 @@ export default function SalesReportPage() {
                 </div>
 
                 {/* Total Transactions */}
-                <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-lg p-6 border-l-4 border-blue-600 shadow-md">
+                <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-3xl p-6 border-l-4 border-blue-600 shadow-md">
                   <div className="flex items-center justify-between">
                     <div>
                       <p className="text-gray-600 text-sm font-medium">Total Transactions</p>
@@ -552,7 +552,7 @@ export default function SalesReportPage() {
                 </div>
 
                 {/* Average Order Value */}
-                <div className="bg-gradient-to-br from-green-50 to-green-100 rounded-lg p-6 border-l-4 border-green-600 shadow-md">
+                <div className="bg-gradient-to-br from-green-50 to-green-100 rounded-3xl p-6 border-l-4 border-green-600 shadow-md">
                   <div className="flex items-center justify-between">
                     <div>
                       <p className="text-gray-600 text-sm font-medium">Average Order Value</p>
@@ -565,7 +565,7 @@ export default function SalesReportPage() {
                 </div>
 
                 {/* Product Transactions Count */}
-                <div className="bg-gradient-to-br from-orange-50 to-orange-100 rounded-lg p-6 border-l-4 border-orange-600 shadow-md">
+                <div className="bg-gradient-to-br from-orange-50 to-orange-100 rounded-3xl p-6 border-l-4 border-orange-600 shadow-md">
                   <div className="flex items-center justify-between">
                     <div>
                       <p className="text-gray-600 text-sm font-medium">Product Sales</p>
@@ -582,7 +582,7 @@ export default function SalesReportPage() {
               {/* Sales by Source and Branch */}
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 print:grid-cols-2">
                 {/* Sales by Source - Pie Chart */}
-                <div className="bg-white rounded-lg shadow-lg p-6">
+                <div className="bg-white rounded-3xl shadow-lg p-6">
                   <h3 className="text-lg font-bold text-gray-900 mb-4">Sales by Source</h3>
                   <div className="flex justify-center">
                     <svg viewBox="0 0 200 200" width="200" height="200" className="mb-4">
@@ -660,7 +660,7 @@ export default function SalesReportPage() {
                 </div>
 
                 {/* Sales by Branch */}
-                <div className="bg-white rounded-lg shadow-lg p-6">
+                <div className="bg-white rounded-3xl shadow-lg p-6">
                   <h3 className="text-lg font-bold text-gray-900 mb-4">Sales by Branch</h3>
                   <div className="space-y-3">
                     {Object.entries(analytics.salesByBranch).map(([branch, data]) => (
@@ -684,7 +684,7 @@ export default function SalesReportPage() {
               {/* Top Products and Services */}
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 print:grid-cols-2">
                 {/* Top Products */}
-                <div className="bg-white rounded-lg shadow-lg p-6">
+                <div className="bg-white rounded-3xl shadow-lg p-6">
                   <h3 className="text-lg font-bold text-gray-900 mb-4">Top 5 Products</h3>
                   <div className="space-y-3">
                     {analytics.topProducts.length > 0 ? (
@@ -706,7 +706,7 @@ export default function SalesReportPage() {
                 </div>
 
                 {/* Top Services - Vertical Bar Chart */}
-                <div className="bg-white rounded-lg shadow-lg p-6">
+                <div className="bg-white rounded-3xl shadow-lg p-6">
                   <h3 className="text-lg font-bold text-gray-900 mb-4">Top 5 Services</h3>
                   {analytics.topServices.length > 0 ? (
                     <div className="space-y-4">
@@ -840,7 +840,7 @@ export default function SalesReportPage() {
             {activeTab === 'transactions' && (
             <div className="space-y-8">
             {/* Products Transactions Section */}
-            <div className="bg-white rounded-lg shadow-lg overflow-hidden mb-8">
+            <div className="bg-white rounded-3xl shadow-lg overflow-hidden mb-8">
               <div className="bg-gradient-to-r from-blue-500 to-blue-600 px-8 py-6">
                 <h2 className="text-2xl font-bold text-white">
                   Product Transactions ({productTransactions.length})
@@ -949,14 +949,14 @@ export default function SalesReportPage() {
                       <button
                         onClick={() => setProductPage(Math.max(1, productPage - 1))}
                         disabled={productPage === 1}
-                        className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-3xl hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
                       >
                         Previous
                       </button>
                       <button
                         onClick={() => setProductPage(Math.min(Math.ceil(productTransactions.length / itemsPerPage), productPage + 1))}
                         disabled={productPage === Math.ceil(productTransactions.length / itemsPerPage)}
-                        className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-3xl hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
                       >
                         Next
                       </button>
@@ -972,7 +972,7 @@ export default function SalesReportPage() {
             </div>
 
             {/* Services Transactions Section */}
-            <div className="bg-white rounded-lg shadow-lg overflow-hidden">
+            <div className="bg-white rounded-3xl shadow-lg overflow-hidden">
               <div className="bg-gradient-to-r from-green-500 to-green-600 px-8 py-6">
                 <h2 className="text-2xl font-bold text-white">
                   Service Transactions ({serviceTransactions.length})
@@ -1085,14 +1085,14 @@ export default function SalesReportPage() {
                         <button
                           onClick={() => setServicePage(Math.max(1, servicePage - 1))}
                           disabled={servicePage === 1}
-                          className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                          className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-3xl hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
                         >
                           Previous
                         </button>
                         <button
                           onClick={() => setServicePage(Math.min(Math.ceil(serviceTransactions.length / itemsPerPage), servicePage + 1))}
                           disabled={servicePage === Math.ceil(serviceTransactions.length / itemsPerPage)}
-                          className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                          className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-3xl hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
                         >
                           Next
                         </button>
@@ -1109,19 +1109,19 @@ export default function SalesReportPage() {
 
             {/* Grand Total Summary */}
             <div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-6 print:gap-4">
-              <div className="bg-blue-50 rounded-lg p-6 border-l-4 border-blue-600">
+              <div className="bg-blue-50 rounded-3xl p-6 border-l-4 border-blue-600">
                 <p className="text-gray-600 text-sm font-medium">Product Revenue</p>
                 <p className="text-3xl font-bold text-blue-600 mt-2">
                   {productTotals.totalSubtotal ? formatCurrency(productTotals.totalSubtotal) : formatCurrency(0)}
                 </p>
               </div>
-              <div className="bg-green-50 rounded-lg p-6 border-l-4 border-green-600">
+              <div className="bg-green-50 rounded-3xl p-6 border-l-4 border-green-600">
                 <p className="text-gray-600 text-sm font-medium">Service Revenue</p>
                 <p className="text-3xl font-bold text-green-600 mt-2">
                   {serviceTotals.totalSubtotal ? formatCurrency(serviceTotals.totalSubtotal) : formatCurrency(0)}
                 </p>
               </div>
-              <div className="bg-purple-50 rounded-lg p-6 border-l-4 border-purple-600">
+              <div className="bg-purple-50 rounded-3xl p-6 border-l-4 border-purple-600">
                 <p className="text-gray-600 text-sm font-medium">Total Revenue</p>
                 <p className="text-3xl font-bold text-purple-600 mt-2">
                   {formatCurrency((productTotals.totalSubtotal || 0) + (serviceTotals.totalSubtotal || 0))}

@@ -112,7 +112,7 @@ export default function RegisterPage() {
             <p className="text-gray-700 mb-4">
               Please verify your email address to activate your account.
             </p>
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
+            <div className="bg-blue-50 border border-blue-200 rounded-3xl p-4 mb-4">
               <p className="text-sm text-blue-900 mb-2">
                 📧 Verification email sent to:
               </p>
@@ -128,7 +128,7 @@ export default function RegisterPage() {
             </p>
             <Link
               to="/signin"
-              className="inline-block px-6 py-2 bg-secondary text-white rounded-lg hover:bg-secondary-light transition-colors font-medium"
+              className="inline-block px-6 py-2 bg-secondary text-white rounded-3xl hover:bg-secondary-light transition-colors font-medium"
             >
               Go to Login
             </Link>
@@ -138,7 +138,7 @@ export default function RegisterPage() {
             <h2 className="heading-main text-primary-darker mb-2">Create account</h2>
             <p className="text-sm text-primary-dark mb-6">Create an account to start shopping for your pets.</p>
             {role === 'admin' && (
-              <div className="mb-4 text-sm text-red-600 font-medium bg-red-50 border border-red-200 rounded-lg p-3">
+              <div className="mb-4 text-sm text-red-600 font-medium bg-red-50 border border-red-200 rounded-3xl p-3">
                 Note: Registering on this URL will create an admin account.
               </div>
             )}
@@ -153,7 +153,7 @@ export default function RegisterPage() {
               onChange={onChange} 
               type="text" 
               required 
-              className="mt-1 block w-full rounded-lg border-2 border-primary px-3 py-2 shadow-sm focus:ring-2 focus:ring-secondary focus:border-secondary text-primary-darker bg-white" 
+              className="mt-1 block w-full rounded-3xl border-2 border-primary px-3 py-2 shadow-sm focus:ring-2 focus:ring-secondary focus:border-secondary text-primary-darker bg-white" 
             />
           </div>
           <div>
@@ -165,7 +165,7 @@ export default function RegisterPage() {
               onChange={onChange} 
               type="email" 
               required 
-              className="mt-1 block w-full rounded-lg border-2 border-primary px-3 py-2 shadow-sm focus:ring-2 focus:ring-secondary focus:border-secondary text-primary-darker bg-white" 
+              className="mt-1 block w-full rounded-3xl border-2 border-primary px-3 py-2 shadow-sm focus:ring-2 focus:ring-secondary focus:border-secondary text-primary-darker bg-white" 
             />
           </div>
           <div>
@@ -177,7 +177,7 @@ export default function RegisterPage() {
               onChange={onChange} 
               type="password" 
               required 
-              className="mt-1 block w-full rounded-lg border-2 border-primary px-3 py-2 shadow-sm focus:ring-2 focus:ring-secondary focus:border-secondary text-primary-darker bg-white" 
+              className="mt-1 block w-full rounded-3xl border-2 border-primary px-3 py-2 shadow-sm focus:ring-2 focus:ring-secondary focus:border-secondary text-primary-darker bg-white" 
             />
           </div>
           <div>
@@ -189,19 +189,19 @@ export default function RegisterPage() {
               onChange={onChange} 
               type="password" 
               required 
-              className="mt-1 block w-full rounded-lg border-2 border-primary px-3 py-2 shadow-sm focus:ring-2 focus:ring-secondary focus:border-secondary text-primary-darker bg-white" 
+              className="mt-1 block w-full rounded-3xl border-2 border-primary px-3 py-2 shadow-sm focus:ring-2 focus:ring-secondary focus:border-secondary text-primary-darker bg-white" 
             />
           </div>
 
           {/* No invite code required for admin registration; role is derived from the URL (/register/admin) */}
 
-          {error && <div className="text-sm text-red-600 font-medium bg-red-50 border border-red-200 rounded-lg p-3">{error}</div>}
+          {error && <div className="text-sm text-red-600 font-medium bg-red-50 border border-red-200 rounded-3xl p-3">{error}</div>}
 
           <div>
             <button 
               disabled={loading} 
               type="submit" 
-              className="w-full inline-flex justify-center items-center px-4 py-3 border border-transparent text-base font-semibold rounded-lg text-accent-cream bg-secondary hover:bg-secondary-light transition-colors shadow-lg disabled:opacity-60"
+              className="w-full inline-flex justify-center items-center px-4 py-3 border border-transparent text-base font-semibold rounded-3xl text-chonky-white bg-secondary hover:bg-btn-yellow hover:text-chonky-brown transition-colors shadow-lg disabled:opacity-60"
             >
               {loading ? 'Creating...' : 'Create account'}
             </button>
@@ -209,7 +209,7 @@ export default function RegisterPage() {
         </form>
 
         <div className="mt-6 text-sm text-primary-dark">
-          Already have an account? <Link to="/signin" className="text-secondary hover:text-secondary-light font-semibold">Sign in</Link>
+          Already have an account? <Link to="/signin" className="text-secondary hover:text-btn-yellow font-semibold">Sign in</Link>
         </div>
           </>
         )}

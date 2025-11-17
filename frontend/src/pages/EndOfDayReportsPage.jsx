@@ -134,7 +134,7 @@ export default function EndOfDayReportsPage() {
       <Toast />
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
-        <div className="bg-white rounded-lg shadow-md p-6 mb-6 print:shadow-none">
+        <div className="bg-white rounded-3xl shadow-md p-6 mb-6 print:shadow-none">
           <div className="flex items-center justify-between mb-4 print:mb-2">
             <div>
               <h1 className="heading-main text-primary-darker">End of Day Report</h1>
@@ -143,13 +143,13 @@ export default function EndOfDayReportsPage() {
             <div className="flex gap-2 print:hidden">
               <button
                 onClick={handlePrint}
-                className="flex items-center gap-2 px-4 py-2 bg-secondary text-accent-cream rounded-lg hover:bg-secondary-light font-medium text-sm transition-colors"
+                className="flex items-center gap-2 px-4 py-2 bg-secondary text-accent-cream rounded-3xl hover:bg-secondary-light font-medium text-sm transition-colors"
               >
                 <FaPrint /> Print Report
               </button>
               <button
                 onClick={() => navigate('/admin/sales-report')}
-                className="flex items-center gap-2 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 font-medium text-sm transition-colors"
+                className="flex items-center gap-2 px-4 py-2 bg-blue-500 text-white rounded-3xl hover:bg-blue-600 font-medium text-sm transition-colors"
               >
                 <FaChartLine /> Sales Report
               </button>
@@ -165,7 +165,7 @@ export default function EndOfDayReportsPage() {
                 value={selectedDate}
                 onChange={(e) => setSelectedDate(e.target.value)}
                 max={new Date().toISOString().split('T')[0]}
-                className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-secondary focus:border-transparent"
+                className="px-4 py-2 border border-gray-300 rounded-3xl focus:ring-2 focus:ring-secondary focus:border-transparent"
               />
             </div>
 
@@ -174,7 +174,7 @@ export default function EndOfDayReportsPage() {
               <select
                 value={selectedBranch}
                 onChange={(e) => setSelectedBranch(e.target.value)}
-                className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-secondary focus:border-transparent"
+                className="px-4 py-2 border border-gray-300 rounded-3xl focus:ring-2 focus:ring-secondary focus:border-transparent"
               >
                 <option value="all">All Branches</option>
                 <option value="Matina">Matina</option>
@@ -201,7 +201,7 @@ export default function EndOfDayReportsPage() {
             {/* Summary Cards */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
               {/* Total Orders */}
-              <div className="bg-white rounded-lg shadow-md p-6">
+              <div className="bg-white rounded-3xl shadow-md p-6">
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-sm font-medium text-gray-600">Total Orders</p>
@@ -214,7 +214,7 @@ export default function EndOfDayReportsPage() {
               </div>
 
               {/* Total Revenue */}
-              <div className="bg-white rounded-lg shadow-md p-6">
+              <div className="bg-white rounded-3xl shadow-md p-6">
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-sm font-medium text-gray-600">Total Revenue</p>
@@ -227,7 +227,7 @@ export default function EndOfDayReportsPage() {
               </div>
 
               {/* Completed Orders */}
-              <div className="bg-white rounded-lg shadow-md p-6">
+              <div className="bg-white rounded-3xl shadow-md p-6">
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-sm font-medium text-gray-600">Completed Orders</p>
@@ -240,7 +240,7 @@ export default function EndOfDayReportsPage() {
               </div>
 
               {/* Pending/Available */}
-              <div className="bg-white rounded-lg shadow-md p-6">
+              <div className="bg-white rounded-3xl shadow-md p-6">
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-sm font-medium text-gray-600">Pending/Available</p>
@@ -258,14 +258,14 @@ export default function EndOfDayReportsPage() {
             {/* Detailed Breakdown */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
               {/* Revenue by Branch */}
-              <div className="bg-white rounded-lg shadow-md p-6">
+              <div className="bg-white rounded-3xl shadow-md p-6">
                 <h2 className="text-xl font-bold text-primary-darker mb-4">Revenue by Branch</h2>
                 {Object.keys(reportData.revenueByBranch).length === 0 ? (
                   <p className="text-gray-500 text-center py-4">No completed orders</p>
                 ) : (
                   <div className="space-y-3">
                     {Object.entries(reportData.revenueByBranch).map(([branch, revenue]) => (
-                      <div key={branch} className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
+                      <div key={branch} className="flex justify-between items-center p-3 bg-gray-50 rounded-3xl">
                         <span className="font-medium text-gray-700">{branch}</span>
                         <span className="text-lg font-bold text-secondary">{formatCurrency(revenue)}</span>
                       </div>
@@ -275,22 +275,22 @@ export default function EndOfDayReportsPage() {
               </div>
 
               {/* Order Status Breakdown */}
-              <div className="bg-white rounded-lg shadow-md p-6">
+              <div className="bg-white rounded-3xl shadow-md p-6">
                 <h2 className="text-xl font-bold text-primary-darker mb-4">Order Status Breakdown</h2>
                 <div className="space-y-3">
-                  <div className="flex justify-between items-center p-3 bg-green-50 rounded-lg">
+                  <div className="flex justify-between items-center p-3 bg-green-50 rounded-3xl">
                     <span className="font-medium text-gray-700">Completed</span>
                     <span className="text-lg font-bold text-green-600">{reportData.completedOrders}</span>
                   </div>
-                  <div className="flex justify-between items-center p-3 bg-blue-50 rounded-lg">
+                  <div className="flex justify-between items-center p-3 bg-blue-50 rounded-3xl">
                     <span className="font-medium text-gray-700">Available for Pickup</span>
                     <span className="text-lg font-bold text-blue-600">{reportData.availableForPickup}</span>
                   </div>
-                  <div className="flex justify-between items-center p-3 bg-yellow-50 rounded-lg">
+                  <div className="flex justify-between items-center p-3 bg-yellow-50 rounded-3xl">
                     <span className="font-medium text-gray-700">Pending</span>
                     <span className="text-lg font-bold text-yellow-600">{reportData.pendingOrders}</span>
                   </div>
-                  <div className="flex justify-between items-center p-3 bg-red-50 rounded-lg">
+                  <div className="flex justify-between items-center p-3 bg-red-50 rounded-3xl">
                     <span className="font-medium text-gray-700">Cancelled</span>
                     <span className="text-lg font-bold text-red-600">{reportData.cancelledOrders}</span>
                   </div>
@@ -301,14 +301,14 @@ export default function EndOfDayReportsPage() {
             {/* Top Products and Services */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               {/* Top Products */}
-              <div className="bg-white rounded-lg shadow-md p-6">
+              <div className="bg-white rounded-3xl shadow-md p-6">
                 <h2 className="text-xl font-bold text-primary-darker mb-4">Top Products</h2>
                 {reportData.topProducts.length === 0 ? (
                   <p className="text-gray-500 text-center py-4">No products sold</p>
                 ) : (
                   <div className="space-y-3">
                     {reportData.topProducts.map((product, index) => (
-                      <div key={index} className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
+                      <div key={index} className="flex justify-between items-center p-3 bg-gray-50 rounded-3xl">
                         <span className="font-medium text-gray-700">{product.name}</span>
                         <span className="text-lg font-bold text-secondary">{product.count} sold</span>
                       </div>
@@ -318,14 +318,14 @@ export default function EndOfDayReportsPage() {
               </div>
 
               {/* Top Services */}
-              <div className="bg-white rounded-lg shadow-md p-6">
+              <div className="bg-white rounded-3xl shadow-md p-6">
                 <h2 className="text-xl font-bold text-primary-darker mb-4">Top Services</h2>
                 {reportData.topServices.length === 0 ? (
                   <p className="text-gray-500 text-center py-4">No services booked</p>
                 ) : (
                   <div className="space-y-3">
                     {reportData.topServices.map((service, index) => (
-                      <div key={index} className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
+                      <div key={index} className="flex justify-between items-center p-3 bg-gray-50 rounded-3xl">
                         <span className="font-medium text-gray-700">{service.name}</span>
                         <span className="text-lg font-bold text-secondary">{service.count} booked</span>
                       </div>

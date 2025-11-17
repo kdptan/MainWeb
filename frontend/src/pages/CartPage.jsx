@@ -221,18 +221,18 @@ export default function CartPage() {
         <div className="mb-8">
           <button
             onClick={() => navigate('/products')}
-            className="flex items-center gap-2 bg-primary-dark text-white px-4 py-2 rounded-lg hover:bg-primary-darker transition-colors font-semibold"
+            className="flex items-center gap-2 bg-secondary text-white px-4 py-2 rounded-3xl hover:bg-btn-yellow transition-colors font-semibold"
           >
             <FaArrowLeft /> Back to Products
           </button>
         </div>
         <div className="text-center py-20">
           <FaShoppingBag className="mx-auto text-6xl text-secondary/50 mb-4" />
-          <h2 className="heading-main text-accent-cream mb-2">Your cart is empty</h2>
+          <h2 className="heading-main text-chonky-white mb-2">Your cart is empty</h2>
           <p className="text-gray-300 mb-6">Add some items to get started!</p>
           <button
             onClick={continueShopping}
-            className="bg-secondary text-white px-6 py-3 rounded-lg hover:bg-orange-500 transition-colors"
+            className="bg-secondary text-white px-6 py-3 rounded-3xl hover:bg-btn-yellow transition-colors"
           >
             Browse Products
           </button>
@@ -248,22 +248,22 @@ export default function CartPage() {
       {/* Back Button */}
       <button
         onClick={() => navigate('/products')}
-        className="flex items-center gap-2 bg-primary-dark text-white px-4 py-2 rounded-lg hover:bg-primary-darker transition-colors font-semibold mb-6"
+        className="flex items-center gap-2 bg-secondary text-white px-4 py-2 rounded-3xl hover:bg-btn-yellow hover:text-chonky-brown transition-colors font-semibold mb-6"
       >
         <FaArrowLeft /> Back to Products
       </button>
 
       {/* Header */}
       <div className="mb-8">
-        <h1 className="display-md text-accent-cream mb-2">Shopping Cart</h1>
-        <p className="text-accent-cream text-lg">Review your items and checkout</p>
+        <h1 className="display-md text-chonky-white mb-2">Shopping Cart</h1>
+        <p className="text-chonky-white text-lg">Review your items and checkout</p>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Cart Items */}
         <div className="lg:col-span-2">
-          <div className="bg-white rounded-lg shadow-md p-6">
-            <h2 className="heading-card text-gray-900 mb-4">
+          <div className="bg-chonky-white rounded-3xl shadow-md p-6">
+            <h2 className="heading-card text-chonky-brown mb-4">
               Cart Items ({cart.length})
             </h2>
             
@@ -271,10 +271,10 @@ export default function CartPage() {
               {cart.map((item) => (
                 <div
                   key={`${item.type}-${item.id}`}
-                  className="flex items-center gap-4 p-4 border border-gray-200 rounded-lg hover:border-blue-300 transition-colors"
+                  className="flex items-center gap-4 p-4 border border-secondary rounded-3xl hover:border-btn-yellow transition-colors"
                 >
                   {/* Item Image/Icon */}
-                  <div className="bg-gradient-to-br from-blue-50 to-indigo-100 w-20 h-20 rounded-lg flex items-center justify-center flex-shrink-0">
+                  <div className="bg-accent-peach w-20 h-20 rounded-3xl flex items-center justify-center flex-shrink-0">
                     <span className="text-3xl">
                       {item.type === 'product' ? '🐾' : '✨'}
                     </span>
@@ -282,20 +282,20 @@ export default function CartPage() {
 
                   {/* Item Info */}
                   <div className="flex-1">
-                    <h3 className="font-semibold text-gray-900">{item.name}</h3>
-                    <p className="text-sm text-gray-500">
+                    <h3 className="font-semibold text-chonky-brown">{item.name}</h3>
+                    <p className="text-sm text-chonky-poop">
                       {item.type === 'product' ? item.category : 'Service'}
                     </p>
                     {item.type === 'product' && item.branch && (
-                      <span className="inline-block mt-1 px-2 py-1 text-xs font-semibold bg-blue-100 text-blue-800 rounded">
+                      <span className="inline-block mt-1 px-2 py-1 text-xs font-semibold bg-brand-sand text-chonky-brown rounded-3xl">
                         {item.branch} Branch
                       </span>
                     )}
-                    <p className="text-sm text-blue-600 mt-1">
+                    <p className="text-sm text-chonky-brown mt-1">
                       {formatCurrency(item.price)} each
                     </p>
                     {item.type === 'product' && (
-                      <p className="text-xs text-gray-500 mt-1">
+                      <p className="text-xs text-chonky-khaki mt-1">
                         {item.availableStock} units available
                       </p>
                     )}
@@ -305,7 +305,7 @@ export default function CartPage() {
                   <div className="flex items-center gap-2">
                     <button
                       onClick={() => updateQuantity(item.id, item.type, -1)}
-                      className="p-2 rounded-lg bg-gray-100 hover:bg-gray-200 transition-colors"
+                      className="p-2 rounded-3xl bg-chonky-khaki hover:bg-chonky-poop transition-colors text-chonky-white"
                       disabled={item.quantity <= 1}
                     >
                       <FaMinus size={12} />
@@ -313,7 +313,7 @@ export default function CartPage() {
                     <span className="w-12 text-center font-semibold">{item.quantity}</span>
                     <button
                       onClick={() => updateQuantity(item.id, item.type, 1)}
-                      className="p-2 rounded-lg bg-gray-100 hover:bg-gray-200 transition-colors"
+                      className="p-2 rounded-3xl bg-chonky-khaki hover:bg-chonky-poop transition-colors text-chonky-white"
                     >
                       <FaPlus size={12} />
                     </button>
@@ -329,7 +329,7 @@ export default function CartPage() {
                   {/* Remove Button */}
                   <button
                     onClick={() => removeItem(item.id, item.type)}
-                    className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                    className="p-2 text-red-600 hover:bg-red-50 rounded-3xl transition-colors"
                   >
                     <FaTrash />
                   </button>
@@ -339,7 +339,7 @@ export default function CartPage() {
 
             {/* Mixed branches warning */}
             {hasMixedBranches() && (
-              <div className="mt-4 p-4 bg-red-50 border border-red-200 rounded-lg">
+              <div className="mt-4 p-4 bg-red-50 border border-red-200 rounded-3xl">
                 <p className="text-red-800 font-semibold">⚠️ Mixed Branches Detected</p>
                 <p className="text-red-600 text-sm mt-1">
                   You have items from multiple branches. Please remove items from one branch to proceed with checkout.
@@ -350,7 +350,7 @@ export default function CartPage() {
 
             <button
               onClick={continueShopping}
-              className="text-secondary hover:text-secondary-light flex items-center gap-2 font-semibold transition-colors"
+              className="text-secondary hover:text-btn-yellow flex items-center gap-2 font-semibold transition-colors"
             >
               ← Continue Shopping
             </button>
@@ -359,17 +359,17 @@ export default function CartPage() {
 
         {/* Order Summary */}
         <div className="lg:col-span-1">
-          <div className="bg-white rounded-lg shadow-md p-6 sticky top-4">
-            <h2 className="heading-card text-gray-900 mb-4">Order Summary</h2>
+          <div className="bg-chonky-white rounded-3xl shadow-md p-6 sticky top-4">
+            <h2 className="heading-section text-chonky-brown mb-4">Order Summary</h2>
 
             {/* Branch Selection */}
             <div className="mb-4">
-              <label className="block text-sm font-semibold text-gray-700 mb-2">
+              <label className="block text-sm font-semibold text-chonky-brown mb-2">
                 Pick-up Branch *
               </label>
-              <div className="px-4 py-3 border-2 border-blue-200 bg-blue-50 rounded-lg">
-                <p className="text-lg font-bold text-blue-900">{selectedBranch}</p>
-                <p className="text-xs text-blue-600 mt-1">
+              <div className="px-4 py-3 border-2 border-chonky-khaki bg-accent-peach rounded-3xl">
+                <p className="text-lg font-bold text-chonky-brown">{selectedBranch}</p>
+                <p className="text-xs text-chonky-poop mt-1">
                   Based on items in your cart
                 </p>
               </div>
@@ -382,7 +382,7 @@ export default function CartPage() {
 
             {/* Notes */}
             <div className="mb-6">
-              <label className="block text-sm font-semibold text-gray-700 mb-2">
+              <label className="block text-sm font-semibold text-chonky-brown mb-2">
                 Order Notes (Optional)
               </label>
               <textarea
@@ -390,17 +390,17 @@ export default function CartPage() {
                 onChange={(e) => setNotes(e.target.value)}
                 placeholder="Any special instructions?"
                 rows="3"
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+                className="w-full px-4 py-2 border border-chonky-khaki rounded-3xl focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
               />
             </div>
 
             {/* Price Breakdown */}
-            <div className="border-t border-gray-200 pt-4 mb-4">
-              <div className="flex justify-between text-gray-600 mb-2">
+            <div className="border-t border-chonky-khaki pt-4 mb-4">
+              <div className="flex justify-between text-chonky-poop mb-2">
                 <span>Items ({cart.reduce((sum, item) => sum + item.quantity, 0)})</span>
                 <span>{formatCurrency(getTotalPrice())}</span>
               </div>
-              <div className="flex justify-between text-xl font-bold text-gray-900 mt-4">
+              <div className="flex justify-between text-xl font-bold text-chonky-brown mt-4">
                 <span>Total</span>
                 <span>{formatCurrency(getTotalPrice())}</span>
               </div>
@@ -410,10 +410,10 @@ export default function CartPage() {
             <button
               onClick={handleCheckout}
               disabled={loading || !user || hasMixedBranches()}
-              className={`w-full py-3 px-4 rounded-lg font-semibold flex items-center justify-center gap-2 transition-colors ${
+              className={`w-full py-3 px-4 rounded-3xl font-semibold flex items-center justify-center gap-2 transition-colors ${
                 loading || !user || hasMixedBranches()
                   ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                  : 'bg-blue-600 text-white hover:bg-blue-700'
+                  : 'bg-secondary text-chonky-white hover:bg-btn-yellow hover:text-chonky-brown'
               }`}
             >
               {loading ? (

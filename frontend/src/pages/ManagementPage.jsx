@@ -52,7 +52,7 @@ export default function ManagementPage() {
             <button
               key={index}
               onClick={() => navigate(module.path)}
-              className={`${module.className} rounded-lg shadow-lg p-6 hover:shadow-2xl transition-all transform hover:scale-105 text-left group`}
+              className={`${module.className} rounded-3xl shadow-lg p-6 hover:shadow-2xl transition-all transform hover:scale-105 text-left group`}
             >
               <div className="mb-4 group-hover:scale-110 transition-transform">
                 {module.icon}

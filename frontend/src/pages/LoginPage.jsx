@@ -33,7 +33,7 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-[80vh] flex items-center justify-center px-4 bg-primary-darker">
-      <div className="w-full max-w-md bg-accent-cream shadow-2xl rounded-xl p-8 text-center border-4 border-secondary">
+      <div className="w-full max-w-md bg-accent-cream shadow-2xl rounded-3xl p-8 text-center border-4 border-secondary">
         {/* Back Button - Top of card */}
         <button
           onClick={() => navigate('/home')}
@@ -61,7 +61,7 @@ export default function LoginPage() {
               onChange={onChange} 
               type="text" 
               required 
-              className="mt-1 block w-full rounded-lg border-2 border-primary px-3 py-2 shadow-sm focus:ring-2 focus:ring-secondary focus:border-secondary text-primary-darker bg-white" 
+              className="mt-1 block w-full rounded-3xl border-2 border-primary px-3 py-2 shadow-sm focus:ring-2 focus:ring-secondary focus:border-secondary text-primary-darker bg-white" 
             />
           </div>
 
@@ -74,7 +74,7 @@ export default function LoginPage() {
               onChange={onChange} 
               type="password" 
               required 
-              className="mt-1 block w-full rounded-lg border-2 border-primary px-3 py-2 shadow-sm focus:ring-2 focus:ring-secondary focus:border-secondary text-primary-darker bg-white" 
+              className="mt-1 block w-full rounded-3xl border-2 border-primary px-3 py-2 shadow-sm focus:ring-2 focus:ring-secondary focus:border-secondary text-primary-darker bg-white" 
             />
           </div>
 
@@ -96,7 +96,7 @@ export default function LoginPage() {
             <button 
               type="submit" 
               disabled={loading} 
-              className="w-full inline-flex justify-center items-center px-4 py-3 border border-transparent text-base font-semibold rounded-lg text-accent-cream bg-secondary hover:bg-secondary-light transition-colors shadow-lg disabled:opacity-60"
+              className="w-full inline-flex justify-center items-center px-4 py-3 border border-transparent text-base font-semibold rounded-3xl text-chonky-white bg-secondary hover:bg-btn-yellow hover:text-chonky-brown transition-colors shadow-lg disabled:opacity-60"
             >
               {loading ? 'Signing in...' : 'Sign in'}
             </button>
@@ -105,7 +105,7 @@ export default function LoginPage() {
         {error && <div className="mt-4 text-sm text-red-600 font-medium">{error}</div>}
 
         <div className="mt-6 text-sm text-primary-dark">
-          Don't have an account? <Link to="/register/user" className="text-secondary hover:text-secondary-light font-semibold ml-1">Sign up</Link>
+          Don't have an account? <Link to="/register/user" className="text-secondary hover:text-btn-yellow font-semibold ml-1">Sign up</Link>
         </div>
       </div>
     </div>

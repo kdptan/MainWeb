@@ -97,7 +97,7 @@ export default function AdminFeedbackPage() {
 
       {/* Stats */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-        <div className="bg-white rounded-lg shadow-md p-6">
+        <div className="bg-white rounded-3xl shadow-md p-6">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-gray-600 mb-1">Total Feedback</p>
@@ -107,7 +107,7 @@ export default function AdminFeedbackPage() {
           </div>
         </div>
         
-        <div className="bg-white rounded-lg shadow-md p-6">
+        <div className="bg-white rounded-3xl shadow-md p-6">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-gray-600 mb-1">Average Rating</p>
@@ -117,7 +117,7 @@ export default function AdminFeedbackPage() {
           </div>
         </div>
 
-        <div className="bg-white rounded-lg shadow-md p-6">
+        <div className="bg-white rounded-3xl shadow-md p-6">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-gray-600 mb-1">Rating Breakdown</p>
@@ -138,13 +138,13 @@ export default function AdminFeedbackPage() {
       </div>
 
       {/* Filters */}
-      <div className="bg-white rounded-lg shadow-md p-4 mb-6">
+      <div className="bg-white rounded-3xl shadow-md p-4 mb-6">
         <div className="flex flex-wrap gap-4 items-center">
           <label className="text-sm font-medium text-gray-700">Filter by Rating:</label>
           <select
             value={filterRating}
             onChange={(e) => setFilterRating(e.target.value)}
-            className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="px-4 py-2 border border-gray-300 rounded-3xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           >
             <option value="all">All Ratings</option>
             <option value="5">5 Stars</option>
@@ -166,7 +166,7 @@ export default function AdminFeedbackPage() {
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
         </div>
       ) : filteredFeedbacks.length === 0 ? (
-        <div className="bg-white rounded-lg shadow-md p-12 text-center">
+        <div className="bg-white rounded-3xl shadow-md p-12 text-center">
           <FaComment className="mx-auto text-gray-300 mb-4" size={64} />
           <h3 className="text-xl font-semibold text-gray-700 mb-2">No Feedback Yet</h3>
           <p className="text-gray-500">
@@ -178,7 +178,7 @@ export default function AdminFeedbackPage() {
       ) : (
         <div className="space-y-4">
           {filteredFeedbacks.map((feedback) => (
-            <div key={feedback.id} className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow">
+            <div key={feedback.id} className="bg-white rounded-3xl shadow-md p-6 hover:shadow-lg transition-shadow">
               {/* Header */}
               <div className="flex flex-wrap items-start justify-between mb-4 gap-4">
                 <div className="flex items-center gap-3">
@@ -208,14 +208,14 @@ export default function AdminFeedbackPage() {
 
               {/* Comment */}
               {feedback.comment && (
-                <div className="bg-gray-50 rounded-lg p-4 border-l-4 border-blue-500">
+                <div className="bg-gray-50 rounded-3xl p-4 border-l-4 border-blue-500">
                   <p className="text-gray-700 whitespace-pre-wrap">{feedback.comment}</p>
                 </div>
               )}
 
               {/* No Comment */}
               {!feedback.comment && (
-                <div className="bg-gray-50 rounded-lg p-4 border-l-4 border-gray-300">
+                <div className="bg-gray-50 rounded-3xl p-4 border-l-4 border-gray-300">
                   <p className="text-gray-400 italic">No written feedback provided</p>
                 </div>
               )}

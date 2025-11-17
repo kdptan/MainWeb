@@ -273,31 +273,30 @@ export default function AdminOrdersPage() {
       />
 
       {/* Header */}
-      <div className="mb-8">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="display-md text-accent-cream mb-2 flex items-center gap-3">
-              <FaShoppingBag /> Admin: All Orders
-            </h1>
-            <p className="text-accent-cream">View and manage orders from all users</p>
-          </div>
-          <button
-            onClick={() => navigate('/products')}
-            className="flex items-center gap-2 bg-primary-dark text-white px-4 py-2 rounded-lg hover:bg-primary-darker transition-colors font-semibold"
-          >
-            <FaArrowLeft /> Back to Products
-          </button>
+      <div className="mb-8 relative text-center">
+        <button
+          onClick={() => navigate('/products')}
+          className="absolute left-0 top-1/2 -translate-y-1/2 flex items-center gap-2 bg-secondary text-white px-4 py-2 rounded-3xl hover:bg-btn-yellow hover:text-chonky-brown transition-colors font-semibold"
+        >
+          <FaArrowLeft /> Back to Products
+        </button>
+        
+        <div>
+          <h1 className="display-md text-accent-cream mb-2 flex items-center justify-center gap-3">
+            <FaShoppingBag /> Admin: All Orders
+          </h1>
+          <p className="text-accent-cream">View and manage orders from all users</p>
         </div>
       </div>
 
       {/* Filters */}
-      <div className="bg-white rounded-lg shadow-sm p-4 mb-6">
+      <div className="bg-white rounded-3xl shadow-sm p-4 mb-6">
         <div className="flex flex-wrap gap-4">
           {/* Status Filter */}
           <div className="flex gap-2">
             <button
               onClick={() => setFilterStatus('all')}
-              className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+              className={`px-4 py-2 rounded-3xl font-medium transition-colors ${
                 filterStatus === 'all'
                   ? 'bg-red-600 text-white'
                   : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
@@ -307,7 +306,7 @@ export default function AdminOrdersPage() {
             </button>
             <button
               onClick={() => setFilterStatus('pending')}
-              className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+              className={`px-4 py-2 rounded-3xl font-medium transition-colors ${
                 filterStatus === 'pending'
                   ? 'bg-yellow-500 text-white'
                   : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
@@ -317,7 +316,7 @@ export default function AdminOrdersPage() {
             </button>
             <button
               onClick={() => setFilterStatus('completed')}
-              className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+              className={`px-4 py-2 rounded-3xl font-medium transition-colors ${
                 filterStatus === 'completed'
                   ? 'bg-green-600 text-white'
                   : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
@@ -327,7 +326,7 @@ export default function AdminOrdersPage() {
             </button>
             <button
               onClick={() => setFilterStatus('cancelled')}
-              className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+              className={`px-4 py-2 rounded-3xl font-medium transition-colors ${
                 filterStatus === 'cancelled'
                   ? 'bg-red-500 text-white'
                   : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
@@ -342,7 +341,7 @@ export default function AdminOrdersPage() {
             <select
               value={filterBranch}
               onChange={(e) => setFilterBranch(e.target.value)}
-              className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
+              className="px-4 py-2 border border-gray-300 rounded-3xl focus:ring-2 focus:ring-red-500 focus:border-transparent"
             >
               <option value="all">All Branches</option>
               <option value="Matina">Matina</option>
@@ -354,10 +353,10 @@ export default function AdminOrdersPage() {
 
       {/* Orders List */}
       {orders.length === 0 ? (
-        <div className="text-center py-12 bg-white rounded-lg shadow-sm">
+        <div className="text-center py-12 bg-white rounded-3xl shadow-sm">
           <FaBox className="mx-auto text-6xl text-gray-300 mb-4" />
-          <h3 className="text-xl font-semibold text-gray-600 mb-2">No orders found</h3>
-          <p className="text-gray-500">No orders match your current filters.</p>
+          <h3 className="text-xl font-semibold text-chonky-poop mb-2">No orders found</h3>
+          <p className="text-chonky-khaki">No orders match your current filters.</p>
         </div>
       ) : (
         <>
@@ -367,14 +366,14 @@ export default function AdminOrdersPage() {
               .map((order) => (
             <div
               key={order.id}
-              className="bg-white rounded-lg shadow-md border border-gray-200 overflow-hidden"
+              className="bg-white rounded-3xl shadow-md border border-gray-200 overflow-hidden"
             >
               {/* Order Header */}
               <div className="p-6 bg-gray-50 border-b border-gray-200">
                 <div className="flex justify-between items-start mb-4">
                   <div className="flex-1">
                     <div className="flex items-center gap-4 mb-2">
-                      <h3 className="text-lg font-semibold text-gray-900">
+                      <h3 className="text-lg font-semibold text-chonky-brown">
                         Order ID: {formatOrderId(order.order_id || order.id)}
                       </h3>
                       <span
@@ -388,15 +387,15 @@ export default function AdminOrdersPage() {
                     </div>
                     
                     {/* User Information */}
-                    <div className="flex items-center gap-2 text-sm text-gray-600 mb-1">
-                      <FaUser className="text-gray-400" />
+                    <div className="flex items-center gap-2 text-sm text-chonky-poop mb-1">
+                      <FaUser className="text-chonky-khaki" />
                       <span className="font-medium">
                         {order.user.first_name} {order.user.last_name}
                       </span>
-                      <span className="text-gray-400">({order.user.email})</span>
+                      <span className="text-chonky-khaki">({order.user.email})</span>
                     </div>
                     
-                    <div className="flex items-center gap-4 text-sm text-gray-600">
+                    <div className="flex items-center gap-4 text-sm text-chonky-poop">
                       <span>
                         <FaClock className="inline mr-1" />
                         {formatDate(order.created_at)}
@@ -408,10 +407,10 @@ export default function AdminOrdersPage() {
                   </div>
                   
                   <div className="text-right">
-                    <p className="text-2xl font-bold text-gray-900">
+                    <p className="text-2xl font-bold text-chonky-brown">
                       {formatCurrency(order.total_price)}
                     </p>
-                    <p className="text-sm text-gray-500">{order.items.length} items</p>
+                    <p className="text-sm text-chonky-khaki">{order.items.length} items</p>
                   </div>
                 </div>
 
@@ -419,7 +418,7 @@ export default function AdminOrdersPage() {
                 <div className="flex gap-2 mb-4">
                   <button
                     onClick={() => toggleOrderDetails(order.id)}
-                    className="flex items-center gap-2 text-red-600 hover:text-red-700 font-medium text-sm transition-colors"
+                    className="flex items-center gap-2 text-accent-peach hover:text-chonky-brown font-medium text-sm transition-colors"
                   >
                     {expandedOrder === order.id ? (
                       <>
@@ -436,7 +435,7 @@ export default function AdminOrdersPage() {
                   {order.status === 'pending' && (
                     <button
                       onClick={() => handleMarkAsAvailableForPickup(order.id)}
-                      className="ml-auto flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium text-sm transition-colors"
+                      className="ml-auto flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-3xl hover:bg-blue-700 font-medium text-sm transition-colors"
                     >
                       🔔 Mark as Available for Pickup
                     </button>
@@ -446,7 +445,7 @@ export default function AdminOrdersPage() {
                   {order.status === 'available_for_pickup' && (
                     <button
                       onClick={() => handleMarkAsCompleted(order.id)}
-                      className="ml-auto flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 font-medium text-sm transition-colors"
+                      className="ml-auto flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-3xl hover:bg-green-700 font-medium text-sm transition-colors"
                     >
                       <FaCheckCircle /> Mark as Completed
                     </button>
@@ -456,7 +455,7 @@ export default function AdminOrdersPage() {
                   {order.status === 'completed' && (
                     <button
                       onClick={() => handleViewReceipt(order.id)}
-                      className="ml-auto flex items-center gap-2 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 font-medium text-sm transition-colors"
+                      className="ml-auto flex items-center gap-2 px-4 py-2 bg-btn-yellow text-chonky-brown rounded-3xl hover:bg-secondary hover:text-chonky-white font-medium text-sm transition-colors"
                     >
                       <FaReceipt /> View Receipt
                     </button>
@@ -466,7 +465,7 @@ export default function AdminOrdersPage() {
                   {(order.status === 'pending' || order.status === 'available_for_pickup') && (
                     <button
                       onClick={() => handleCancelOrder(order.id)}
-                      className="flex items-center gap-2 px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 font-medium text-sm transition-colors"
+                      className="flex items-center gap-2 px-4 py-2 bg-red-500 text-white rounded-3xl hover:bg-red-600 font-medium text-sm transition-colors"
                     >
                       <FaTimesCircle /> Cancel Order
                     </button>
@@ -479,21 +478,21 @@ export default function AdminOrdersPage() {
                 <div className="p-6">
                   {/* Order Items */}
                   <div className="mb-6">
-                    <h4 className="font-semibold text-gray-900 mb-3">Order Items:</h4>
+                    <h4 className="font-semibold text-chonky-brown mb-3">Order Items:</h4>
                     <div className="space-y-2">
                       {order.items.map((item, index) => (
                         <div
                           key={index}
-                          className="flex justify-between items-start p-4 bg-gray-50 rounded-lg border border-gray-200"
+                          className="flex justify-between items-start p-4 bg-gray-50 rounded-3xl border border-gray-200"
                         >
                           <div className="flex-1">
-                            <p className="font-medium text-gray-900 mb-1">
+                            <p className="font-medium text-chonky-brown mb-1">
                               {item.product_details?.name || 
                                item.service_details?.service_name || 
                                item.item_name || 
                                'Unknown Item'}
                             </p>
-                            <div className="flex flex-wrap gap-2 text-sm text-gray-600">
+                            <div className="flex flex-wrap gap-2 text-sm text-chonky-poop">
                               <span className={`px-2 py-1 rounded text-xs font-medium ${
                                 item.item_type === 'product' 
                                   ? 'bg-blue-100 text-blue-800' 
@@ -506,12 +505,12 @@ export default function AdminOrdersPage() {
                               {item.item_type === 'product' && item.product_details && (
                                 <>
                                   {item.product_details.category && (
-                                    <span className="text-gray-500">
+                                    <span className="text-chonky-khaki">
                                       Category: {item.product_details.category}
                                     </span>
                                   )}
                                   {item.product_details.branch && (
-                                    <span className="text-gray-500">
+                                    <span className="text-chonky-khaki">
                                       Branch: {item.product_details.branch}
                                     </span>
                                   )}
@@ -522,7 +521,7 @@ export default function AdminOrdersPage() {
                               {item.item_type === 'service' && item.service_details && (
                                 <>
                                   {item.service_details.description && (
-                                    <span className="text-gray-500 block mt-1">
+                                    <span className="text-chonky-khaki block mt-1">
                                       {item.service_details.description}
                                     </span>
                                   )}
@@ -531,12 +530,12 @@ export default function AdminOrdersPage() {
                             </div>
                           </div>
                           <div className="text-right ml-4">
-                            <p className="text-sm text-gray-600">Qty: {item.quantity}</p>
-                            <p className="font-semibold text-gray-900 text-lg">
+                            <p className="text-sm text-chonky-poop">Qty: {item.quantity}</p>
+                            <p className="font-semibold text-chonky-brown text-lg">
                               {formatCurrency(item.price)}
                             </p>
                             {item.item_type === 'product' && item.product_details?.unit_cost && (
-                              <p className="text-xs text-gray-500">
+                              <p className="text-xs text-chonky-khaki">
                                 {formatCurrency(item.product_details.unit_cost)} each
                               </p>
                             )}
@@ -549,16 +548,16 @@ export default function AdminOrdersPage() {
                   {/* Notes */}
                   {order.notes && (
                     <div className="mb-4">
-                      <h4 className="font-semibold text-gray-900 mb-2">Notes:</h4>
-                      <p className="text-gray-700 bg-gray-50 p-3 rounded-lg">{order.notes}</p>
+                      <h4 className="font-semibold text-chonky-brown mb-2">Notes:</h4>
+                      <p className="text-gray-700 bg-chonky-khaki p-3 rounded-3xl">{order.notes}</p>
                     </div>
                   )}
 
                   {/* Completion Date */}
                   {order.completed_at && (
                     <div>
-                      <h4 className="font-semibold text-gray-900 mb-2">Completed At:</h4>
-                      <p className="text-gray-700">{formatDate(order.completed_at)}</p>
+                      <h4 className="font-semibold text-chonky-brown mb-2">Completed At:</h4>
+                      <p className="text-chonky-poop">{formatDate(order.completed_at)}</p>
                     </div>
                   )}
                 </div>
@@ -572,7 +571,7 @@ export default function AdminOrdersPage() {
             <button
               onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
               disabled={currentPage === 1}
-              className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:bg-gray-400 disabled:cursor-not-allowed font-medium transition-colors"
+              className="px-4 py-2 bg-secondary text-chonky-white rounded-3xl hover:bg-chonky-poop disabled:bg-chonky-khaki disabled:cursor-not-allowed font-medium transition-colors"
             >
               Previous
             </button>
@@ -583,10 +582,10 @@ export default function AdminOrdersPage() {
                   <button
                     key={page}
                     onClick={() => setCurrentPage(page)}
-                    className={`px-3 py-2 rounded-lg font-medium transition-colors ${
+                    className={`px-3 py-2 rounded-3xl font-medium transition-colors ${
                       currentPage === page
-                        ? 'bg-red-600 text-white'
-                        : 'bg-gray-200 text-gray-800 hover:bg-gray-300'
+                        ? 'bg-secondary text-chonky-white'
+                        : 'bg-chonky-white text-chonky-brown hover:bg-chonky-poop hover:text-chonky-white'
                     }`}
                   >
                     {page}
@@ -602,13 +601,13 @@ export default function AdminOrdersPage() {
                 )
               }
               disabled={currentPage === Math.ceil(orders.length / ordersPerPage)}
-              className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:bg-gray-400 disabled:cursor-not-allowed font-medium transition-colors"
+              className="px-4 py-2 bg-secondary text-chonky-white rounded-3xl hover:bg-chonky-poop disabled:bg-chonky-khaki disabled:cursor-not-allowed font-medium transition-colors"
             >
               Next
             </button>
           </div>
 
-          <p className="text-center mt-4 text-gray-600">
+          <p className="text-center mt-4 text-chonky-khaki">
             Page {currentPage} of {Math.ceil(orders.length / ordersPerPage)} (Showing {Math.min(ordersPerPage, orders.length - (currentPage - 1) * ordersPerPage)} of {orders.length} orders)
           </p>
         </>

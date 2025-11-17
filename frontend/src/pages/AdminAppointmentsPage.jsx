@@ -200,7 +200,7 @@ export default function AdminAppointmentsPage() {
         <div className="mb-8">
           <button
             onClick={() => navigate('/appointment')}
-            className="mb-4 flex items-center gap-2 px-4 py-2 bg-secondary text-white font-semibold rounded-lg hover:bg-secondary-light transition-colors"
+            className="mb-4 flex items-center gap-2 px-4 py-2 bg-secondary text-white font-semibold rounded-3xl hover:bg-btn-yellow hover:text-chonky-brown transition-colors"
           >
             ← Back to Appointments
           </button>
@@ -209,7 +209,7 @@ export default function AdminAppointmentsPage() {
         </div>
 
         {/* Filters */}
-        <div className="bg-white rounded-lg border border-gray-300 shadow-md p-6 mb-6">
+        <div className="bg-white rounded-3xl border border-gray-300 shadow-md p-6 mb-6">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             {/* Status Filter */}
             <div>
@@ -217,7 +217,7 @@ export default function AdminAppointmentsPage() {
               <select
                 value={statusFilter}
                 onChange={(e) => setStatusFilter(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg bg-white text-gray-900 focus:ring-2 focus:ring-secondary focus:border-transparent"
+                className="w-full px-3 py-2 border border-gray-300 rounded-3xl bg-white text-gray-900 focus:ring-2 focus:ring-secondary focus:border-transparent"
               >
                 <option value="all" className="bg-white text-gray-900">All Appointments</option>
                 <option value="upcoming" className="bg-white text-gray-900">Upcoming Only</option>
@@ -230,7 +230,7 @@ export default function AdminAppointmentsPage() {
               <select
                 value={branchFilter}
                 onChange={(e) => setBranchFilter(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg bg-white text-gray-900 focus:ring-2 focus:ring-secondary focus:border-transparent"
+                className="w-full px-3 py-2 border border-gray-300 rounded-3xl bg-white text-gray-900 focus:ring-2 focus:ring-secondary focus:border-transparent"
               >
                 <option value="all" className="bg-white text-gray-900">All Branches</option>
                 <option value="Matina" className="bg-white text-gray-900">Matina</option>
@@ -245,7 +245,7 @@ export default function AdminAppointmentsPage() {
                 type="month"
                 value={dateFilter}
                 onChange={(e) => setDateFilter(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg bg-white text-gray-900 focus:ring-2 focus:ring-secondary focus:border-transparent"
+                className="w-full px-3 py-2 border border-gray-300 rounded-3xl bg-white text-gray-900 focus:ring-2 focus:ring-secondary focus:border-transparent"
               />
             </div>
 
@@ -257,7 +257,7 @@ export default function AdminAppointmentsPage() {
                   setDateFilter('');
                   setStatusFilter('upcoming');
                 }}
-                className="w-full px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 border border-gray-300 font-medium transition-colors"
+                className="w-full px-4 py-2 bg-gray-200 text-gray-700 rounded-3xl hover:bg-gray-300 border border-gray-300 font-medium transition-colors"
               >
                 Clear Filters
               </button>
@@ -271,7 +271,7 @@ export default function AdminAppointmentsPage() {
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-secondary"></div>
           </div>
         ) : appointments.length === 0 ? (
-          <div className="bg-white/10 backdrop-blur-sm rounded-lg border border-secondary/20 p-12 text-center">
+          <div className="bg-white/10 backdrop-blur-sm rounded-3xl border border-secondary/20 p-12 text-center">
             <FaCalendar className="mx-auto text-secondary/50 mb-4" size={64} />
             <h3 className="text-xl font-bold text-accent-cream mb-2">No Appointments Found</h3>
             <p className="text-gray-400">No appointments match your current filters.</p>
@@ -279,7 +279,7 @@ export default function AdminAppointmentsPage() {
         ) : (
           <div className="space-y-4">
             {appointments.map((appointment) => (
-              <div key={appointment.id} className="bg-white rounded-lg p-6 hover:shadow-lg transition-shadow">
+              <div key={appointment.id} className="bg-white rounded-3xl p-6 hover:shadow-lg transition-shadow">
                 <div className="flex justify-between items-start mb-4">
                   <div className="flex-1">
                     <div className="flex items-center gap-3 mb-2">
@@ -296,7 +296,7 @@ export default function AdminAppointmentsPage() {
                 </div>
 
                 {/* Customer Info */}
-                <div className="bg-secondary/5 rounded-lg p-4 mb-4 border border-secondary/10">
+                <div className="bg-secondary/5 rounded-3xl p-4 mb-4 border border-secondary/10">
                   <div className="flex items-center gap-2 text-gray-900">
                     <FaUser className="text-secondary" />
                     <span className="font-medium">Customer:</span>
@@ -357,7 +357,7 @@ export default function AdminAppointmentsPage() {
                         setSelectedPaymentAppointment(appointment);
                         setPaymentModalOpen(true);
                       }}
-                      className="px-4 py-2 bg-secondary text-white rounded-lg hover:bg-orange-500 flex items-center gap-2"
+                      className="px-4 py-2 bg-secondary text-white rounded-3xl hover:bg-orange-500 flex items-center gap-2"
                     >
                       <FaCheckCircle />
                       Complete Payment
@@ -375,7 +375,7 @@ export default function AdminAppointmentsPage() {
                         setSelectedReceiptAppointment(appointmentWithPayment);
                         setReceiptModalOpen(true);
                       }}
-                      className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 flex items-center gap-2"
+                      className="px-4 py-2 bg-secondary text-chonky-white rounded-3xl hover:bg-btn-yellow hover:text-chonky-brown flex items-center gap-2"
                     >
                       <FaReceipt />
                       View Receipt

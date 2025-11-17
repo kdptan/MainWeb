@@ -234,7 +234,7 @@ export default function AdminServicesPage() {
           </div>
           <button
             onClick={() => handleOpenModal()}
-            className="bg-secondary hover:bg-secondary-dark text-white px-6 py-3 rounded-lg flex items-center gap-2 transition"
+            className="bg-secondary hover:bg-secondary-dark text-white px-6 py-3 rounded-3xl flex items-center gap-2 transition"
           >
             <FaPlus size={18} />
             Add Service
@@ -247,11 +247,11 @@ export default function AdminServicesPage() {
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-secondary-lighter"></div>
           </div>
         ) : services.length === 0 ? (
-          <div className="bg-primary-dark rounded-lg p-8 text-center text-accent-cream">
+          <div className="bg-primary-dark rounded-3xl p-8 text-center text-accent-cream">
             <p className="text-xl mb-4">No services yet. Create your first service!</p>
             <button
               onClick={() => handleOpenModal()}
-              className="bg-secondary hover:bg-secondary-dark text-white px-6 py-3 rounded-lg inline-flex items-center gap-2 transition"
+              className="bg-secondary hover:bg-secondary-dark text-white px-6 py-3 rounded-3xl inline-flex items-center gap-2 transition"
             >
               <FaPlus size={18} />
               Create Service
@@ -260,19 +260,19 @@ export default function AdminServicesPage() {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {services.map((service) => (
-              <div key={service.id} className="bg-primary-dark rounded-lg p-6 border-2 border-secondary">
+              <div key={service.id} className="bg-primary-dark rounded-3xl p-6 border-2 border-secondary">
                 <div className="flex justify-between items-start mb-4">
                   <h3 className="heading-card text-accent-cream">{service.service_name}</h3>
                   <div className="flex gap-2">
                     <button
                       onClick={() => handleOpenModal(service)}
-                      className="bg-blue-500 hover:bg-blue-600 text-white p-2 rounded-lg transition"
+                      className="bg-blue-500 hover:bg-blue-600 text-white p-2 rounded-3xl transition"
                     >
                       <FaEdit size={16} />
                     </button>
                     <button
                       onClick={() => handleDelete(service.id)}
-                      className="bg-red-500 hover:bg-red-600 text-white p-2 rounded-lg transition"
+                      className="bg-red-500 hover:bg-red-600 text-white p-2 rounded-3xl transition"
                     >
                       <FaTrash size={16} />
                     </button>
@@ -330,7 +330,7 @@ export default function AdminServicesPage() {
       {/* Modal */}
       {showModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-start justify-center pt-4 z-50">
-          <div className="bg-primary-dark rounded-lg p-8 max-w-2xl w-full max-h-[90vh] overflow-y-auto border-2 border-secondary">
+          <div className="bg-primary-dark rounded-3xl p-8 max-w-2xl w-full max-h-[90vh] overflow-y-auto border-2 border-secondary">
             <div className="flex justify-between items-center mb-6">
               <h2 className="heading-main text-accent-cream">
                 {editingService ? 'Edit Service' : 'Create Service'}
@@ -355,7 +355,7 @@ export default function AdminServicesPage() {
                   value={formData.service_name}
                   onChange={handleInputChange}
                   placeholder="e.g., Dog Grooming"
-                  className="w-full px-4 py-2 rounded-lg bg-primary border-2 border-secondary text-accent-cream placeholder-gray-400 focus:outline-none focus:border-secondary-light"
+                  className="w-full px-4 py-2 rounded-3xl bg-primary border-2 border-secondary text-accent-cream placeholder-gray-400 focus:outline-none focus:border-secondary-light"
                 />
               </div>
 
@@ -370,7 +370,7 @@ export default function AdminServicesPage() {
                   onChange={handleInputChange}
                   placeholder="Service description..."
                   rows="3"
-                  className="w-full px-4 py-2 rounded-lg bg-primary border-2 border-secondary text-accent-cream placeholder-gray-400 focus:outline-none focus:border-secondary-light"
+                  className="w-full px-4 py-2 rounded-3xl bg-primary border-2 border-secondary text-accent-cream placeholder-gray-400 focus:outline-none focus:border-secondary-light"
                 />
               </div>
 
@@ -385,7 +385,7 @@ export default function AdminServicesPage() {
                   value={formData.duration_minutes}
                   onChange={handleInputChange}
                   min="1"
-                  className="w-full px-4 py-2 rounded-lg bg-primary border-2 border-secondary text-accent-cream placeholder-gray-400 focus:outline-none focus:border-secondary-light"
+                  className="w-full px-4 py-2 rounded-3xl bg-primary border-2 border-secondary text-accent-cream placeholder-gray-400 focus:outline-none focus:border-secondary-light"
                 />
               </div>
 
@@ -404,7 +404,7 @@ export default function AdminServicesPage() {
               </div>
 
               {/* Size-Based Pricing Toggle */}
-              <div className="bg-primary p-4 rounded-lg border-2 border-secondary">
+              <div className="bg-primary p-4 rounded-3xl border-2 border-secondary">
                 <div className="flex items-center gap-3 mb-4">
                   <input
                     type="checkbox"
@@ -432,7 +432,7 @@ export default function AdminServicesPage() {
                         placeholder="Price for small"
                         step="0.01"
                         min="0"
-                        className="w-full px-3 py-2 rounded-lg bg-primary-dark border-2 border-secondary text-accent-cream placeholder-gray-400 focus:outline-none focus:border-secondary-light"
+                        className="w-full px-3 py-2 rounded-3xl bg-primary-dark border-2 border-secondary text-accent-cream placeholder-gray-400 focus:outline-none focus:border-secondary-light"
                       />
                     </div>
                     <div>
@@ -447,7 +447,7 @@ export default function AdminServicesPage() {
                         placeholder="Price for medium"
                         step="0.01"
                         min="0"
-                        className="w-full px-3 py-2 rounded-lg bg-primary-dark border-2 border-secondary text-accent-cream placeholder-gray-400 focus:outline-none focus:border-secondary-light"
+                        className="w-full px-3 py-2 rounded-3xl bg-primary-dark border-2 border-secondary text-accent-cream placeholder-gray-400 focus:outline-none focus:border-secondary-light"
                       />
                     </div>
                     <div>
@@ -462,7 +462,7 @@ export default function AdminServicesPage() {
                         placeholder="Price for large"
                         step="0.01"
                         min="0"
-                        className="w-full px-3 py-2 rounded-lg bg-primary-dark border-2 border-secondary text-accent-cream placeholder-gray-400 focus:outline-none focus:border-secondary-light"
+                        className="w-full px-3 py-2 rounded-3xl bg-primary-dark border-2 border-secondary text-accent-cream placeholder-gray-400 focus:outline-none focus:border-secondary-light"
                       />
                     </div>
                     <div>
@@ -477,7 +477,7 @@ export default function AdminServicesPage() {
                         placeholder="Price for extra large"
                         step="0.01"
                         min="0"
-                        className="w-full px-3 py-2 rounded-lg bg-primary-dark border-2 border-secondary text-accent-cream placeholder-gray-400 focus:outline-none focus:border-secondary-light"
+                        className="w-full px-3 py-2 rounded-3xl bg-primary-dark border-2 border-secondary text-accent-cream placeholder-gray-400 focus:outline-none focus:border-secondary-light"
                       />
                     </div>
                   </div>
@@ -494,7 +494,7 @@ export default function AdminServicesPage() {
                       placeholder="Service price"
                       step="0.01"
                       min="0"
-                      className="w-full px-3 py-2 rounded-lg bg-primary-dark border-2 border-secondary text-accent-cream placeholder-gray-400 focus:outline-none focus:border-secondary-light"
+                      className="w-full px-3 py-2 rounded-3xl bg-primary-dark border-2 border-secondary text-accent-cream placeholder-gray-400 focus:outline-none focus:border-secondary-light"
                     />
                   </div>
                 )}
@@ -510,12 +510,12 @@ export default function AdminServicesPage() {
                     value={newInclusion}
                     onChange={(e) => setNewInclusion(e.target.value)}
                     placeholder="Add inclusion..."
-                    className="flex-1 px-4 py-2 rounded-lg bg-primary border-2 border-secondary text-accent-cream placeholder-gray-400 focus:outline-none focus:border-secondary-light"
+                    className="flex-1 px-4 py-2 rounded-3xl bg-primary border-2 border-secondary text-accent-cream placeholder-gray-400 focus:outline-none focus:border-secondary-light"
                   />
                   <button
                     type="button"
                     onClick={handleAddInclusion}
-                    className="bg-secondary hover:bg-secondary-dark text-white px-4 py-2 rounded-lg transition"
+                    className="bg-secondary hover:bg-secondary-dark text-white px-4 py-2 rounded-3xl transition"
                   >
                     Add
                   </button>
@@ -525,7 +525,7 @@ export default function AdminServicesPage() {
                     {formData.inclusions.map((inclusion, idx) => (
                       <div
                         key={idx}
-                        className="flex justify-between items-center bg-primary p-2 rounded-lg border border-secondary"
+                        className="flex justify-between items-center bg-primary p-2 rounded-3xl border border-secondary"
                       >
                         <span className="text-accent-cream">{inclusion}</span>
                         <button
@@ -546,14 +546,14 @@ export default function AdminServicesPage() {
                 <button
                   type="button"
                   onClick={handleCloseModal}
-                  className="bg-gray-600 hover:bg-gray-700 text-white px-6 py-3 rounded-lg transition"
+                  className="bg-gray-600 hover:bg-gray-700 text-white px-6 py-3 rounded-3xl transition"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={submitting}
-                  className="bg-secondary hover:bg-secondary-dark text-white px-6 py-3 rounded-lg transition disabled:opacity-50"
+                  className="bg-secondary hover:bg-secondary-dark text-white px-6 py-3 rounded-3xl transition disabled:opacity-50"
                 >
                   {submitting ? 'Saving...' : editingService ? 'Update' : 'Create'}
                 </button>

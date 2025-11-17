@@ -129,7 +129,7 @@ export default function MyAppointmentsPage() {
         <div className="mb-8">
           <button
             onClick={() => navigate('/')}
-            className="mb-4 flex items-center gap-2 font-medium px-4 py-2 rounded-lg bg-secondary text-white hover:bg-orange-500 transition-colors shadow-md"
+            className="mb-4 flex items-center gap-2 font-medium px-4 py-2 rounded-3xl bg-secondary text-white hover:bg-orange-500 transition-colors shadow-md"
           >
             ← Back to Home
           </button>
@@ -138,54 +138,54 @@ export default function MyAppointmentsPage() {
         </div>
 
         {/* Filter Tabs */}
-        <div className="bg-white rounded-lg shadow-md p-4 mb-6 border border-gray-300">
+        <div className="bg-white rounded-3xl shadow-md p-4 mb-6 border border-secondary">
           <div className="flex flex-wrap gap-2">
             <button
               onClick={() => setStatusFilter('all')}
-              className={`px-4 py-2 rounded-lg transition-all font-medium ${
+              className={`px-4 py-2 rounded-3xl transition-all font-medium ${
                 statusFilter === 'all'
                   ? 'bg-secondary text-white shadow-lg'
-                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200 border border-gray-300'
+                  : 'bg-gray-100 text-chonky-poop hover:bg-gray-200 border border-secondary'
               }`}
             >
               All Appointments
             </button>
             <button
               onClick={() => setStatusFilter('pending')}
-              className={`px-4 py-2 rounded-lg transition-all font-medium ${
+              className={`px-4 py-2 rounded-3xl transition-all font-medium ${
                 statusFilter === 'pending'
                   ? 'bg-yellow-500 text-white shadow-lg'
-                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200 border border-gray-300'
+                  : 'bg-gray-100 text-chonky-poop hover:bg-gray-200 border border-secondary'
               }`}
             >
               Pending
             </button>
             <button
               onClick={() => setStatusFilter('confirmed')}
-              className={`px-4 py-2 rounded-lg transition-all font-medium ${
+              className={`px-4 py-2 rounded-3xl transition-all font-medium ${
                 statusFilter === 'confirmed'
                   ? 'bg-secondary text-white shadow-lg'
-                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200 border border-gray-300'
+                  : 'bg-gray-100 text-chonky-poop hover:bg-gray-200 border border-secondary'
               }`}
             >
               Confirmed
             </button>
             <button
               onClick={() => setStatusFilter('completed')}
-              className={`px-4 py-2 rounded-lg transition-all font-medium ${
+              className={`px-4 py-2 rounded-3xl transition-all font-medium ${
                 statusFilter === 'completed'
                   ? 'bg-green-500 text-white shadow-lg'
-                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200 border border-gray-300'
+                  : 'bg-gray-100 text-chonky-poop hover:bg-gray-200 border border-secondary'
               }`}
             >
               Completed
             </button>
             <button
               onClick={() => setStatusFilter('cancelled')}
-              className={`px-4 py-2 rounded-lg transition-all font-medium ${
+              className={`px-4 py-2 rounded-3xl transition-all font-medium ${
                 statusFilter === 'cancelled'
                   ? 'bg-red-500 text-white shadow-lg'
-                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200 border border-gray-300'
+                  : 'bg-gray-100 text-chonky-poop hover:bg-gray-200 border border-secondary'
               }`}
             >
               Cancelled
@@ -205,41 +205,41 @@ export default function MyAppointmentsPage() {
                 <h2 className="heading-main text-accent-cream mb-4">Upcoming Appointments</h2>
                 <div className="space-y-4">
                   {upcomingAppointments.map((appointment) => (
-                    <div key={appointment.id} className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow border border-gray-300">
+                    <div key={appointment.id} className="bg-white rounded-3xl shadow-md p-6 hover:shadow-lg transition-shadow border border-secondary">
                       <div className="flex justify-between items-start mb-4">
                         <div>
-                          <h3 className="heading-card text-gray-900">{appointment.service_details?.service_name}</h3>
-                          <p className="text-sm text-gray-700 mt-1">{appointment.service_details?.description}</p>
+                          <h3 className="heading-card text-chonky-brown">{appointment.service_details?.service_name}</h3>
+                          <p className="text-sm text-chonky-poop mt-1">{appointment.service_details?.description}</p>
                         </div>
                         {getStatusBadge(appointment.status)}
                       </div>
 
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                        <div className="flex items-center gap-2 text-gray-900">
-                          <FaCalendar className="text-gray-500" />
+                        <div className="flex items-center gap-2 text-chonky-brown">
+                          <FaCalendar className="text-chonky-khaki" />
                           <span>{formatDate(appointment.appointment_date)}</span>
                         </div>
-                        <div className="flex items-center gap-2 text-gray-900">
-                          <FaClock className="text-gray-500" />
+                        <div className="flex items-center gap-2 text-chonky-brown">
+                          <FaClock className="text-chonky-khaki" />
                           <span>{formatTime(appointment.start_time)} - {formatTime(appointment.end_time)}</span>
                           <span className="text-sm text-gray-600">({formatDuration(appointment.duration_minutes)})</span>
                         </div>
-                        <div className="flex items-center gap-2 text-gray-900">
-                          <FaMapMarkerAlt className="text-gray-500" />
+                        <div className="flex items-center gap-2 text-chonky-brown">
+                          <FaMapMarkerAlt className="text-chonky-khaki" />
                           <span>{appointment.branch} Branch</span>
                         </div>
                       </div>
 
                       {appointment.pet_details && (
-                        <div className="border-t border-gray-300 pt-4 mb-4">
+                        <div className="border-t border-secondary pt-4 mb-4">
                           <div className="flex items-center gap-3">
                             <PetAvatar imageUrl={appointment.pet_details.pet_picture} size="small" />
                             <div>
                               <div className="flex items-center gap-2">
-                                <span className="font-medium text-gray-900">{appointment.pet_details.pet_name}</span>
+                                <span className="font-medium text-chonky-brown">{appointment.pet_details.pet_name}</span>
                                 <GenderIcon gender={appointment.pet_details.gender} size={14} />
                               </div>
-                              <p className="text-sm text-gray-700">
+                              <p className="text-sm text-chonky-poop">
                                 {appointment.pet_details.breed} • {formatAge(appointment.pet_details.age_value, appointment.pet_details.age_unit)} • {appointment.pet_details.weight_lbs} lbs
                               </p>
                             </div>
@@ -248,8 +248,8 @@ export default function MyAppointmentsPage() {
                       )}
 
                       {appointment.notes && (
-                        <div className="bg-gray-100 rounded p-3 mb-4 border border-gray-300">
-                          <p className="text-sm text-gray-900">
+                        <div className="bg-gray-100 rounded p-3 mb-4 border border-secondary">
+                          <p className="text-sm text-chonky-brown">
                             <span className="font-medium">Notes:</span> {appointment.notes}
                           </p>
                         </div>
@@ -259,7 +259,7 @@ export default function MyAppointmentsPage() {
                         <div className="flex justify-end">
                           <button
                             onClick={() => setConfirmDialog({ isOpen: true, appointmentId: appointment.id })}
-                            className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg flex items-center gap-2 transition-colors font-medium"
+                            className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-3xl flex items-center gap-2 transition-colors font-medium"
                           >
                             <FaTimes />
                             Cancel Appointment
@@ -278,40 +278,40 @@ export default function MyAppointmentsPage() {
                 <h2 className="heading-main text-accent-cream mb-4">Past Appointments</h2>
                 <div className="space-y-4">
                   {pastAppointments.map((appointment) => (
-                    <div key={appointment.id} className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow border border-gray-300">
+                    <div key={appointment.id} className="bg-white rounded-3xl shadow-md p-6 hover:shadow-lg transition-shadow border border-secondary">
                       <div className="flex justify-between items-start mb-4">
                         <div>
-                          <h3 className="heading-card text-gray-900">{appointment.service_details?.service_name}</h3>
-                          <p className="text-sm text-gray-700 mt-1">{appointment.service_details?.description}</p>
+                          <h3 className="heading-card text-chonky-brown">{appointment.service_details?.service_name}</h3>
+                          <p className="text-sm text-chonky-poop mt-1">{appointment.service_details?.description}</p>
                         </div>
                         {getStatusBadge(appointment.status)}
                       </div>
 
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div className="flex items-center gap-2 text-gray-900">
-                          <FaCalendar className="text-gray-500" />
+                        <div className="flex items-center gap-2 text-chonky-brown">
+                          <FaCalendar className="text-chonky-khaki" />
                           <span>{formatDate(appointment.appointment_date)}</span>
                         </div>
-                        <div className="flex items-center gap-2 text-gray-900">
-                          <FaClock className="text-gray-500" />
+                        <div className="flex items-center gap-2 text-chonky-brown">
+                          <FaClock className="text-chonky-khaki" />
                           <span>{formatTime(appointment.start_time)} - {formatTime(appointment.end_time)}</span>
                         </div>
-                        <div className="flex items-center gap-2 text-gray-900">
-                          <FaMapMarkerAlt className="text-gray-500" />
+                        <div className="flex items-center gap-2 text-chonky-brown">
+                          <FaMapMarkerAlt className="text-chonky-khaki" />
                           <span>{appointment.branch} Branch</span>
                         </div>
                       </div>
 
                       {appointment.pet_details && (
-                        <div className="border-t border-gray-300 pt-4 mt-4">
+                        <div className="border-t border-secondary pt-4 mt-4">
                           <div className="flex items-center gap-3">
                             <PetAvatar imageUrl={appointment.pet_details.pet_picture} size="small" />
                             <div>
                               <div className="flex items-center gap-2">
-                                <span className="font-medium text-gray-900">{appointment.pet_details.pet_name}</span>
+                                <span className="font-medium text-chonky-brown">{appointment.pet_details.pet_name}</span>
                                 <GenderIcon gender={appointment.pet_details.gender} size={14} />
                               </div>
-                              <p className="text-sm text-gray-700">
+                              <p className="text-sm text-chonky-poop">
                                 {appointment.pet_details.breed}
                               </p>
                             </div>
@@ -326,13 +326,13 @@ export default function MyAppointmentsPage() {
 
             {/* Empty State */}
             {appointments.length === 0 && !loading && (
-              <div className="bg-white rounded-lg shadow-md p-12 text-center border border-gray-300">
+              <div className="bg-white rounded-3xl shadow-md p-12 text-center border border-secondary">
                 <FaCalendar className="mx-auto text-gray-400 mb-4" size={64} />
-                <h3 className="heading-card text-gray-900 mb-2">No Appointments Found</h3>
+                <h3 className="heading-card text-chonky-brown mb-2">No Appointments Found</h3>
                 <p className="text-gray-600 mb-6">You haven't booked any appointments yet.</p>
                 <button
                   onClick={() => navigate('/appointment')}
-                  className="px-6 py-3 bg-secondary hover:bg-secondary-light text-white rounded-lg transition-colors font-medium"
+                  className="px-6 py-3 bg-secondary hover:bg-btn-yellow hover:text-chonky-brown text-white rounded-3xl transition-colors font-medium"
                 >
                   Book an Appointment
                 </button>

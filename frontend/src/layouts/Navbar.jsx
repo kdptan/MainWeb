@@ -83,7 +83,7 @@ export default function Navbar() {
 
           {/* Right: Navigation links */}
           <div className="flex items-center space-x-6">
-            <div className="hidden sm:flex space-x-2">
+            <div className="hidden sm:flex items-center space-x-2">
               <Link 
                 to="/home" 
                 className={`btn btn-nav transition-all duration-200 ${
@@ -117,6 +117,31 @@ export default function Navbar() {
                 Appointment
               </Link>
               {/* Management link removed from the main nav; admin users have a Management dropdown next to their avatar */}
+              {user && ((user.role || '').toLowerCase() === 'admin') && (
+                <div className="relative" ref={managementRef}>
+                  <button
+                    onClick={() => setManagementOpen(s => !s)}
+                    className={`btn btn-nav transition-all duration-200 ${managementOpen ? 'bg-secondary shadow-md scale-105' : ''}`}
+                  >
+                    Management
+                  </button>
+
+                  {managementOpen && (
+                    <div className="absolute left-0 top-full mt-1 w-56 bg-accent-peach border border-secondary rounded-md shadow-xl py-2 z-20 dropdown-menu">
+                      <div className="px-2 py-1">
+                        <a href="/admin/sales" className="block px-4 py-2 text-sm text-primary-darker hover:bg-accent-cream hover:text-secondary transition-colors rounded-3xl">Point of Sale</a>
+                        <a href="/management/inventory" className="block px-4 py-2 text-sm text-primary-darker hover:bg-accent-cream hover:text-secondary transition-colors rounded-3xl">Inventory</a>
+                        <a href="/management/products" className="block px-4 py-2 text-sm text-primary-darker hover:bg-accent-cream hover:text-secondary transition-colors rounded-3xl">Products</a>
+                        <a href="/management/services" className="block px-4 py-2 text-sm text-primary-darker hover:bg-accent-cream hover:text-secondary transition-colors rounded-3xl">Services</a>
+                        <a href="/management/petprofile" className="block px-4 py-2 text-sm text-primary-darker hover:bg-accent-cream hover:text-secondary transition-colors rounded-3xl">Pet Profile</a>
+                        <a href="/management/activity-log" className="block px-4 py-2 text-sm text-primary-darker hover:bg-accent-cream hover:text-secondary transition-colors rounded-3xl">Activity Log</a>
+                        <a href="/management/staff-management" className="block px-4 py-2 text-sm text-primary-darker hover:bg-accent-cream hover:text-secondary transition-colors rounded-3xl">Staff Management</a>
+                        <a href="/admin/feedback" className="block px-4 py-2 text-sm text-primary-darker hover:bg-accent-cream hover:text-secondary transition-colors rounded-3xl">Purchase Feedback</a>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
 
             {/* Auth area */}
@@ -130,29 +155,15 @@ export default function Navbar() {
 
               {user && (
                 <>
-                  <div className="relative" ref={managementRef}>
-                    {((user.role || '').toLowerCase() === 'admin') && (
-                      <button onClick={() => setManagementOpen(s => !s)} className={`text-primary-darker px-3 py-2 rounded-md text-sm font-semibold transition-all border-b-2 hover:bg-accent-peach ${managementOpen ? 'border-secondary bg-accent-peach' : 'border-transparent'}`}>Management</button>
-                    )}
-
-                    {managementOpen && (
-                      <div className="absolute left-0 top-full mt-1 w-56 bg-accent-peach border border-secondary rounded-md shadow-xl py-2 z-20 dropdown-menu">
-                        <div className="px-2 py-1">
-                          <a href="/admin/sales" className="block px-4 py-2 text-sm text-primary-darker hover:bg-accent-cream hover:text-secondary transition-colors rounded">Point of Sale</a>
-                          <a href="/management/inventory" className="block px-4 py-2 text-sm text-primary-darker hover:bg-accent-cream hover:text-secondary transition-colors rounded">Inventory</a>
-                          <a href="/management/products" className="block px-4 py-2 text-sm text-primary-darker hover:bg-accent-cream hover:text-secondary transition-colors rounded">Products</a>
-                          <a href="/management/services" className="block px-4 py-2 text-sm text-primary-darker hover:bg-accent-cream hover:text-secondary transition-colors rounded">Services</a>
-                          <a href="/management/petprofile" className="block px-4 py-2 text-sm text-primary-darker hover:bg-accent-cream hover:text-secondary transition-colors rounded">Pet Profile</a>
-                          <a href="/management/activity-log" className="block px-4 py-2 text-sm text-primary-darker hover:bg-accent-cream hover:text-secondary transition-colors rounded">Activity Log</a>
-                          <a href="/management/staff-management" className="block px-4 py-2 text-sm text-primary-darker hover:bg-accent-cream hover:text-secondary transition-colors rounded">Staff Management</a>
-                          <a href="/admin/feedback" className="block px-4 py-2 text-sm text-primary-darker hover:bg-accent-cream hover:text-secondary transition-colors rounded">Purchase Feedback</a>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-
                   <div className="relative" ref={menuRef}>
-                    <button onClick={() => setMenuOpen(s => !s)} aria-haspopup="true" aria-expanded={menuOpen} className="inline-flex items-center gap-2 px-3 py-2 rounded-md hover:bg-accent-peach transition-colors">
+                    <button
+                      onClick={() => setMenuOpen(s => !s)}
+                      aria-haspopup="true"
+                      aria-expanded={menuOpen}
+                      className={`inline-flex items-center gap-2 px-3 py-2 rounded-md transition-all duration-200 hover:bg-accent-peach hover:rounded-full hover:text-secondary ${
+                        menuOpen ? 'bg-secondary text-accent-cream rounded-full shadow-md' : 'text-primary-darker'
+                      }`}
+                    >
                       <span className="relative inline-block">
                         {user.profile_picture ? (
                           <img src={user.profile_picture} alt="avatar" className="w-8 h-8 rounded-full object-cover border-2 border-secondary" />

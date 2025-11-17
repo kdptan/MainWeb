@@ -51,7 +51,9 @@ module.exports = {
           poop: '#7D4826',       // chonkypoop - Medium brown
           khaki: '#96725B',       // chonkykhaki - Light brown/khaki
           white: '#E9E4DA',
-          offwhite: '#DECBB1'      // chonkywhite - Off-white/cream
+          offwhite: '#DECBB1',      // chonkywhite - Off-white/cream
+          pink: '#D3A084',
+          pinklight: '#EBC1A9'
         },
         // Navigation & UI Colors
         nav: {

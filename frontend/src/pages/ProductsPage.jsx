@@ -6,6 +6,7 @@ import { useToast } from '../hooks/useToast';
 import Toast from '../components/Toast';
 import DecorativeBackground from '../components/DecorativeBackground';
 import { formatCurrency } from '../utils/formatters';
+import productsHero from '../assets/DOG3.png';
 
 export default function ProductsPage() {
   const { token, user } = useAuth();
@@ -228,67 +229,65 @@ export default function ProductsPage() {
 
   return (
     <DecorativeBackground variant="bones">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Header */}
-      <div className="mb-8">
-        <h1 className="display-md text-accent-cream mb-2">Shop Products</h1>
-        <p className="text-body-lg text-accent-cream">Browse our wide selection of pet supplies and accessories</p>
-      </div>
-
-      {/* Search and Filters */}
-      <div className="bg-primary-dark rounded-lg shadow-xl p-4 mb-6 border-2 border-primary">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          {/* Search Bar */}
-          <div className="md:col-span-2">
-            <div className="relative">
-              <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-accent-cream" />
-              <input
-                type="text"
-                placeholder="Search products..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 bg-primary border-2 border-primary-dark rounded-lg focus:ring-2 focus:ring-secondary-light focus:border-secondary-light text-accent-cream placeholder-accent-cream"
-              />
+      <div className="bg-chonky-white min-h-screen">
+        {/* Hero Section */}
+        <section className="bg-chonky-brown pt-16 pb-0">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center min-h-[450px]">
+              {/* Left Side: Title, Tagline, and Search */}
+              <div className="text-left">
+                <h1 className="hero-title mb-4">
+                  Shop Our Products
+                </h1>
+                <p className="text-body-lg text-accent-cream leading-relaxed mb-6">
+                  Browse our wide selection of pet supplies and accessories.
+                </p>
+                {/* Search and Filters */}
+                <div className="bg-primary-dark rounded-3xl shadow-xl p-4 border-2 border-primary">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {/* Search Bar */}
+                    <div className="relative">
+                      <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-chonky-white" />
+                      <input
+                        type="text"
+                        placeholder="Search products..."
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        className="w-full pl-10 pr-4 py-3 bg-primary border-2 border-primary-dark rounded-3xl focus:ring-2 focus:ring-secondary-light focus:border-secondary-light text-lg text-chonky-white placeholder-chonky-white"
+                      />
+                    </div>
+                    {/* Category Filter */}
+                    <div className="relative">
+                      <FaFilter className="absolute left-3 top-1/2 transform -translate-y-1/2 text-chonky-white" />
+                      <select
+                        value={selectedCategory}
+                        onChange={(e) => setSelectedCategory(e.target.value)}
+                        className="w-full pl-10 pr-4 py-3 bg-primary border-2 border-primary-dark rounded-3xl focus:ring-2 focus:ring-secondary-light focus:border-secondary-light appearance-none text-lg text-chonky-white"
+                      >
+                        {categories.map((cat) => (
+                          <option key={cat} value={cat} className="bg-primary-dark text-base">
+                            {cat}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                  </div>
+                  <div className="mt-3 text-sm text-chonky-white text-center">
+                    Showing {filteredProducts.length} of {products.length} products
+                  </div>
+                </div>
+              </div>
+              {/* Right: Products Hero Image */}
+              <div className="flex justify-center self-end">
+                <img 
+                  src={productsHero} 
+                  alt="Happy dog with products" 
+                  className="max-w-full h-auto object-contain"
+                />
+              </div>
             </div>
           </div>
-
-          {/* Category Filter */}
-          <div>
-            <div className="relative">
-              <FaFilter className="absolute left-3 top-1/2 transform -translate-y-1/2 text-accent-cream" />
-              <select
-                value={selectedCategory}
-                onChange={(e) => setSelectedCategory(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 bg-primary border-2 border-primary-dark rounded-lg focus:ring-2 focus:ring-secondary-light focus:border-secondary-light appearance-none text-accent-cream"
-              >
-                {categories.map((cat) => (
-                  <option key={cat} value={cat} className="bg-primary-dark">
-                    {cat}
-                  </option>
-                ))}
-              </select>
-            </div>
-          </div>
-
-          {/* Branch Filter */}
-          <div>
-            <select
-              value={selectedBranch}
-              onChange={(e) => setSelectedBranch(e.target.value)}
-              className="w-full px-4 py-2 bg-primary border-2 border-primary-dark rounded-lg focus:ring-2 focus:ring-secondary-light focus:border-secondary-light appearance-none text-accent-cream"
-            >
-              <option value="All" className="bg-primary-dark">All Branches</option>
-              <option value="Matina" className="bg-primary-dark">Matina</option>
-              <option value="Toril" className="bg-primary-dark">Toril</option>
-            </select>
-          </div>
-        </div>
-
-        {/* Results count */}
-        <div className="mt-4 text-sm text-accent-cream">
-          Showing {filteredProducts.length} of {products.length} products
-        </div>
-      </div>
+        </section>
 
       {/* Loading State */}
       {loading ? (
@@ -296,48 +295,87 @@ export default function ProductsPage() {
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-secondary-lighter"></div>
         </div>
       ) : (
-        <>
+        <section className="bg-chonky-khaki">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 bg-chonky-white shadow-md">
+            <div className="py-8">
+              {/* Branch Filter */}
+              <div className="mb-6 max-w-xs">
+                <label className="block text-sm font-medium text-chonky-brown mb-2">Filter by Branch:</label>
+                <select
+                  value={selectedBranch}
+                  onChange={(e) => setSelectedBranch(e.target.value)}
+                  className="w-full px-4 py-2 bg-white border-2 border-chonky-brown-light rounded-lg focus:ring-2 focus:ring-secondary-light focus:border-secondary-light appearance-none text-chonky-brown"
+                >
+                  <option value="All">All Branches</option>
+                  <option value="Matina">Matina</option>
+                  <option value="Toril">Toril</option>
+                </select>
+              </div>
+
           {/* Products Grid */}
           {filteredProducts.length === 0 ? (
             <div className="text-center py-12">
-              <p className="text-accent-cream text-lg">No products found matching your criteria.</p>
+                  <p className="text-chonky-brown text-lg">No products found matching your criteria.</p>
             </div>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-              {filteredProducts.map((product) => {
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+              {filteredProducts.map((product, index) => {
+                const cardVariants = [
+                  { // Original
+                    bg: 'bg-primary-dark',
+                    border: 'border-primary',
+                    button: 'bg-secondary text-chonky-white hover:bg-btn-yellow hover:text-chonky-brown',
+                  },
+                  { // Variant 2
+                    bg: 'bg-chonky-pink',
+                    border: 'border-chonky-pinklight',
+                    button: 'bg-secondary text-chonky-white hover:bg-btn-yellow hover:text-chonky-brown',
+                  },
+                  { // Variant 3
+                    bg: 'bg-chonky-khaki',
+                    border: 'border-chonky-offwhite',
+                    button: 'bg-secondary text-chonky-white hover:bg-btn-yellow hover:text-chonky-brown',
+                  },
+                ];
+                const variant = cardVariants[index % 3];
                 return (
                   <div
                     key={product.id}
-                    className="product-card bg-primary-dark rounded-lg shadow-xl hover:shadow-2xl transition-shadow duration-300 overflow-hidden group flex flex-col border-2 border-primary"
+                    className={`product-card ${variant.bg} rounded-3xl shadow-xl hover:shadow-2xl transition-shadow duration-300 overflow-hidden group flex flex-col border-2 ${variant.border}`}
                   >
                     {/* Category Badge */}
-                    <div className="px-4 pt-3 pb-1">
-                      <p className="text-xs text-accent-cream uppercase tracking-wide font-semibold">
+                    <div className="px-4 pt-4 pb-2">
+                      <p 
+                        className="text-sm text-accent-cream uppercase tracking-wider font-bold"
+                        style={{ fontFamily: "'Martel Sans', sans-serif" }}
+                      >
                         {product.category}
                       </p>
                     </div>
 
                     {/* Product Image */}
-                    <div className="bg-gradient-to-br from-accent-brown to-secondary h-40 flex items-center justify-center relative overflow-hidden flex-shrink-0">
-                      <div className="text-6xl opacity-30 group-hover:scale-110 transition-transform duration-300">
-                        🐾
-                      </div>
-                      {/* Branch Badge */}
-                      <div className="absolute top-2 left-2 px-3 py-1 rounded-full text-xs font-semibold bg-secondary text-accent-cream">
-                        {product.branch}
-                      </div>
-                      
-                      {/* Stock Status Badge */}
-                      <div 
-                        className="absolute top-2 right-2 px-3 py-1 rounded-full text-xs font-semibold text-white flex items-center gap-1"
-                        style={{backgroundColor: product.quantity > 10 ? '#10b981' : product.quantity > 0 ? '#f59e0b' : '#ef4444'}}
-                      >
-                        <span>{product.quantity > 10 ? '✓ In Stock' : product.quantity > 0 ? '⚠ Low' : '✕ Out'}</span>
+                    <div className="px-4">
+                      <div className="bg-gradient-to-br from-accent-brown to-secondary h-40 flex items-center justify-center relative overflow-hidden flex-shrink-0 rounded-3xl">
+                        <div className="text-6xl opacity-30 group-hover:scale-110 transition-transform duration-300">
+                          🐾
+                        </div>
+                        {/* Branch Badge */}
+                        <div className="absolute top-2 left-2 px-3 py-1 rounded-full text-xs font-semibold bg-secondary text-accent-cream">
+                          {product.branch}
+                        </div>
+                        
+                        {/* Stock Status Badge */}
+                        <div 
+                          className="absolute top-2 right-2 px-3 py-1 rounded-full text-xs font-semibold text-white flex items-center gap-1"
+                          style={{backgroundColor: product.quantity > 10 ? '#10b981' : product.quantity > 0 ? '#f59e0b' : '#ef4444'}}
+                        >
+                          <span>{product.quantity > 10 ? '✓ In Stock' : product.quantity > 0 ? '⚠ Low' : '✕ Out'}</span>
+                        </div>
                       </div>
                     </div>
 
                     {/* Product Info */}
-                    <div className="p-4 flex flex-col flex-grow">
+                    <div className="p-4 pt-3 flex flex-col flex-grow">
                       {/* Product Name and Price Row */}
                       <div className="flex justify-between items-start gap-2 mb-3">
                         <h3 className="heading-card text-accent-cream line-clamp-2 flex-1">
@@ -347,9 +385,6 @@ export default function ProductsPage() {
                           {product.retail_price ? formatCurrency(product.retail_price) : formatCurrency(0)}
                         </p>
                       </div>
-
-                      {/* Divider Line */}
-                      <div className="border-b-2 border-primary mb-3"></div>
 
                       {/* Ratings and Add to Cart Row */}
                       <div className="flex justify-between items-center mb-3">
@@ -380,7 +415,7 @@ export default function ProductsPage() {
                       <div>
                         <button
                           onClick={() => openQuantityModal(product)}
-                          className="py-2 px-3 rounded-lg font-semibold flex items-center justify-center gap-2 transition-colors shadow-md text-sm bg-secondary text-accent-cream hover:bg-secondary-light"
+                          className={`py-2 px-3 rounded-3xl font-semibold flex items-center justify-center gap-2 transition-colors shadow-md text-sm ${variant.button}`}
                           title={!user ? 'Login required to add to cart' : ''}
                         >
                           <FaShoppingCart />
@@ -393,7 +428,9 @@ export default function ProductsPage() {
               })}
             </div>
           )}
-        </>
+            </div>
+          </div>
+        </section>
       )}
 
       {/* Quantity Selection Modal */}
@@ -402,10 +439,10 @@ export default function ProductsPage() {
           <div className="bg-white rounded-lg shadow-xl max-w-md w-full p-6">
             {/* Modal Header */}
             <div className="flex justify-between items-start mb-4">
-              <h3 className="text-xl font-bold text-gray-900">Select Quantity</h3>
+              <h3 className="text-xl font-bold text-chonky-brown">Select Quantity</h3>
               <button
                 onClick={closeQuantityModal}
-                className="text-gray-400 hover:text-gray-600 transition-colors"
+                className="text-gray-400 hover:text-chonky-brown transition-colors"
               >
                 <FaTimes size={20} />
               </button>
@@ -413,9 +450,9 @@ export default function ProductsPage() {
 
             {/* Product Info */}
             <div className="mb-6">
-              <h4 className="font-semibold text-gray-900 mb-1">{selectedProduct.name}</h4>
-              <p className="text-sm text-gray-500 mb-2">{selectedProduct.category}</p>
-              <p className="text-lg font-bold text-blue-600">
+              <h4 className="font-semibold text-chonky-brown mb-1">{selectedProduct.name}</h4>
+              <p className="text-sm text-secondary mb-2">{selectedProduct.category}</p>
+              <p className="text-lg font-bold text-chonky-brown">
                 {formatCurrency(selectedProduct.retail_price)} each
               </p>
               
@@ -479,13 +516,13 @@ export default function ProductsPage() {
             <div className="flex gap-3">
               <button
                 onClick={closeQuantityModal}
-                className="flex-1 px-4 py-3 border-2 border-gray-300 text-gray-700 rounded-lg font-semibold hover:bg-gray-50 transition-colors"
+                className="flex-1 px-4 py-3 border-2 border-gray-300 text-gray-700 rounded-3xl font-semibold hover:bg-gray-50 transition-colors"
               >
                 Cancel
               </button>
               <button
                 onClick={() => addToCart(selectedProduct)}
-                className="flex-1 px-4 py-3 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition-colors flex items-center justify-center gap-2"
+                className="flex-1 px-4 py-3 bg-secondary text-white rounded-3xl font-semibold hover:bg-btn-yellow transition-colors flex items-center justify-center gap-2"
               >
                 <FaShoppingCart />
                 Confirm

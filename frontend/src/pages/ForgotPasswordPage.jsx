@@ -110,7 +110,7 @@ export default function ForgotPasswordPage() {
               </p>
               
               {/* User Profile Card */}
-              <div className="bg-gradient-to-br from-secondary/10 to-accent-cream/30 border-2 border-secondary/20 rounded-lg p-6 shadow-sm">
+              <div className="bg-gradient-to-br from-secondary/10 to-accent-cream/30 border-2 border-secondary/20 rounded-3xl p-6 shadow-sm">
                 <div className="flex items-center space-x-4">
                   {/* Profile Picture */}
                   <div className="flex-shrink-0">
