@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { FaSearch, FaClock, FaCheckCircle } from 'react-icons/fa';
 import { useAuth } from '../hooks/useAuth';
 import DecorativeBackground from '../components/DecorativeBackground';
+import { formatCurrency } from '../utils/formatters';
 
 export default function ServicesPage() {
   const navigate = useNavigate();
@@ -171,7 +172,7 @@ export default function ServicesPage() {
                         ) : (
                           <div className="text-center">
                             <p className="text-small text-accent-peach mb-1">💰 Starting at:</p>
-                            <p className="price price-medium text-secondary-lighter">₱{parseFloat(service.base_price).toFixed(2)}</p>
+                            <p className="price price-medium text-secondary-lighter">{formatCurrency(service.base_price)}</p>
                           </div>
                         )}
                       </div>
@@ -247,13 +248,13 @@ export default function ServicesPage() {
                         {service.can_be_addon && (
                           <div className="mb-2 pb-2 border-b border-primary-dark">
                             <p className="text-xs text-accent-peach mb-0.5">🏷️ Add-on:</p>
-                            <p className="price text-sm text-brand-gold font-semibold">₱{parseFloat(service.addon_price).toFixed(2)}</p>
+                            <p className="price text-sm text-brand-gold font-semibold">{formatCurrency(service.addon_price)}</p>
                           </div>
                         )}
                         {service.can_be_standalone && (
                           <div>
                             <p className="text-xs text-accent-peach mb-0.5">🛍️ Solo:</p>
-                            <p className="price text-sm text-brand-gold font-semibold">₱{parseFloat(service.standalone_price).toFixed(2)}</p>
+                            <p className="price text-sm text-brand-gold font-semibold">{formatCurrency(service.standalone_price)}</p>
                           </div>
                         )}
                       </div>
@@ -274,7 +275,7 @@ export default function ServicesPage() {
       {/* Service Details Modal */}
       {selectedService && (
         <div
-          className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50"
+          className="fixed inset-0 bg-black bg-opacity-50 flex items-start justify-center pt-4 z-50"
           onClick={() => setSelectedService(null)}
         >
           <div
@@ -322,13 +323,13 @@ export default function ServicesPage() {
                       {selectedService.can_be_addon && (
                         <div className="bg-primary-dark p-4 rounded">
                           <p className="text-accent-peach text-small mb-2">🏷️ Add-on Price:</p>
-                          <p className="price price-large text-brand-gold">₱{parseFloat(selectedService.addon_price).toFixed(2)}</p>
+                          <p className="price price-large text-brand-gold">{formatCurrency(selectedService.addon_price)}</p>
                         </div>
                       )}
                       {selectedService.can_be_standalone && (
                         <div className="bg-primary-dark p-4 rounded">
                           <p className="text-accent-peach text-small mb-2">🛍️ Standalone Price:</p>
-                          <p className="price price-large text-brand-gold">₱{parseFloat(selectedService.standalone_price).toFixed(2)}</p>
+                          <p className="price price-large text-brand-gold">{formatCurrency(selectedService.standalone_price)}</p>
                         </div>
                       )}
                     </div>
@@ -358,7 +359,7 @@ export default function ServicesPage() {
                 ) : (
                   <div className="bg-primary rounded-lg p-4 text-center">
                     <p className="text-small text-accent-peach mb-2">💰 Base Price</p>
-                    <p className="price price-large text-secondary-lighter">₱{parseFloat(selectedService.base_price).toFixed(2)}</p>
+                    <p className="price price-large text-secondary-lighter">{formatCurrency(selectedService.base_price)}</p>
                   </div>
                 )}
               </div>

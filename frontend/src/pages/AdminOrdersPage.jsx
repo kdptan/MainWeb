@@ -9,6 +9,7 @@ import ConfirmDialog from '../components/ConfirmDialog';
 import PaymentModal from '../components/PaymentModal';
 import ReceiptModal from '../components/ReceiptModal';
 import { formatOrderId } from '../utils/formatters';
+import { formatCurrency } from '../utils/formatters';
 
 export default function AdminOrdersPage() {
   const navigate = useNavigate();
@@ -408,7 +409,7 @@ export default function AdminOrdersPage() {
                   
                   <div className="text-right">
                     <p className="text-2xl font-bold text-gray-900">
-                      ₱{parseFloat(order.total_price).toFixed(2)}
+                      {formatCurrency(order.total_price)}
                     </p>
                     <p className="text-sm text-gray-500">{order.items.length} items</p>
                   </div>
@@ -532,11 +533,11 @@ export default function AdminOrdersPage() {
                           <div className="text-right ml-4">
                             <p className="text-sm text-gray-600">Qty: {item.quantity}</p>
                             <p className="font-semibold text-gray-900 text-lg">
-                              ₱{parseFloat(item.price).toFixed(2)}
+                              {formatCurrency(item.price)}
                             </p>
                             {item.item_type === 'product' && item.product_details?.unit_cost && (
                               <p className="text-xs text-gray-500">
-                                ₱{parseFloat(item.product_details.unit_cost).toFixed(2)} each
+                                {formatCurrency(item.product_details.unit_cost)} each
                               </p>
                             )}
                           </div>

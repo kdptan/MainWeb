@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { useToast } from '../hooks/useToast';
 import Toast from '../components/Toast';
 import DecorativeBackground from '../components/DecorativeBackground';
+import { formatCurrency } from '../utils/formatters';
 
 export default function ProductsPage() {
   const { token, user } = useAuth();
@@ -343,7 +344,7 @@ export default function ProductsPage() {
                           {product.name}
                         </h3>
                         <p className="price price-medium text-secondary-lighter flex-shrink-0">
-                          ₱{product.retail_price ? Number(product.retail_price).toFixed(2) : '0.00'}
+                          {product.retail_price ? formatCurrency(product.retail_price) : formatCurrency(0)}
                         </p>
                       </div>
 
@@ -397,7 +398,7 @@ export default function ProductsPage() {
 
       {/* Quantity Selection Modal */}
       {showQuantityModal && selectedProduct && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-start justify-center pt-4 z-50">
           <div className="bg-white rounded-lg shadow-xl max-w-md w-full p-6">
             {/* Modal Header */}
             <div className="flex justify-between items-start mb-4">
@@ -415,7 +416,7 @@ export default function ProductsPage() {
               <h4 className="font-semibold text-gray-900 mb-1">{selectedProduct.name}</h4>
               <p className="text-sm text-gray-500 mb-2">{selectedProduct.category}</p>
               <p className="text-lg font-bold text-blue-600">
-                ₱{Number(selectedProduct.retail_price).toFixed(2)} each
+                {formatCurrency(selectedProduct.retail_price)} each
               </p>
               
               {/* Available Units */}
@@ -469,7 +470,7 @@ export default function ProductsPage() {
               <div className="flex justify-between items-center">
                 <span className="text-gray-600">Total Price:</span>
                 <span className="text-2xl font-bold text-gray-900">
-                  ₱{(Number(selectedProduct.retail_price) * modalQuantity).toFixed(2)}
+                  {formatCurrency((Number(selectedProduct.retail_price) * modalQuantity))}
                 </span>
               </div>
             </div>
@@ -499,7 +500,7 @@ export default function ProductsPage() {
 
       {/* Product Feedback Modal */}
       {showFeedbackModal && selectedProductFeedback && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50" onClick={() => setShowFeedbackModal(false)}>
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-start justify-center pt-4 z-50" onClick={() => setShowFeedbackModal(false)}>
           <div className="bg-white rounded-lg shadow-xl max-w-3xl w-full max-h-[80vh] overflow-hidden" onClick={(e) => e.stopPropagation()}>
             {/* Header */}
             <div className="bg-blue-600 text-white p-6">

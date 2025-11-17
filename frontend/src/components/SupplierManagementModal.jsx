@@ -1,10 +1,11 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { FaTimes, FaPlus, FaEdit, FaTrash, FaSearch } from 'react-icons/fa';
+import { FaTimes, FaPlus, FaEdit, FaTrash, FaSearch, FaChevronLeft, FaChevronRight } from 'react-icons/fa';
 import axios from 'axios';
 import { useAuth } from '../hooks/useAuth';
 
 const SupplierManagementModal = ({ isOpen, onClose }) => {
   const { token } = useAuth();
+  const scrollContainerRef = React.useRef(null);
   const [suppliers, setSuppliers] = useState([]);
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState(null);
@@ -38,6 +39,18 @@ const SupplierManagementModal = ({ isOpen, onClose }) => {
       setLoading(false);
     }
   }, [token]);
+
+  // Disable body scroll when modal is open
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, [isOpen]);
 
   // Fetch suppliers on mount
   useEffect(() => {
@@ -144,19 +157,18 @@ const SupplierManagementModal = ({ isOpen, onClose }) => {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-start justify-center pt-4 z-50 p-4">
       <div className="bg-white rounded-lg shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-y-auto">
         {/* Header */}
-        <div className="sticky top-0 bg-gradient-to-r from-secondary to-orange-600 px-8 py-6 flex items-center justify-between z-10">
+        <div className="sticky top-0 bg-gradient-to-r from-secondary to-orange-600 px-6 py-4 flex items-center justify-between z-10">
           <div>
-            <h2 className="heading-main text-white">Supplier Management</h2>
-            <p className="text-orange-100 text-sm mt-1">Add, edit, and manage suppliers</p>
+            <h2 className="text-xl font-bold text-white">Supplier Management</h2>
           </div>
           <button
             onClick={onClose}
             className="text-white hover:bg-orange-700 p-2 rounded-lg transition"
           >
-            <FaTimes size={24} />
+            <FaTimes size={20} />
           </button>
         </div>
 
@@ -306,24 +318,52 @@ const SupplierManagementModal = ({ isOpen, onClose }) => {
           )}
 
           {/* Suppliers List */}
-          {loading && !suppliers.length ? (
-            <div className="text-center py-8">
-              <p className="text-gray-600">Loading suppliers...</p>
-            </div>
-          ) : filteredSuppliers.length === 0 ? (
-            <div className="text-center py-8">
-              <p className="text-gray-600">
-                {suppliers.length === 0
-                  ? 'No suppliers yet. Add your first supplier!'
-                  : 'No suppliers match your search.'}
-              </p>
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {filteredSuppliers.map(supplier => (
+          {!showForm && (
+            <>
+              {loading && !suppliers.length ? (
+                <div className="text-center py-8">
+                  <p className="text-gray-600">Loading suppliers...</p>
+                </div>
+              ) : filteredSuppliers.length === 0 ? (
+                <div className="text-center py-8">
+                  <p className="text-gray-600">
+                    {suppliers.length === 0
+                      ? 'No suppliers yet. Add your first supplier!'
+                      : 'No suppliers match your search.'}
+                  </p>
+                </div>
+              ) : (
+                <div className="relative">
+                  {/* Scroll Left Button */}
+                  <button
+                    onClick={() => {
+                      if (scrollContainerRef.current) {
+                        scrollContainerRef.current.scrollBy({ left: -320, behavior: 'smooth' });
+                      }
+                    }}
+                    className="absolute -left-4 top-1/2 -translate-y-1/2 z-10 bg-white shadow-lg hover:bg-gray-100 p-3 rounded-full transition"
+                  >
+                    <FaChevronLeft className="text-gray-700" size={20} />
+                  </button>
+
+                  {/* Scroll Right Button */}
+                  <button
+                    onClick={() => {
+                      if (scrollContainerRef.current) {
+                        scrollContainerRef.current.scrollBy({ left: 320, behavior: 'smooth' });
+                      }
+                    }}
+                    className="absolute -right-4 top-1/2 -translate-y-1/2 z-10 bg-white shadow-lg hover:bg-gray-100 p-3 rounded-full transition"
+                  >
+                    <FaChevronRight className="text-gray-700" size={20} />
+                  </button>
+
+                  {/* Supplier Cards Container */}
+                  <div ref={scrollContainerRef} className="flex gap-4 overflow-x-auto pb-4 scroll-smooth px-4">
+                    {filteredSuppliers.map(supplier => (
                 <div
                   key={supplier.id}
-                  className="p-4 border border-gray-200 rounded-lg hover:shadow-lg transition"
+                  className="flex-shrink-0 w-80 p-4 border border-gray-200 rounded-lg hover:shadow-lg transition"
                 >
                   <div className="flex justify-between items-start mb-3">
                     <div>
@@ -379,6 +419,9 @@ const SupplierManagementModal = ({ isOpen, onClose }) => {
                 </div>
               ))}
             </div>
+                </div>
+              )}
+            </>
           )}
         </div>
       </div>

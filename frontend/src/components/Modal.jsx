@@ -10,7 +10,7 @@ export default function Modal({ isOpen, onClose, title, children, maxWidth = 'ma
   };
 
   return (
-    <div className="fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center p-4 z-50 overflow-y-auto">
+    <div className="fixed inset-0 bg-gray-800 bg-opacity-50 flex items-start justify-center pt-4 z-50 overflow-y-auto">
       <div className={`bg-white rounded shadow-lg w-full ${maxWidth} my-8`}>
         <div className="p-4 border-b flex justify-between items-center">
           <h2 className="text-xl font-semibold">{title}</h2>

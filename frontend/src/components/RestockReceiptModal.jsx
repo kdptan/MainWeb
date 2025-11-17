@@ -1,11 +1,12 @@
 import React, { useRef, useEffect } from 'react';
 import { FaTimes, FaPrint } from 'react-icons/fa';
-import TransactionReceipt from './TransactionReceipt';
+import RestockReceipt from './RestockReceipt';
 
-export default function ReceiptModal({ isOpen, onClose, transaction }) {
+export default function RestockReceiptModal({ isOpen, onClose, restockData }) {
   const receiptRef = useRef(null);
   const modalRef = useRef(null);
 
+  // Disable body scroll when modal is open
   useEffect(() => {
     if (isOpen) {
       document.body.style.overflow = 'hidden';
@@ -17,15 +18,7 @@ export default function ReceiptModal({ isOpen, onClose, transaction }) {
     };
   }, [isOpen]);
 
-  const handlePrint = () => {
-    if (receiptRef.current) {
-      const printWindow = window.open('', '', 'height=600,width=800');
-      printWindow.document.write(receiptRef.current.innerHTML);
-      printWindow.document.close();
-      printWindow.print();
-    }
-  };
-
+  // Close modal on outside click
   useEffect(() => {
     if (!isOpen) return;
     const handler = (e) => {
@@ -39,13 +32,22 @@ export default function ReceiptModal({ isOpen, onClose, transaction }) {
     return () => document.removeEventListener('mousedown', handler);
   }, [isOpen, onClose]);
 
-  if (!isOpen || !transaction) return null;
+  if (!isOpen || !restockData) return null;
+
+  const handlePrint = () => {
+    if (receiptRef.current) {
+      const printWindow = window.open('', '', 'height=600,width=800');
+      printWindow.document.write(receiptRef.current.innerHTML);
+      printWindow.document.close();
+      printWindow.print();
+    }
+  };
 
   return (
     <>
       {/* Black Overlay - fixed to viewport, doesn't scroll with page */}
       <div className="fixed inset-0 bg-black bg-opacity-70 z-40 pointer-events-none" />
-
+      
       {/* Receipt Modal - fixed to viewport center, doesn't scroll with page */}
       <div
         ref={modalRef}
@@ -54,7 +56,7 @@ export default function ReceiptModal({ isOpen, onClose, transaction }) {
       >
         <div className="bg-white rounded-lg shadow-2xl overflow-hidden flex flex-col h-full min-h-0">
           <div className="sticky top-0 bg-white border-b p-3 flex justify-between items-center flex-shrink-0 z-10">
-            <h2 className="text-sm font-bold text-gray-900">Transaction Receipt</h2>
+            <h2 className="text-sm font-bold text-gray-900">Restock Receipt</h2>
             <div className="flex gap-2">
               <button
                 onClick={handlePrint}
@@ -71,8 +73,8 @@ export default function ReceiptModal({ isOpen, onClose, transaction }) {
             </div>
           </div>
 
-          <div ref={receiptRef} className="overflow-y-auto flex-1 overscroll-contain">
-            <TransactionReceipt transaction={transaction} />
+          <div ref={receiptRef} className="overflow-y-auto flex-1">
+            <RestockReceipt restockData={restockData} />
           </div>
 
           <div className="border-t p-3 flex justify-end gap-2 flex-shrink-0 bg-white">

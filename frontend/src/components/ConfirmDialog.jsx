@@ -4,7 +4,7 @@ export default function ConfirmDialog({ isOpen, onConfirm, onCancel, title, mess
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center p-4 z-[60]">
+    <div className="fixed inset-0 bg-gray-800 bg-opacity-50 flex items-start justify-center pt-4 z-[60]">
       <div className="bg-white rounded shadow-lg p-6 max-w-sm w-full">
         <h3 className="text-lg font-semibold mb-2">{title}</h3>
         <p className="text-gray-600 mb-6">{message}</p>

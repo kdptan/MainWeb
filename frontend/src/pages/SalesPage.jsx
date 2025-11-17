@@ -5,6 +5,7 @@ import { useAuth } from '../hooks/useAuth';
 import { useToast } from '../hooks/useToast';
 import Toast from '../components/Toast';
 import SalesReceiptModal from '../components/SalesReceiptModal';
+import { formatCurrency } from '../utils/formatters';
 
 const API_BASE_URL = 'http://127.0.0.1:8000/api';
 
@@ -453,7 +454,7 @@ export default function SalesPage() {
 
       {/* Service Type Selection Modal */}
       {serviceTypeModal.isOpen && serviceTypeModal.service && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-start justify-center pt-4 z-50">
           <div className="bg-white rounded-lg p-8 max-w-md w-full shadow-2xl">
             <h2 className="text-2xl font-bold text-primary-darker mb-4">
               How would you like to add {serviceTypeModal.service.service_name}?
@@ -467,7 +468,7 @@ export default function SalesPage() {
                   className="w-full p-4 border-2 border-blue-300 rounded-lg hover:bg-blue-50 transition-colors text-left"
                 >
                   <p className="font-bold text-primary-darker">Solo Service</p>
-                  <p className="text-lg text-blue-600 font-semibold">₱{parseFloat(serviceTypeModal.service.standalone_price).toFixed(2)}</p>
+                  <p className="text-lg text-blue-600 font-semibold">{formatCurrency(parseFloat(serviceTypeModal.service.standalone_price))}</p>
                 </button>
               )}
               
@@ -477,7 +478,7 @@ export default function SalesPage() {
                   className="w-full p-4 border-2 border-purple-300 rounded-lg hover:bg-purple-50 transition-colors text-left"
                 >
                   <p className="font-bold text-primary-darker">Add-on</p>
-                  <p className="text-lg text-purple-600 font-semibold">₱{parseFloat(serviceTypeModal.service.addon_price).toFixed(2)}</p>
+                  <p className="text-lg text-purple-600 font-semibold">{formatCurrency(parseFloat(serviceTypeModal.service.addon_price))}</p>
                 </button>
               )}
             </div>
@@ -559,7 +560,7 @@ export default function SalesPage() {
                         >
                           <p className="font-semibold text-primary-darker text-xs">{product.name}</p>
                           <p className="text-xs text-gray-500">Stock: {product.quantity}</p>
-                          <p className="font-bold text-secondary text-xs mt-1">₱{parseFloat(product.retail_price || product.unit_cost).toFixed(2)}</p>
+                          <p className="font-bold text-secondary text-xs mt-1">{formatCurrency(parseFloat(product.retail_price || product.unit_cost))}</p>
                         </button>
                       ))}
                   </div>
@@ -581,7 +582,7 @@ export default function SalesPage() {
                           >
                             <p className="font-semibold text-primary-darker text-xs">{service.service_name}</p>
                             {service.has_sizes && <p className="text-xs text-gray-500">Medium</p>}
-                            <p className="font-bold text-secondary text-xs mt-1">₱{parseFloat(price).toFixed(2)}</p>
+                            <p className="font-bold text-secondary text-xs mt-1">{formatCurrency(parseFloat(price))}</p>
                           </button>
                         );
                       })}
@@ -607,10 +608,10 @@ export default function SalesPage() {
                             <p className="font-semibold text-primary-darker text-xs">{service.service_name}</p>
                             <div className="text-xs mt-0.5 space-y-0.5">
                               {service.is_solo && service.can_be_standalone && (
-                                <p className="text-blue-600 text-xs">Solo: ₱{standalonePrice.toFixed(2)}</p>
+                                <p className="text-blue-600 text-xs">Solo: {formatCurrency(standalonePrice)}</p>
                               )}
                               {service.can_be_addon && (
-                                <p className="text-purple-600 text-xs">Add-on: ₱{addonPrice.toFixed(2)}</p>
+                                <p className="text-purple-600 text-xs">Add-on: {formatCurrency(addonPrice)}</p>
                               )}
                             </div>
                           </button>
@@ -662,7 +663,7 @@ export default function SalesPage() {
                             <FaPlus size={12} />
                           </button>
                         </div>
-                        <p className="text-right font-bold text-secondary">₱{(item.price * item.quantity).toFixed(2)}</p>
+                        <p className="text-right font-bold text-secondary">{formatCurrency(item.price * item.quantity)}</p>
                       </div>
                     ))
                   )}
@@ -672,24 +673,24 @@ export default function SalesPage() {
                 <div className="bg-gradient-to-r from-gray-100 to-gray-50 rounded-lg p-4 space-y-2">
                   <div className="flex justify-between text-sm">
                     <span>Subtotal:</span>
-                    <span className="font-semibold">₱{subtotal.toFixed(2)}</span>
+                    <span className="font-semibold">{formatCurrency(subtotal)}</span>
                   </div>
                   <div className="flex justify-between text-sm">
                     <span>Discount:</span>
-                    <span className="font-semibold text-red-600">-₱{discountAmount.toFixed(2)}</span>
+                    <span className="font-semibold text-red-600">-{formatCurrency(discountAmount)}</span>
                   </div>
                   <div className="flex justify-between text-sm">
-                    <span>Tax (12%):</span>
-                    <span className="font-semibold text-secondary">₱{tax.toFixed(2)}</span>
+                    <span>VAT_Tax:</span>
+                    <span className="font-semibold text-secondary">{formatCurrency(tax)}</span>
                   </div>
                   <div className="flex justify-between text-lg font-bold text-primary-darker border-t-2 pt-2">
                     <span>Total:</span>
-                    <span className="text-secondary">₱{total.toFixed(2)}</span>
+                    <span className="text-secondary">{formatCurrency(total)}</span>
                   </div>
                   {change > 0 && (
                     <div className="flex justify-between text-lg font-bold bg-green-100 p-2 rounded text-green-700">
                       <span>Change:</span>
-                      <span>₱{change.toFixed(2)}</span>
+                      <span>{formatCurrency(change)}</span>
                     </div>
                   )}
                 </div>
@@ -789,7 +790,7 @@ export default function SalesPage() {
                         </div>
                         <div>
                           <p className="text-xs text-gray-600">Total</p>
-                          <p className="font-bold text-secondary text-lg">₱{parseFloat(sale.total).toFixed(2)}</p>
+                          <p className="font-bold text-secondary text-lg">{formatCurrency(parseFloat(sale.total))}</p>
                         </div>
                         <div>
                           <p className="text-xs text-gray-600">Time</p>
@@ -818,7 +819,7 @@ export default function SalesPage() {
 
         {/* Checkout Modal */}
         {checkoutModalOpen && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-start justify-center pt-4 z-50">
             <div className="bg-white rounded-lg shadow-2xl p-8 max-w-md w-full h-[95vh] max-h-[95vh] flex flex-col overflow-hidden">
               <h2 className="text-2xl font-bold text-primary-darker mb-6 flex-shrink-0">Payment Details</h2>
 
@@ -828,19 +829,19 @@ export default function SalesPage() {
               <div className="bg-gray-50 rounded-lg p-4 space-y-2">
                 <div className="flex justify-between text-sm">
                   <span>Subtotal:</span>
-                  <span className="font-semibold">₱{subtotal.toFixed(2)}</span>
+                  <span className="font-semibold">{formatCurrency(subtotal)}</span>
                 </div>
                 <div className="flex justify-between text-sm">
                   <span>Discount:</span>
-                  <span className="font-semibold text-red-600">-₱{discountAmount.toFixed(2)}</span>
+                  <span className="font-semibold text-red-600">-{formatCurrency(discountAmount)}</span>
                 </div>
                 <div className="flex justify-between text-sm">
-                  <span>Tax (12%):</span>
-                  <span className="font-semibold text-secondary">₱{tax.toFixed(2)}</span>
+                  <span>VAT_Tax:</span>
+                  <span className="font-semibold text-secondary">{formatCurrency(tax)}</span>
                 </div>
                 <div className="flex justify-between text-lg font-bold text-primary-darker border-t-2 pt-2">
                   <span>Total:</span>
-                  <span className="text-secondary">₱{total.toFixed(2)}</span>
+                  <span className="text-secondary">{formatCurrency(total)}</span>
                 </div>
               </div>
 

@@ -6,7 +6,8 @@ from .views import (
     AdjustStockQuantityAPIView,
     ProductHistoryAPIView,
     SupplierListCreateAPIView,
-    SupplierUpdateDeleteAPIView
+    SupplierUpdateDeleteAPIView,
+    UpdatePaymentAPIView
 )
 
 urlpatterns = [
@@ -17,4 +18,5 @@ urlpatterns = [
     path('history/', ProductHistoryAPIView.as_view(), name='inventory-history'),
     path('suppliers/', SupplierListCreateAPIView.as_view(), name='inventory-suppliers'),
     path('suppliers/<int:pk>/', SupplierUpdateDeleteAPIView.as_view(), name='inventory-supplier-detail'),
+    path('update-payment/', UpdatePaymentAPIView.as_view(), name='inventory-update-payment'),
 ]

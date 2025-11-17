@@ -213,6 +213,7 @@ class AdjustStockQuantityAPIView(APIView):
             "operation": "ADD" or "DEDUCT",
             "transaction_type": "addition|restock|sale|adjustment|damaged|return",
             "quantity": 10,
+            "supplier": "Optional supplier name",
             "reason": "Optional reason for adjustment"
         }
         """
@@ -221,7 +222,9 @@ class AdjustStockQuantityAPIView(APIView):
             operation = request.data.get('operation', 'ADD').upper()
             transaction_type = request.data.get('transaction_type', 'adjustment')
             quantity = int(request.data.get('quantity', 0))
+            supplier = request.data.get('supplier', '')
             reason = request.data.get('reason', '')
+            amount_paid = request.data.get('amount_paid')
             
             # Validation
             if not product_id:
@@ -278,6 +281,14 @@ class AdjustStockQuantityAPIView(APIView):
             unit_cost_decimal = Decimal(str(product.unit_cost)) if product.unit_cost else Decimal('0')
             total_cost = unit_cost_decimal * Decimal(str(abs(quantity_change)))
             
+            # Convert amount_paid to Decimal if provided
+            amount_paid_decimal = None
+            if amount_paid is not None:
+                try:
+                    amount_paid_decimal = Decimal(str(amount_paid))
+                except (ValueError, TypeError):
+                    amount_paid_decimal = None
+            
             # Create history entry
             ProductHistory.objects.create(
                 product=product,
@@ -286,8 +297,10 @@ class AdjustStockQuantityAPIView(APIView):
                 quantity_change=quantity_change,
                 old_quantity=old_quantity,
                 new_quantity=new_quantity,
+                supplier=supplier or product.supplier,
                 unit_cost=unit_cost_decimal,
                 total_cost=total_cost,
+                amount_paid=amount_paid_decimal,
                 reason=reason or f"{operation}ED {quantity} unit(s)"
             )
             
@@ -367,3 +380,61 @@ class SupplierUpdateDeleteAPIView(APIView):
         supplier.is_active = False
         supplier.save()
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class UpdatePaymentAPIView(APIView):
+    """Update amount_paid for multiple transactions"""
+    permission_classes = [permissions.IsAuthenticated, permissions.IsAdminUser]
+
+    def post(self, request):
+        transaction_ids = request.data.get('transaction_ids', [])
+        amount_paid = request.data.get('amount_paid')
+
+        print(f"[UPDATE PAYMENT] Received request")
+        print(f"[UPDATE PAYMENT] transaction_ids: {transaction_ids}")
+        print(f"[UPDATE PAYMENT] amount_paid: {amount_paid}")
+
+        if not transaction_ids:
+            return Response(
+                {"error": "transaction_ids is required"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        if amount_paid is None:
+            return Response(
+                {"error": "amount_paid is required"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        try:
+            amount_paid = Decimal(str(amount_paid))
+            if amount_paid < 0:
+                return Response(
+                    {"error": "amount_paid must be non-negative"},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+        except (ValueError, TypeError):
+            return Response(
+                {"error": "Invalid amount_paid value"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        # Update all transactions with the same amount_paid
+        updated_count = ProductHistory.objects.filter(
+            id__in=transaction_ids
+        ).update(amount_paid=amount_paid)
+
+        print(f"[UPDATE PAYMENT] Updated {updated_count} transaction(s)")
+        
+        # Verify the update
+        updated_txns = ProductHistory.objects.filter(id__in=transaction_ids)
+        for txn in updated_txns:
+            print(f"[UPDATE PAYMENT] Transaction ID {txn.id} now has amount_paid: {txn.amount_paid}")
+
+        return Response(
+            {
+                "message": f"Successfully updated {updated_count} transaction(s)",
+                "updated_count": updated_count
+            },
+            status=status.HTTP_200_OK
+        )

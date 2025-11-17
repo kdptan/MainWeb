@@ -4,6 +4,7 @@ import { useToast } from '../../hooks/useToast';
 import { fetchWithAuth } from '../../services/api';
 import Toast from '../../components/Toast';
 import ConfirmDialog from '../../components/ConfirmDialog';
+import { formatCurrency } from '../../utils/formatters';
 
 export default function Services() {
   const { toast, showToast } = useToast();
@@ -636,10 +637,10 @@ export default function Services() {
                       <h3 className="font-medium text-green-900">{service.service_name}</h3>
                       <div className="text-xs text-green-700 mt-1 space-y-1">
                         {service.can_be_addon && (
-                          <p>🏷️ Add-on: ₱{parseFloat(service.addon_price).toFixed(2)}</p>
+                          <p>🏷️ Add-on: {formatCurrency(service.addon_price)}</p>
                         )}
                         {service.can_be_standalone && (
-                          <p>🛍️ Standalone: ₱{parseFloat(service.standalone_price).toFixed(2)}</p>
+                          <p>🛍️ Standalone: {formatCurrency(service.standalone_price)}</p>
                         )}
                       </div>
                     </div>
@@ -683,7 +684,7 @@ export default function Services() {
 
       {/* View Modal */}
       {showViewModal && selectedService && (
-        <div className="fixed inset-0 bg-gray-800 bg-opacity-50 z-40 pointer-events-none flex items-center justify-center p-4">
+        <div className="fixed inset-0 bg-gray-800 bg-opacity-50 z-40 pointer-events-none flex items-start justify-center pt-4">
           <div ref={modalRef} className="bg-accent-cream rounded-lg shadow-2xl w-full max-w-7xl h-fit pointer-events-auto">
             {/* Header with primary color */}
             <div className="bg-gradient-to-r from-primary-darker to-primary-dark p-5 text-accent-cream rounded-t-lg">
@@ -762,7 +763,7 @@ export default function Services() {
                   ) : (
                     <div className="bg-accent-cream p-3 rounded border-2 border-brand-gold text-center flex-1 flex flex-col justify-center">
                       <p className="text-xs text-primary-dark font-semibold mb-1">Base Price</p>
-                      <p className="price price-large text-primary-darker">₱{parseFloat(selectedService.base_price).toFixed(2)}</p>
+                      <p className="price price-large text-primary-darker">{formatCurrency(selectedService.base_price)}</p>
                     </div>
                   )}
                 </div>
@@ -799,7 +800,7 @@ export default function Services() {
 
       {/* Edit Modal */}
       {showEditModal && editForm && (
-        <div className="fixed inset-0 bg-gray-800 bg-opacity-50 z-40 pointer-events-none flex items-center justify-center p-4">
+        <div className="fixed inset-0 bg-gray-800 bg-opacity-50 z-40 pointer-events-none flex items-start justify-center pt-4">
           <div ref={modalRef} className="bg-white p-6 rounded shadow-lg w-full max-w-lg pointer-events-auto">
             <h2 className="text-lg font-semibold mb-4">Edit Service</h2>
             <div className="grid grid-cols-1 gap-3">
@@ -999,7 +1000,7 @@ export default function Services() {
       
       {/* Solo Service Modal */}
       {showSoloModal && (
-        <div className="fixed inset-0 bg-gray-800 bg-opacity-50 z-40 pointer-events-none flex items-center justify-center p-4">
+        <div className="fixed inset-0 bg-gray-800 bg-opacity-50 z-40 pointer-events-none flex items-start justify-center pt-4">
           <div ref={modalRef} className="bg-white rounded-lg shadow-2xl w-full max-w-md pointer-events-auto">
             {/* Header */}
             <div className="bg-gradient-to-r from-green-600 to-green-700 p-4 text-white rounded-t-lg">

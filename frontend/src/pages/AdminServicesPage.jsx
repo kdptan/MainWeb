@@ -4,6 +4,7 @@ import { FaArrowLeft, FaPlus, FaEdit, FaTrash, FaTimes } from 'react-icons/fa';
 import { useAuth } from '../hooks/useAuth';
 import { useToast } from '../hooks/useToast';
 import Toast from '../components/Toast';
+import { formatCurrency } from '../utils/formatters';
 
 export default function AdminServicesPage() {
   const navigate = useNavigate();
@@ -294,13 +295,13 @@ export default function AdminServicesPage() {
                   <span className="text-accent-cream font-semibold">Pricing:</span>
                   {service.has_sizes ? (
                     <div className="mt-2 space-y-1 text-sm text-accent-cream">
-                      <div>Small: ₱{parseFloat(service.small_price).toFixed(2)}</div>
-                      <div>Medium: ₱{parseFloat(service.medium_price).toFixed(2)}</div>
-                      <div>Large: ₱{parseFloat(service.large_price).toFixed(2)}</div>
-                      <div>Extra Large: ₱{parseFloat(service.extra_large_price).toFixed(2)}</div>
+                      <div>Small: {formatCurrency(service.small_price)}</div>
+                      <div>Medium: {formatCurrency(service.medium_price)}</div>
+                      <div>Large: {formatCurrency(service.large_price)}</div>
+                      <div>Extra Large: {formatCurrency(service.extra_large_price)}</div>
                     </div>
                   ) : (
-                    <span className="text-accent-cream ml-2">₱{parseFloat(service.base_price).toFixed(2)}</span>
+                    <span className="text-accent-cream ml-2">{formatCurrency(service.base_price)}</span>
                   )}
                 </div>
 
@@ -328,7 +329,7 @@ export default function AdminServicesPage() {
 
       {/* Modal */}
       {showModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-start justify-center pt-4 z-50">
           <div className="bg-primary-dark rounded-lg p-8 max-w-2xl w-full max-h-[90vh] overflow-y-auto border-2 border-secondary">
             <div className="flex justify-between items-center mb-6">
               <h2 className="heading-main text-accent-cream">

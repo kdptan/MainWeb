@@ -6,6 +6,18 @@ export default function AppointmentReceiptModal({ isOpen, onClose, appointment }
   const receiptRef = useRef(null);
   const modalRef = useRef(null);
 
+  // Disable body scroll when modal is open
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, [isOpen]);
+
   useEffect(() => {
     if (!isOpen) return;
     const handler = (e) => {

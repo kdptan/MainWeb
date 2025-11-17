@@ -3,6 +3,7 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { FaBell, FaFileAlt } from 'react-icons/fa';
 import logo from '../assets/ChonkyLogo.png';
 import { useAuth } from '../hooks/useAuth';
+import { formatCurrency } from '../utils/formatters';
 import { API_BASE_URL, fetchWithAuth } from '../services/api';
 import UpdateProfileModal from '../components/UpdateProfileModal';
 import { formatOrderId } from '../utils/formatters';
@@ -219,7 +220,7 @@ export default function Navbar() {
                                 Branch: {notification.branch}
                               </div>
                               <div className="text-xs text-primary-dark">
-                                Amount: ₱{Number(notification.total_price).toFixed(2)}
+                                Amount: {formatCurrency(notification.total_price)}
                               </div>
                               <button
                                 onClick={() => navigate('/my-orders')}
@@ -234,12 +235,12 @@ export default function Navbar() {
                     )}
                   </div>
 
-                  {/* End of Day Reports Button - Admin Only */}
+                  {/* Sales Report Button - Admin Only */}
                   {((user.role || '').toLowerCase() === 'admin' || user.is_staff) && (
                     <button
-                      onClick={() => navigate('/admin/end-of-day-reports')}
+                      onClick={() => navigate('/admin/sales-report')}
                       className="relative text-primary-darker hover:text-secondary px-3 py-2 rounded-md text-sm font-medium transition-colors"
-                      title="End of Day Reports"
+                      title="Sales Report"
                     >
                       <FaFileAlt size={20} />
                     </button>

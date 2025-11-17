@@ -34,7 +34,7 @@ class ProductHistorySerializer(serializers.ModelSerializer):
         fields = [
             'id', 'product', 'product_name', 'product_formatted_id', 'user', 'user_name',
             'transaction_type', 'quantity_change', 'old_quantity', 'new_quantity',
-            'supplier', 'unit_cost', 'total_cost', 'reason', 'timestamp'
+            'supplier', 'unit_cost', 'total_cost', 'amount_paid', 'reason', 'timestamp'
         ]
         read_only_fields = ['id', 'timestamp', 'old_quantity', 'new_quantity']
     

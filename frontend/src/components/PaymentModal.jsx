@@ -1,8 +1,21 @@
 import React, { useState, useEffect } from 'react';
 import { FaTimes, FaCheck } from 'react-icons/fa';
+import { formatCurrency } from '../utils/formatters';
 
 export default function PaymentModal({ isOpen, onClose, order, onPaymentComplete }) {
   const [amountPaid, setAmountPaid] = useState('');
+
+  // Disable body scroll when modal is open
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, [isOpen]);
 
   // Reset state when modal opens with a new order
   useEffect(() => {
@@ -84,7 +97,7 @@ export default function PaymentModal({ isOpen, onClose, order, onPaymentComplete
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-start justify-center pt-4 z-50">
       <div className="bg-white rounded-lg shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-auto">
         {/* Header */}
         <div className="sticky top-0 bg-gradient-to-r from-secondary to-orange-500 text-white p-6 flex justify-between items-center">
@@ -108,8 +121,8 @@ export default function PaymentModal({ isOpen, onClose, order, onPaymentComplete
                     <p className="text-sm text-gray-600">Qty: {item.quantity}</p>
                   </div>
                   <div className="text-right">
-                    <p className="font-semibold text-gray-900">₱{(parsePrice(item.price) * item.quantity).toFixed(2)}</p>
-                    <p className="text-sm text-gray-600">₱{parsePrice(item.price).toFixed(2)} each</p>
+                    <p className="font-semibold text-gray-900">{formatCurrency(parsePrice(item.price) * item.quantity)}</p>
+                    <p className="text-sm text-gray-600">{formatCurrency(parsePrice(item.price))} each</p>
                   </div>
                 </div>
               ))}
@@ -119,15 +132,15 @@ export default function PaymentModal({ isOpen, onClose, order, onPaymentComplete
             <div className="space-y-2 border-t-2 border-gray-300 pt-4">
               <div className="flex justify-between text-gray-700">
                 <span>Subtotal:</span>
-                <span className="font-semibold">₱{subtotal.toFixed(2)}</span>
+                <span className="font-semibold">{formatCurrency(subtotal)}</span>
               </div>
               <div className="flex justify-between text-gray-700">
                 <span>Tax (12% VAT):</span>
-                <span className="font-semibold text-secondary">₱{tax.toFixed(2)}</span>
+                <span className="font-semibold text-secondary">{formatCurrency(tax)}</span>
               </div>
               <div className="flex justify-between text-lg font-bold text-gray-900 bg-yellow-50 p-2 rounded">
                 <span>Total:</span>
-                <span className="text-secondary">₱{total.toFixed(2)}</span>
+                <span className="text-secondary">{formatCurrency(total)}</span>
               </div>
             </div>
           </div>
@@ -152,7 +165,7 @@ export default function PaymentModal({ isOpen, onClose, order, onPaymentComplete
               <div className="mt-2 p-3 bg-blue-50 rounded-lg border-2 border-blue-200">
                 <div className="flex justify-between text-blue-900">
                   <span className="font-semibold">Change:</span>
-                  <span className="text-xl font-bold">₱{Math.max(change, 0).toFixed(2)}</span>
+                  <span className="text-xl font-bold">{formatCurrency(Math.max(change, 0))}</span>
                 </div>
               </div>
             )}

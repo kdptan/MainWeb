@@ -158,6 +158,7 @@ class ProductHistory(models.Model):
     supplier = models.CharField(max_length=255, blank=True)  # for restock transactions
     unit_cost = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
     total_cost = models.DecimalField(max_digits=12, decimal_places=2, null=True, blank=True)  # quantity_change * unit_cost
+    amount_paid = models.DecimalField(max_digits=12, decimal_places=2, null=True, blank=True)  # amount paid for this transaction
     reason = models.TextField(blank=True)  # reason for adjustment/change
     timestamp = models.DateTimeField(auto_now_add=True)
     

@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useAuth } from '../hooks/useAuth';
 import placeholder from '../assets/placeholder-avatar.svg';
 import { FaPencilAlt } from 'react-icons/fa';
@@ -12,6 +12,14 @@ export default function UpdateProfileModal({ onClose }) {
   const [saving, setSaving] = useState(false);
   const [editingUsername, setEditingUsername] = useState(false);
   const [editingEmail, setEditingEmail] = useState(false);
+
+  // Disable body scroll when modal is open
+  useEffect(() => {
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, []);
 
   // Format error messages into clean, formal text
   const formatErrorMessage = (err) => {
@@ -76,7 +84,7 @@ export default function UpdateProfileModal({ onClose }) {
   }
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
+    <div className="fixed inset-0 bg-black bg-opacity-40 flex items-start justify-center pt-4 z-50">
       <div className="bg-white rounded-md p-6 w-full max-w-md max-h-[90vh] overflow-auto">
         <h3 className="text-lg font-medium mb-4">Update Profile</h3>
   {error && <div className="text-sm text-red-600 mb-2 break-words whitespace-pre-wrap max-w-full">{error}</div>}

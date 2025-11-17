@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { FaHistory } from 'react-icons/fa';
+import { formatCurrency } from '../utils/formatters';
 
 export default function ProductHistoryModal({ isOpen, onClose, token, embedded = false }) {
   const [history, setHistory] = useState([]);
@@ -8,6 +9,20 @@ export default function ProductHistoryModal({ isOpen, onClose, token, embedded =
   const [branch, setBranch] = useState('all');
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
+
+  // Disable body scroll when modal is open (only if not embedded)
+  useEffect(() => {
+    if (!embedded && isOpen) {
+      document.body.style.overflow = 'hidden';
+    } else if (!embedded) {
+      document.body.style.overflow = 'unset';
+    }
+    return () => {
+      if (!embedded) {
+        document.body.style.overflow = 'unset';
+      }
+    };
+  }, [isOpen, embedded]);
 
   const fetchHistory = useCallback(async () => {
     setLoading(true);
@@ -90,11 +105,11 @@ export default function ProductHistoryModal({ isOpen, onClose, token, embedded =
   if (!isOpen) return null;
 
   const historyContent = (
-    <div className="bg-white rounded-lg shadow-2xl w-[95vw] max-h-[90vh] flex flex-col">
+    <div className="bg-white rounded-lg shadow-2xl w-[85vw] max-w-[1400px] max-h-[90vh] flex flex-col mx-auto">
         {/* Filters Header */}
-        <div className="sticky top-0 bg-gray-50 p-4 z-10 border-b border-gray-200">
+        <div className="sticky top-0 bg-gray-50 p-3 z-10 border-b border-gray-200">
           {/* Filters */}
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-2">
             <div>
               <label className="block text-xs font-semibold text-gray-700 mb-1">Transaction Type</label>
               <select
@@ -103,7 +118,7 @@ export default function ProductHistoryModal({ isOpen, onClose, token, embedded =
                   setFilter(e.target.value);
                   setCurrentPage(1);
                 }}
-                className="w-full px-2 py-1.5 border border-gray-300 rounded bg-white text-gray-900 text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full px-2 py-1 border border-gray-300 rounded bg-white text-gray-900 text-xs focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               >
                 <option value="all" className="text-gray-900">All Transactions</option>
                 <option value="addition" className="text-gray-900">Product Addition</option>
@@ -123,7 +138,7 @@ export default function ProductHistoryModal({ isOpen, onClose, token, embedded =
                   setBranch(e.target.value);
                   setCurrentPage(1);
                 }}
-                className="w-full px-2 py-1.5 border border-gray-300 rounded bg-white text-gray-900 text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full px-2 py-1 border border-gray-300 rounded bg-white text-gray-900 text-xs focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               >
                 <option value="all" className="text-gray-900">All Branches</option>
                 <option value="Matina" className="text-gray-900">Matina</option>
@@ -132,13 +147,13 @@ export default function ProductHistoryModal({ isOpen, onClose, token, embedded =
             </div>
 
             <div className="flex items-end">
-              <div className="text-sm font-semibold text-gray-700">
+              <div className="text-xs font-semibold text-gray-700">
                 Total Records: <span className="text-blue-600">{history.length}</span>
               </div>
             </div>
 
             <div className="flex items-end">
-              <div className="text-sm font-semibold text-gray-700">
+              <div className="text-xs font-semibold text-gray-700">
                 Page <span className="text-blue-600">{currentPage}</span> of <span className="text-blue-600">{Math.ceil(history.length / itemsPerPage)}</span>
               </div>
             </div>
@@ -159,21 +174,21 @@ export default function ProductHistoryModal({ isOpen, onClose, token, embedded =
           ) : (
             <>
               <div className="overflow-x-auto flex-1">
-                <table className="w-full border-collapse">
+                <table className="w-full border-collapse text-xs">
                   <thead className="bg-gray-100 sticky top-0">
                     <tr className="border-b-2 border-gray-300">
-                      <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700 border-r border-gray-300">Date & Time</th>
-                      <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700 border-r border-gray-300">Product</th>
-                      <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700 border-r border-gray-300">Item ID</th>
-                      <th className="px-4 py-3 text-center text-sm font-semibold text-gray-700 border-r border-gray-300">Transaction</th>
-                      <th className="px-4 py-3 text-center text-sm font-semibold text-gray-700 border-r border-gray-300">Qty Change</th>
-                      <th className="px-4 py-3 text-center text-sm font-semibold text-gray-700 border-r border-gray-300">Old Stock</th>
-                      <th className="px-4 py-3 text-center text-sm font-semibold text-gray-700 border-r border-gray-300">New Stock</th>
-                      <th className="px-4 py-3 text-right text-sm font-semibold text-gray-700 border-r border-gray-300">Unit Cost</th>
-                      <th className="px-4 py-3 text-right text-sm font-semibold text-gray-700 border-r border-gray-300">Total Cost</th>
-                      <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700 border-r border-gray-300">User</th>
-                      <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700 border-r border-gray-300">Supplier</th>
-                      <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700">Reason</th>
+                      <th className="px-2 py-2 text-left text-xs font-semibold text-gray-700 border-r border-gray-300">Date & Time</th>
+                      <th className="px-2 py-2 text-left text-xs font-semibold text-gray-700 border-r border-gray-300">Product</th>
+                      <th className="px-2 py-2 text-left text-xs font-semibold text-gray-700 border-r border-gray-300">Item ID</th>
+                      <th className="px-2 py-2 text-center text-xs font-semibold text-gray-700 border-r border-gray-300">Transaction</th>
+                      <th className="px-2 py-2 text-center text-xs font-semibold text-gray-700 border-r border-gray-300">Qty Change</th>
+                      <th className="px-2 py-2 text-center text-xs font-semibold text-gray-700 border-r border-gray-300">Old Stock</th>
+                      <th className="px-2 py-2 text-center text-xs font-semibold text-gray-700 border-r border-gray-300">New Stock</th>
+                      <th className="px-2 py-2 text-right text-xs font-semibold text-gray-700 border-r border-gray-300">Unit Cost</th>
+                      <th className="px-2 py-2 text-right text-xs font-semibold text-gray-700 border-r border-gray-300">Total Cost</th>
+                      <th className="px-2 py-2 text-left text-xs font-semibold text-gray-700 border-r border-gray-300">User</th>
+                      <th className="px-2 py-2 text-left text-xs font-semibold text-gray-700 border-r border-gray-300">Supplier</th>
+                      <th className="px-2 py-2 text-left text-xs font-semibold text-gray-700">Reason</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -181,42 +196,42 @@ export default function ProductHistoryModal({ isOpen, onClose, token, embedded =
                       .slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage)
                       .map((item) => (
                       <tr key={item.id} className="border-b hover:bg-gray-50 transition">
-                        <td className="px-4 py-3 text-sm whitespace-nowrap border-r border-gray-300">
+                        <td className="px-2 py-2 text-xs whitespace-nowrap border-r border-gray-300">
                           {new Date(item.timestamp).toLocaleString()}
                         </td>
-                        <td className="px-4 py-3 text-sm font-medium text-gray-900 border-r border-gray-300">
+                        <td className="px-2 py-2 text-xs font-medium text-gray-900 border-r border-gray-300">
                           {item.product_name}
                         </td>
-                        <td className="px-4 py-3 text-sm font-mono text-gray-600 border-r border-gray-300">
+                        <td className="px-2 py-2 text-xs font-mono text-gray-600 border-r border-gray-300">
                           {item.product_formatted_id}
                         </td>
-                        <td className="px-4 py-3 text-center border-r border-gray-300">
-                          <span className={`px-3 py-1 rounded-lg border-2 font-semibold text-xs whitespace-nowrap inline-block ${getTransactionColor(item.transaction_type)}`}>
+                        <td className="px-2 py-2 text-center border-r border-gray-300">
+                          <span className={`px-2 py-0.5 rounded-lg border-2 font-semibold text-xs whitespace-nowrap inline-block ${getTransactionColor(item.transaction_type)}`}>
                             {getTransactionIcon(item.transaction_type)} {item.transaction_type.toUpperCase()}
                           </span>
                         </td>
-                        <td className={`px-4 py-3 text-center text-sm font-bold border-r border-gray-300 ${item.quantity_change > 0 ? 'text-green-600' : 'text-red-600'}`}>
+                        <td className={`px-2 py-2 text-center text-xs font-bold border-r border-gray-300 ${item.quantity_change > 0 ? 'text-green-600' : 'text-red-600'}`}>
                           {item.quantity_change > 0 ? '+' : ''}{item.quantity_change}
                         </td>
-                    <td className="px-4 py-3 text-center text-sm text-gray-600 border-r border-gray-300">
+                    <td className="px-2 py-2 text-center text-xs text-gray-600 border-r border-gray-300">
                       {item.old_quantity}
                     </td>
-                    <td className="px-4 py-3 text-center text-sm font-semibold text-gray-900 border-r border-gray-300">
+                    <td className="px-2 py-2 text-center text-xs font-semibold text-gray-900 border-r border-gray-300">
                       {item.new_quantity}
                     </td>
-                    <td className="px-4 py-3 text-right text-sm font-medium text-gray-700 border-r border-gray-300">
-                      {item.unit_cost ? `₱${parseFloat(item.unit_cost).toFixed(2)}` : '—'}
+                    <td className="px-2 py-2 text-right text-xs font-medium text-gray-700 border-r border-gray-300">
+                      {item.unit_cost ? formatCurrency(parseFloat(item.unit_cost)) : '—'}
                     </td>
-                    <td className="px-4 py-3 text-right text-sm font-bold text-blue-600 border-r border-gray-300">
-                      {item.total_cost ? `₱${parseFloat(item.total_cost).toFixed(2)}` : '—'}
+                    <td className="px-2 py-2 text-right text-xs font-bold text-blue-600 border-r border-gray-300">
+                      {item.total_cost ? formatCurrency(parseFloat(item.total_cost)) : '—'}
                     </td>
-                    <td className="px-4 py-3 text-sm text-gray-700 border-r border-gray-300">
+                    <td className="px-2 py-2 text-xs text-gray-700 border-r border-gray-300">
                       {item.user_name || 'System'}
                     </td>
-                    <td className="px-4 py-3 text-sm text-gray-600 border-r border-gray-300">
+                    <td className="px-2 py-2 text-xs text-gray-600 border-r border-gray-300">
                       {item.supplier || '—'}
                     </td>
-                    <td className="px-4 py-3 text-sm text-gray-600 max-w-xs truncate">
+                    <td className="px-2 py-2 text-xs text-gray-600 max-w-xs truncate">
                       {item.reason || '—'}
                     </td>
                   </tr>
@@ -226,22 +241,22 @@ export default function ProductHistoryModal({ isOpen, onClose, token, embedded =
               </div>
 
               {/* Pagination Controls */}
-              <div className="border-t p-4 bg-gray-50 flex items-center justify-between">
-                <p className="text-sm text-gray-600">
+              <div className="border-t p-3 bg-gray-50 flex items-center justify-between">
+                <p className="text-xs text-gray-600">
                   Showing {(currentPage - 1) * itemsPerPage + 1} to {Math.min(currentPage * itemsPerPage, history.length)} of {history.length} records
                 </p>
                 <div className="flex gap-2">
                   <button
                     onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
                     disabled={currentPage === 1}
-                    className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="px-3 py-1.5 text-xs font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     Previous
                   </button>
                   <button
                     onClick={() => setCurrentPage(Math.min(Math.ceil(history.length / itemsPerPage), currentPage + 1))}
                     disabled={currentPage === Math.ceil(history.length / itemsPerPage)}
-                    className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="px-3 py-1.5 text-xs font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     Next
                   </button>
@@ -258,7 +273,7 @@ export default function ProductHistoryModal({ isOpen, onClose, token, embedded =
       return <div className="w-full">{content}</div>;
     }
     return (
-      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-start justify-center pt-4 z-50">
         {content}
       </div>
     );

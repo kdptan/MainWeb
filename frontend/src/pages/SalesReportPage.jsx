@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FaArrowLeft, FaPrint, FaFilter } from 'react-icons/fa';
+import { FaArrowLeft, FaPrint, FaFilter, FaCalendar } from 'react-icons/fa';
 import { useAuth } from '../hooks/useAuth';
 import { useToast } from '../hooks/useToast';
 import Toast from '../components/Toast';
+import { formatCurrency } from '../utils/formatters';
 
 const API_BASE_URL = 'http://127.0.0.1:8000/api';
 
@@ -428,30 +429,28 @@ export default function SalesReportPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 py-8">
+    <div className="min-h-screen bg-primary-darker py-8">
       <Toast />
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Back Button */}
-        <button
-          onClick={() => navigate(-1)}
-          className="mb-6 flex items-center gap-2 text-primary-darker hover:text-primary font-medium transition-colors"
-        >
-          <FaArrowLeft /> Back to EOD
-        </button>
-
         {/* Header */}
-        <div className="bg-white rounded-lg shadow-lg p-8 mb-8 print:shadow-none">
-          <div className="flex items-center justify-between mb-6 print:mb-4">
+        <div className="bg-white rounded-lg shadow-md p-6 mb-6 print:shadow-none">
+          <div className="flex items-center justify-between mb-4 print:mb-2">
             <div>
-              <h1 className="text-4xl font-bold text-primary-darker">Sales Report</h1>
-              <p className="text-gray-600 mt-2">Complete Transaction Summary</p>
+              <h1 className="heading-main text-primary-darker">Sales Report</h1>
+              <p className="text-sm text-gray-600 mt-1">Complete Transaction Summary</p>
             </div>
-            <div className="flex gap-3 print:hidden">
+            <div className="flex gap-2 print:hidden">
               <button
                 onClick={handlePrint}
-                className="flex items-center gap-2 px-4 py-2 bg-secondary text-white rounded-lg hover:bg-secondary-light font-medium transition-colors"
+                className="flex items-center gap-2 px-4 py-2 bg-secondary text-accent-cream rounded-lg hover:bg-secondary-light font-medium text-sm transition-colors"
               >
-                <FaPrint /> Print
+                <FaPrint /> Print Report
+              </button>
+              <button
+                onClick={() => navigate('/admin/end-of-day-reports')}
+                className="flex items-center gap-2 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 font-medium text-sm transition-colors"
+              >
+                <FaCalendar /> End of Day Reports
               </button>
             </div>
           </div>
@@ -495,31 +494,34 @@ export default function SalesReportPage() {
         ) : (
           <>
             {/* Tab Navigation */}
-            <div className="flex gap-4 mb-6 border-b border-gray-200 print:hidden">
-              <button
-                onClick={() => setActiveTab('analytics')}
-                className={`px-6 py-3 font-semibold text-base transition-all ${
-                  activeTab === 'analytics'
-                    ? 'text-secondary border-b-2 border-secondary'
-                    : 'text-gray-600 hover:text-gray-900'
-                }`}
-              >
-                Analytics
-              </button>
-              <button
-                onClick={() => setActiveTab('transactions')}
-                className={`px-6 py-3 font-semibold text-base transition-all ${
-                  activeTab === 'transactions'
-                    ? 'text-secondary border-b-2 border-secondary'
-                    : 'text-gray-600 hover:text-gray-900'
-                }`}
-              >
-                Transactions
-              </button>
+            <div className="bg-white rounded-lg shadow-md p-6 mb-6">
+              <div className="flex gap-4 border-b border-gray-200 print:hidden">
+                <button
+                  onClick={() => setActiveTab('analytics')}
+                  className={`px-6 py-3 font-semibold text-base transition-all ${
+                    activeTab === 'analytics'
+                      ? 'text-secondary border-b-2 border-secondary'
+                      : 'text-gray-600 hover:text-gray-900'
+                  }`}
+                >
+                  Analytics
+                </button>
+                <button
+                  onClick={() => setActiveTab('transactions')}
+                  className={`px-6 py-3 font-semibold text-base transition-all ${
+                    activeTab === 'transactions'
+                      ? 'text-secondary border-b-2 border-secondary'
+                      : 'text-gray-600 hover:text-gray-900'
+                  }`}
+                >
+                  Transactions
+                </button>
+              </div>
             </div>
 
             {/* Analytics Tab */}
             {activeTab === 'analytics' && (
+            <div className="bg-white rounded-lg shadow-md p-6">
             <div className="space-y-8 mb-8">
               {/* Key Performance Indicators */}
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 print:grid-cols-4">
@@ -529,7 +531,7 @@ export default function SalesReportPage() {
                     <div>
                       <p className="text-gray-600 text-sm font-medium">Total Revenue</p>
                       <p className="text-3xl font-bold text-purple-600 mt-2">
-                        ₱{analytics.totalRevenue.toFixed(2)}
+                        {formatCurrency(analytics.totalRevenue)}
                       </p>
                     </div>
                     <div className="text-4xl text-purple-200">₱</div>
@@ -555,7 +557,7 @@ export default function SalesReportPage() {
                     <div>
                       <p className="text-gray-600 text-sm font-medium">Average Order Value</p>
                       <p className="text-3xl font-bold text-green-600 mt-2">
-                        ₱{analytics.averageOrderValue.toFixed(2)}
+                        {formatCurrency(analytics.averageOrderValue)}
                       </p>
                     </div>
                     <div className="text-4xl text-green-200">Ø</div>
@@ -570,7 +572,7 @@ export default function SalesReportPage() {
                       <p className="text-3xl font-bold text-orange-600 mt-2">
                         {productTransactions.length}
                       </p>
-                      <p className="text-xs text-gray-600 mt-1">₱{productTotals.totalSubtotal.toFixed(2)}</p>
+                      <p className="text-xs text-gray-600 mt-1">{formatCurrency(productTotals.totalSubtotal)}</p>
                     </div>
                     <div className="text-4xl text-orange-200">📦</div>
                   </div>
@@ -668,7 +670,7 @@ export default function SalesReportPage() {
                           <p className="text-sm text-gray-600">{data.count} transactions</p>
                         </div>
                         <div className="text-right">
-                          <p className="font-bold text-gray-900">₱{data.revenue.toFixed(2)}</p>
+                          <p className="font-bold text-gray-900">{formatCurrency(data.revenue)}</p>
                           <p className="text-xs text-gray-600">
                             {((data.revenue / analytics.totalRevenue) * 100).toFixed(1)}%
                           </p>
@@ -693,7 +695,7 @@ export default function SalesReportPage() {
                             <p className="text-sm text-gray-600">{product.quantity} units • {product.count} transactions</p>
                           </div>
                           <div className="text-right ml-2">
-                            <p className="font-bold text-gray-900">₱{product.revenue.toFixed(2)}</p>
+                            <p className="font-bold text-gray-900">{formatCurrency(product.revenue)}</p>
                           </div>
                         </div>
                       ))
@@ -831,6 +833,7 @@ export default function SalesReportPage() {
                 </div>
               </div>
             </div>
+            </div>
             )}
 
             {/* Transactions Tab */}
@@ -889,10 +892,10 @@ export default function SalesReportPage() {
                                 {transaction.quantity || 0}
                               </td>
                               <td className="px-3 py-4 text-sm font-medium text-gray-700 text-right border-r border-gray-200">
-                                ₱{(transaction.unitPrice ? parseFloat(transaction.unitPrice).toFixed(2) : '0.00')}
+                                {transaction.unitPrice ? formatCurrency(transaction.unitPrice) : formatCurrency(0)}
                               </td>
                               <td className="px-3 py-4 text-sm font-bold text-blue-600 text-right border-r border-gray-200">
-                                ₱{(transaction.subtotal ? parseFloat(transaction.subtotal).toFixed(2) : '0.00')}
+                                {transaction.subtotal ? formatCurrency(transaction.subtotal) : formatCurrency(0)}
                               </td>
                               <td className="px-3 py-4 text-sm text-gray-700 capitalize border-r border-gray-200">
                                 {transaction.paymentMethod || 'Unknown'}
@@ -929,7 +932,7 @@ export default function SalesReportPage() {
                             </td>
                             <td className="px-3 py-4 text-right border-r border-gray-300">-</td>
                             <td className="px-3 py-4 text-right text-blue-600 border-r border-gray-300">
-                              ₱{(productTotals.totalSubtotal ? parseFloat(productTotals.totalSubtotal).toFixed(2) : '0.00')}
+                              {productTotals.totalSubtotal ? formatCurrency(productTotals.totalSubtotal) : formatCurrency(0)}
                             </td>
                             <td colSpan="2"></td>
                           </tr>
@@ -1018,7 +1021,7 @@ export default function SalesReportPage() {
                               </td>
                               <td className="px-3 py-4 text-sm text-gray-700 border-r border-gray-200">{transaction.branch || 'Unknown Branch'}</td>
                               <td className="px-3 py-4 text-sm font-medium text-gray-700 text-right border-r border-gray-200">
-                                ₱{(transaction.unitPrice ? parseFloat(transaction.unitPrice).toFixed(2) : '0.00')}
+                                {transaction.unitPrice ? formatCurrency(transaction.unitPrice) : formatCurrency(0)}
                               </td>
                               <td className="px-3 py-4 text-sm text-gray-700 border-r border-gray-200">
                                 <span className={`px-2 py-1 rounded-full text-xs font-semibold whitespace-nowrap inline-block ${
@@ -1030,7 +1033,7 @@ export default function SalesReportPage() {
                                 </span>
                               </td>
                               <td className="px-3 py-4 text-sm font-bold text-green-600 text-right border-r border-gray-200">
-                                ₱{(transaction.subtotal ? parseFloat(transaction.subtotal).toFixed(2) : '0.00')}
+                                {transaction.subtotal ? formatCurrency(transaction.subtotal) : formatCurrency(0)}
                               </td>
                               <td className="px-3 py-4 text-sm text-gray-700 capitalize border-r border-gray-200">
                                 {transaction.paymentMethod || 'Unknown'}
@@ -1065,7 +1068,7 @@ export default function SalesReportPage() {
                             <td className="px-3 py-4 text-right border-r border-gray-300">-</td>
                             <td className="px-3 py-4 text-center border-r border-gray-300">-</td>
                             <td className="px-3 py-4 text-right text-green-600 border-r border-gray-300">
-                              ₱{(serviceTotals.totalSubtotal ? parseFloat(serviceTotals.totalSubtotal).toFixed(2) : '0.00')}
+                              {serviceTotals.totalSubtotal ? formatCurrency(serviceTotals.totalSubtotal) : formatCurrency(0)}
                             </td>
                             <td colSpan="2"></td>
                           </tr>
@@ -1109,19 +1112,19 @@ export default function SalesReportPage() {
               <div className="bg-blue-50 rounded-lg p-6 border-l-4 border-blue-600">
                 <p className="text-gray-600 text-sm font-medium">Product Revenue</p>
                 <p className="text-3xl font-bold text-blue-600 mt-2">
-                  ₱{(productTotals.totalSubtotal ? parseFloat(productTotals.totalSubtotal).toFixed(2) : '0.00')}
+                  {productTotals.totalSubtotal ? formatCurrency(productTotals.totalSubtotal) : formatCurrency(0)}
                 </p>
               </div>
               <div className="bg-green-50 rounded-lg p-6 border-l-4 border-green-600">
                 <p className="text-gray-600 text-sm font-medium">Service Revenue</p>
                 <p className="text-3xl font-bold text-green-600 mt-2">
-                  ₱{(serviceTotals.totalSubtotal ? parseFloat(serviceTotals.totalSubtotal).toFixed(2) : '0.00')}
+                  {serviceTotals.totalSubtotal ? formatCurrency(serviceTotals.totalSubtotal) : formatCurrency(0)}
                 </p>
               </div>
               <div className="bg-purple-50 rounded-lg p-6 border-l-4 border-purple-600">
                 <p className="text-gray-600 text-sm font-medium">Total Revenue</p>
                 <p className="text-3xl font-bold text-purple-600 mt-2">
-                  ₱{((productTotals.totalSubtotal || 0) + (serviceTotals.totalSubtotal || 0)).toFixed(2)}
+                  {formatCurrency((productTotals.totalSubtotal || 0) + (serviceTotals.totalSubtotal || 0))}
                 </p>
               </div>
             </div>

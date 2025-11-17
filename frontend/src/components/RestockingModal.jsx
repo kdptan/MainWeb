@@ -181,7 +181,7 @@ function SelectProductsModal({ isOpen, onClose, onProceed, token, embedded = fal
   if (!isOpen) return null;
 
   return embedded ? renderModalContent() : (
-    <div className="fixed inset-0 bg-black bg-opacity-50 z-40 pointer-events-none flex items-center justify-center">
+    <div className="fixed inset-0 bg-black bg-opacity-50 z-40 pointer-events-none flex items-start justify-center pt-4">
       <div ref={modalRef} className="w-[90vw] max-w-5xl max-h-[90vh] pointer-events-auto">
         {renderModalContent()}
       </div>
@@ -194,6 +194,20 @@ export default function BatchRestockingModal({ isOpen, onClose, products, token,
   const [selectModalOpen, setSelectModalOpen] = useState(false);
   const [adjustmentModalOpen, setAdjustmentModalOpen] = useState(false);
   const [selectedProducts, setSelectedProducts] = useState([]);
+
+  // Disable body scroll when modal is open (only if not embedded)
+  useEffect(() => {
+    if (!embedded && isOpen) {
+      document.body.style.overflow = 'hidden';
+    } else if (!embedded) {
+      document.body.style.overflow = 'unset';
+    }
+    return () => {
+      if (!embedded) {
+        document.body.style.overflow = 'unset';
+      }
+    };
+  }, [isOpen, embedded]);
 
   useEffect(() => {
     if (isOpen) {

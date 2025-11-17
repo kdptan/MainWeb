@@ -23,6 +23,21 @@ export const minutesToHours = (minutes) => {
   return (minutes / 60).toFixed(2);
 };
 
+// Format number with thousand separators (e.g., 1000 -> 1,000)
+export const formatNumber = (number, decimals = 2) => {
+  if (number === null || number === undefined || isNaN(number)) return '0.00';
+  const num = typeof number === 'string' ? parseFloat(number) : number;
+  return num.toLocaleString('en-US', { 
+    minimumFractionDigits: decimals, 
+    maximumFractionDigits: decimals 
+  });
+};
+
+// Format currency with peso sign and thousand separators (e.g., 1000 -> ₱1,000.00)
+export const formatCurrency = (amount, decimals = 2) => {
+  return `₱${formatNumber(amount, decimals)}`;
+};
+
 // Format order ID to professional alphanumeric format (ORD-XXXXX-XXXXX)
 // Converts numeric ID to base36 (0-9, A-Z) for compact representation
 export const formatOrderId = (orderId) => {

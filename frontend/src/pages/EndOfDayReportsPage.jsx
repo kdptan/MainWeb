@@ -5,6 +5,7 @@ import { useAuth } from '../hooks/useAuth';
 import { useToast } from '../hooks/useToast';
 import { orderService } from '../services/orderService';
 import Toast from '../components/Toast';
+import { formatCurrency } from '../utils/formatters';
 
 export default function EndOfDayReportsPage() {
   const navigate = useNavigate();
@@ -217,7 +218,7 @@ export default function EndOfDayReportsPage() {
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-sm font-medium text-gray-600">Total Revenue</p>
-                    <p className="text-3xl font-bold text-green-600 mt-2">₱{reportData.totalRevenue.toFixed(2)}</p>
+                    <p className="text-3xl font-bold text-green-600 mt-2">{formatCurrency(reportData.totalRevenue)}</p>
                   </div>
                   <div className="p-3 bg-green-100 rounded-full">
                     <FaDollarSign className="text-green-600 text-2xl" />
@@ -266,7 +267,7 @@ export default function EndOfDayReportsPage() {
                     {Object.entries(reportData.revenueByBranch).map(([branch, revenue]) => (
                       <div key={branch} className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
                         <span className="font-medium text-gray-700">{branch}</span>
-                        <span className="text-lg font-bold text-secondary">₱{revenue.toFixed(2)}</span>
+                        <span className="text-lg font-bold text-secondary">{formatCurrency(revenue)}</span>
                       </div>
                     ))}
                   </div>

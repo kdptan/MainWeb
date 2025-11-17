@@ -8,6 +8,7 @@ import Toast from '../components/Toast';
 import PetAvatar from '../components/PetAvatar';
 import GenderIcon from '../components/GenderIcon';
 import { formatAge } from '../utils/formatters';
+import { formatCurrency } from '../utils/formatters';
 
 export default function AppointmentPage() {
   const navigate = useNavigate();
@@ -299,7 +300,7 @@ export default function AppointmentPage() {
                           ) : (
                             <div className="text-center">
                               <p className="text-xs font-semibold text-accent-cream mb-1">💰 Starting at:</p>
-                              <p className="text-lg font-bold text-secondary-lighter">₱{parseFloat(service.base_price).toFixed(2)}</p>
+                              <p className="text-lg font-bold text-secondary-lighter">{formatCurrency(service.base_price)}</p>
                             </div>
                           )}
                         </div>
@@ -358,13 +359,13 @@ export default function AppointmentPage() {
                           {service.can_be_addon && (
                             <div className="mb-2 pb-2 border-b border-primary-dark">
                               <p className="text-xs text-accent-peach mb-0.5">🏷️ Add-on:</p>
-                              <p className="text-sm font-semibold text-brand-gold">₱{parseFloat(service.addon_price).toFixed(2)}</p>
+                              <p className="text-sm font-semibold text-brand-gold">{formatCurrency(service.addon_price)}</p>
                             </div>
                           )}
                           {service.can_be_standalone && (
                             <div>
                               <p className="text-xs text-accent-peach mb-0.5">🛍️ Solo:</p>
-                              <p className="text-sm font-semibold text-brand-gold">₱{parseFloat(service.standalone_price).toFixed(2)}</p>
+                              <p className="text-sm font-semibold text-brand-gold">{formatCurrency(service.standalone_price)}</p>
                             </div>
                           )}
                         </div>
@@ -591,7 +592,7 @@ export default function AppointmentPage() {
                   <div className="text-right">
                     {selectedAddOns.map((addon, idx) => (
                       <div key={idx} className="text-gray-900 font-medium text-sm mb-1">
-                        {addon.service_name} (₱{parseFloat(addon.addon_price).toFixed(2)})
+                        {addon.service_name} ({formatCurrency(addon.addon_price)})
                       </div>
                     ))}
                   </div>
@@ -674,7 +675,7 @@ export default function AppointmentPage() {
 
       {/* Add-ons Modal */}
       {showAddOnsModal && selectedService && !selectedService.is_solo && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50" onClick={() => setShowAddOnsModal(false)}>
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-start justify-center pt-4 z-50" onClick={() => setShowAddOnsModal(false)}>
           <div className="bg-primary-dark rounded-lg shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto border-2 border-brand-gold" onClick={(e) => e.stopPropagation()}>
             {/* Modal Header */}
             <div className="bg-brand-gold p-6 text-primary-darker border-b-2 border-brand-gold sticky top-0">
@@ -741,7 +742,7 @@ export default function AppointmentPage() {
                         {addon.can_be_addon && (
                           <div>
                             <p className="text-xs text-accent-peach mb-0.5">🏷️ Add-on Price:</p>
-                            <p className="text-sm font-semibold text-brand-gold">₱{parseFloat(addon.addon_price).toFixed(2)}</p>
+                            <p className="text-sm font-semibold text-brand-gold">{formatCurrency(addon.addon_price)}</p>
                           </div>
                         )}
                       </div>
@@ -758,12 +759,12 @@ export default function AppointmentPage() {
                     {selectedAddOns.map((addon, idx) => (
                       <div key={idx} className="flex justify-between items-center text-sm">
                         <span className="text-accent-cream">{addon.service_name}</span>
-                        <span className="text-brand-gold font-semibold">₱{parseFloat(addon.addon_price).toFixed(2)}</span>
+                        <span className="text-brand-gold font-semibold">{formatCurrency(addon.addon_price)}</span>
                       </div>
                     ))}
                     <div className="border-t border-primary-dark pt-2 mt-2 flex justify-between font-bold">
                       <span className="text-accent-cream">Total Add-ons:</span>
-                      <span className="text-brand-gold">₱{selectedAddOns.reduce((sum, addon) => sum + parseFloat(addon.addon_price), 0).toFixed(2)}</span>
+                      <span className="text-brand-gold">{formatCurrency(selectedAddOns.reduce((sum, addon) => sum + parseFloat(addon.addon_price), 0))}</span>
                     </div>
                   </div>
                 </div>

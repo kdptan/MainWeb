@@ -1,9 +1,22 @@
 import React, { useState, useEffect } from 'react';
 import { FaTimes, FaCheck } from 'react-icons/fa';
+import { formatCurrency } from '../utils/formatters';
 
 export default function AppointmentPaymentModal({ isOpen, onClose, appointment, onPaymentComplete }) {
   const [selectedSize, setSelectedSize] = useState('M');
   const [amountPaid, setAmountPaid] = useState('');
+
+  // Disable body scroll when modal is open
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, [isOpen]);
 
   // Reset state when modal opens with a new appointment
   useEffect(() => {
@@ -120,7 +133,7 @@ export default function AppointmentPaymentModal({ isOpen, onClose, appointment, 
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-start justify-center pt-4 z-50">
       <div className="bg-white rounded-lg shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-auto">
         {/* Header */}
         <div className="sticky top-0 bg-gradient-to-r from-secondary to-orange-500 text-white p-6 flex justify-between items-center">
@@ -167,10 +180,10 @@ export default function AppointmentPaymentModal({ isOpen, onClose, appointment, 
                 onChange={(e) => setSelectedSize(e.target.value)}
                 className="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-secondary focus:border-transparent text-lg font-semibold"
               >
-                <option value="S">Small - ₱{parsePrice(appointment.service_details?.small_price).toFixed(2)}</option>
-                <option value="M">Medium - ₱{parsePrice(appointment.service_details?.medium_price).toFixed(2)}</option>
-                <option value="L">Large - ₱{parsePrice(appointment.service_details?.large_price).toFixed(2)}</option>
-                <option value="XL">Extra Large - ₱{parsePrice(appointment.service_details?.extra_large_price).toFixed(2)}</option>
+                <option value="S">Small - {formatCurrency(parsePrice(appointment.service_details?.small_price))}</option>
+                <option value="M">Medium - {formatCurrency(parsePrice(appointment.service_details?.medium_price))}</option>
+                <option value="L">Large - {formatCurrency(parsePrice(appointment.service_details?.large_price))}</option>
+                <option value="XL">Extra Large - {formatCurrency(parsePrice(appointment.service_details?.extra_large_price))}</option>
               </select>
             </div>
           )}
@@ -188,7 +201,7 @@ export default function AppointmentPaymentModal({ isOpen, onClose, appointment, 
                     <p className="text-sm text-gray-600">Size: {selectedSize}</p>
                   )}
                 </div>
-                <p className="font-semibold text-gray-900">₱{servicePrice.toFixed(2)}</p>
+                <p className="font-semibold text-gray-900">{formatCurrency(servicePrice)}</p>
               </div>
             </div>
 
@@ -199,7 +212,7 @@ export default function AppointmentPaymentModal({ isOpen, onClose, appointment, 
                 {appointment.add_ons.map((addon, idx) => (
                   <div key={idx} className="flex justify-between items-center p-2 bg-white rounded border border-gray-100">
                     <p className="font-medium text-gray-900">{addon.service_name}</p>
-                    <p className="font-semibold text-gray-900">₱{parsePrice(addon.addon_price).toFixed(2)}</p>
+                    <p className="font-semibold text-gray-900">{formatCurrency(parsePrice(addon.addon_price))}</p>
                   </div>
                 ))}
               </div>
@@ -209,15 +222,15 @@ export default function AppointmentPaymentModal({ isOpen, onClose, appointment, 
             <div className="space-y-2">
               <div className="flex justify-between text-gray-700">
                 <span>Subtotal:</span>
-                <span className="font-semibold">₱{subtotal.toFixed(2)}</span>
+                <span className="font-semibold">{formatCurrency(subtotal)}</span>
               </div>
               <div className="flex justify-between text-gray-700">
                 <span>Tax (12% VAT):</span>
-                <span className="font-semibold text-secondary">₱{tax.toFixed(2)}</span>
+                <span className="font-semibold text-secondary">{formatCurrency(tax)}</span>
               </div>
               <div className="flex justify-between text-lg font-bold text-gray-900 bg-yellow-50 p-2 rounded">
                 <span>Total:</span>
-                <span className="text-secondary">₱{total.toFixed(2)}</span>
+                <span className="text-secondary">{formatCurrency(total)}</span>
               </div>
             </div>
           </div>
@@ -242,7 +255,7 @@ export default function AppointmentPaymentModal({ isOpen, onClose, appointment, 
               <div className="mt-2 p-3 bg-blue-50 rounded-lg border-2 border-blue-200">
                 <div className="flex justify-between text-blue-900">
                   <span className="font-semibold">Change:</span>
-                  <span className="text-xl font-bold">₱{Math.max(change, 0).toFixed(2)}</span>
+                  <span className="text-xl font-bold">{formatCurrency(Math.max(change, 0))}</span>
                 </div>
               </div>
             )}

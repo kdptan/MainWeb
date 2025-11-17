@@ -1,5 +1,5 @@
 import React from 'react';
-import { formatOrderId } from '../utils/formatters';
+import { formatOrderId, formatCurrency } from '../utils/formatters';
 
 export default function TransactionReceipt({ transaction }) {
   if (!transaction) return null;
@@ -61,10 +61,10 @@ export default function TransactionReceipt({ transaction }) {
               <span className="flex-1">
                 {item.product_details?.name || item.service_details?.name || 'Item'} x{item.quantity}
               </span>
-              <span className="font-semibold ml-2">₱{(parsePrice(item.price) * item.quantity).toFixed(2)}</span>
+              <span className="font-semibold ml-2">{formatCurrency(parsePrice(item.price) * item.quantity)}</span>
             </div>
             <div className="text-[10px] text-gray-600 flex justify-between">
-              <span>@₱{parsePrice(item.price).toFixed(2)} each</span>
+              <span>@{formatCurrency(parsePrice(item.price))} each</span>
             </div>
           </div>
         ))}
@@ -74,15 +74,15 @@ export default function TransactionReceipt({ transaction }) {
       <div className="border-b-2 border-gray-400 pb-3 mb-4">
         <div className="flex justify-between mb-1 text-[11px]">
           <span>SUBTOTAL:</span>
-          <span className="font-semibold">₱{transaction.subtotal.toFixed(2)}</span>
+          <span className="font-semibold">{formatCurrency(transaction.subtotal)}</span>
         </div>
         <div className="flex justify-between mb-2 text-[11px]">
           <span>TAX (12% VAT):</span>
-          <span className="font-semibold">₱{transaction.tax.toFixed(2)}</span>
+          <span className="font-semibold">{formatCurrency(transaction.tax)}</span>
         </div>
         <div className="flex justify-between text-sm font-bold bg-gray-100 p-1.5 rounded">
           <span>TOTAL:</span>
-          <span>₱{transaction.total.toFixed(2)}</span>
+          <span>{formatCurrency(transaction.total)}</span>
         </div>
       </div>
 
@@ -90,11 +90,11 @@ export default function TransactionReceipt({ transaction }) {
       <div className="border-b-2 border-gray-400 pb-3 mb-4">
         <div className="flex justify-between mb-1.5 text-[11px]">
           <span>AMOUNT PAID:</span>
-          <span className="font-semibold">₱{transaction.amountPaid.toFixed(2)}</span>
+          <span className="font-semibold">{formatCurrency(transaction.amountPaid)}</span>
         </div>
         <div className="flex justify-between text-sm font-bold bg-green-100 p-1.5 rounded">
           <span>CHANGE:</span>
-          <span>₱{transaction.change.toFixed(2)}</span>
+          <span>{formatCurrency(transaction.change)}</span>
         </div>
       </div>
 

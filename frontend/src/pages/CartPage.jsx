@@ -5,6 +5,7 @@ import { useAuth } from '../hooks/useAuth';
 import { useToast } from '../hooks/useToast';
 import { orderService } from '../services/orderService';
 import Toast from '../components/Toast';
+import { formatCurrency } from '../utils/formatters';
 
 export default function CartPage() {
   const navigate = useNavigate();
@@ -291,7 +292,7 @@ export default function CartPage() {
                       </span>
                     )}
                     <p className="text-sm text-blue-600 mt-1">
-                      ₱{item.price.toFixed(2)} each
+                      {formatCurrency(item.price)} each
                     </p>
                     {item.type === 'product' && (
                       <p className="text-xs text-gray-500 mt-1">
@@ -321,7 +322,7 @@ export default function CartPage() {
                   {/* Item Total */}
                   <div className="text-right">
                     <p className="font-bold text-gray-900">
-                      ₱{(item.price * item.quantity).toFixed(2)}
+                      {formatCurrency((item.price * item.quantity))}
                     </p>
                   </div>
 
@@ -397,11 +398,11 @@ export default function CartPage() {
             <div className="border-t border-gray-200 pt-4 mb-4">
               <div className="flex justify-between text-gray-600 mb-2">
                 <span>Items ({cart.reduce((sum, item) => sum + item.quantity, 0)})</span>
-                <span>₱{getTotalPrice().toFixed(2)}</span>
+                <span>{formatCurrency(getTotalPrice())}</span>
               </div>
               <div className="flex justify-between text-xl font-bold text-gray-900 mt-4">
                 <span>Total</span>
-                <span>₱{getTotalPrice().toFixed(2)}</span>
+                <span>{formatCurrency(getTotalPrice())}</span>
               </div>
             </div>
 

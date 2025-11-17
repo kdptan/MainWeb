@@ -9,7 +9,7 @@ export default function SalesReceiptModal({ isOpen, onClose, receiptData }) {
 
   useEffect(() => {
     if (isOpen) {
-      // Don't hide overflow - let page scroll
+      document.body.style.overflow = 'hidden';
     } else {
       document.body.style.overflow = 'unset';
     }

@@ -6,6 +6,7 @@ import { useToast } from '../hooks/useToast';
 import { orderService } from '../services/orderService';
 import Toast from '../components/Toast';
 import { formatOrderId } from '../utils/formatters';
+import { formatCurrency } from '../utils/formatters';
 
 export default function FeedbackPage() {
   const navigate = useNavigate();
@@ -305,7 +306,7 @@ export default function FeedbackPage() {
                 </div>
                 <div className="text-right">
                   <p className="price price-large text-gray-900">
-                    ₱{parseFloat(order.total_price).toFixed(2)}
+                    {formatCurrency(order.total_price)}
                   </p>
                   <p className="text-sm text-gray-500">{order.items.length} items</p>
                 </div>

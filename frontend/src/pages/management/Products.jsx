@@ -4,6 +4,7 @@ import { useToast } from '../../hooks/useToast';
 import Toast from '../../components/Toast';
 import { FaTruck } from 'react-icons/fa';
 import SupplierManagementModal from '../../components/SupplierManagementModal';
+import { formatCurrency } from '../../utils/formatters';
 
 export default function Products(){
   const initialForm = {
@@ -140,11 +141,12 @@ export default function Products(){
 
   return (
     <div className="p-6 min-h-screen bg-accent-cream">
-      <div className="flex items-center justify-between mb-6">
-        <h1 className="heading-main text-primary-darker">Products Management</h1>
+      <div className="mx-auto max-w-[1400px]">
+      <div className="flex items-center justify-between mb-4">
+        <h1 className="text-2xl font-extrabold text-primary-darker">Products Management</h1>
         <button
           onClick={() => setShowSupplierModal(true)}
-          className="px-4 py-2 bg-blue-600 text-white hover:bg-blue-700 rounded-lg flex items-center gap-2 font-semibold transition"
+          className="px-3 py-1.5 bg-blue-600 text-white hover:bg-blue-700 rounded-lg flex items-center gap-2 text-sm font-semibold transition"
         >
           <FaTruck /> Suppliers
         </button>
@@ -283,7 +285,7 @@ export default function Products(){
                   <div className="col-span-2 font-medium break-words">{i.name}</div>
                   <div className="text-gray-600 break-words">{i.category}</div>
                   <div className="text-center font-medium">{i.quantity}</div>
-                  <div className="text-right font-semibold">₱{i.unitCost.toFixed(2)}</div>
+                  <div className="text-right font-semibold">{formatCurrency(i.unitCost)}</div>
                 </div>
               ))}
             </div>
@@ -291,7 +293,7 @@ export default function Products(){
               <div className="text-right">
                 <span className="text-sm font-medium text-gray-700">Total Cost: </span>
                 <span className="text-xl font-bold text-blue-600">
-                  ₱{tempList.reduce((sum, item) => sum + (item.quantity * item.unitCost), 0).toFixed(2)}
+                  {formatCurrency(tempList.reduce((sum, item) => sum + (item.quantity * item.unitCost), 0))}
                 </span>
               </div>
             </div>
@@ -312,6 +314,7 @@ export default function Products(){
           fetchSuppliers();
         }}
       />
+      </div>
     </div>
   );
 }

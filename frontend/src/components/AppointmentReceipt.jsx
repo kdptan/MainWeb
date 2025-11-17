@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react';
+import { formatCurrency } from '../utils/formatters';
 
 export default function AppointmentReceipt({ appointment }) {
   // Log the appointment data for debugging
@@ -207,7 +208,7 @@ export default function AppointmentReceipt({ appointment }) {
         <div className="space-y-1">
           <div className="flex justify-between text-[11px]">
             <span>{appointment.service_details?.service_name}</span>
-            <span className="font-semibold">₱{servicePrice.toFixed(2)}</span>
+            <span className="font-semibold">{formatCurrency(servicePrice)}</span>
           </div>
 
           {/* Add-ons (if any) */}
@@ -219,7 +220,7 @@ export default function AppointmentReceipt({ appointment }) {
                 return (
                   <div key={idx} className="flex justify-between text-[10px]">
                     <span>  • {addon.service_name}</span>
-                    <span className="font-semibold">₱{addonPrice.toFixed(2)}</span>
+                    <span className="font-semibold">{formatCurrency(addonPrice)}</span>
                   </div>
                 );
               })}
@@ -232,26 +233,26 @@ export default function AppointmentReceipt({ appointment }) {
       <div className="border-b-2 border-gray-400 pb-3 mb-4">
         <div className="flex justify-between mb-1 text-[11px]">
           <span>SUBTOTAL:</span>
-          <span className="font-semibold">₱{subtotal.toFixed(2)}</span>
+          <span className="font-semibold">{formatCurrency(subtotal)}</span>
         </div>
         <div className="flex justify-between mb-2 text-[11px]">
           <span>TAX (12% VAT):</span>
-          <span className="font-semibold">₱{tax.toFixed(2)}</span>
+          <span className="font-semibold">{formatCurrency(tax)}</span>
         </div>
         <div className="flex justify-between text-sm font-bold bg-gray-100 p-1.5 rounded mb-3">
           <span>TOTAL:</span>
-          <span>₱{total.toFixed(2)}</span>
+          <span>{formatCurrency(total)}</span>
         </div>
         
         {/* Payment Information */}
         <div className="space-y-1.5">
           <div className="flex justify-between text-[11px]">
             <span className="font-semibold">AMOUNT PAID:</span>
-            <span className="font-bold">₱{(appointment.amount_paid ? parseFloat(appointment.amount_paid).toFixed(2) : total.toFixed(2))}</span>
+            <span className="font-bold">{formatCurrency(appointment.amount_paid ? parseFloat(appointment.amount_paid) : total)}</span>
           </div>
           <div className="flex justify-between text-[11px]">
             <span className="font-semibold">CHANGE:</span>
-            <span className="font-bold">₱{(appointment.change ? parseFloat(appointment.change).toFixed(2) : '0.00')}</span>
+            <span className="font-bold">{formatCurrency(appointment.change ? parseFloat(appointment.change) : 0)}</span>
           </div>
         </div>
       </div>

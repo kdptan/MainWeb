@@ -49,6 +49,9 @@ function AppContent() {
     location.pathname === '/my-orders' ||
     location.pathname === '/admin/orders';
 
+  // Hide footer on all management pages
+  const hideFooter = location.pathname.startsWith('/management');
+
   // Fetch pending orders count for admin
   useEffect(() => {
     if (user && user.is_staff && showFloatingButtons) {
@@ -186,7 +189,7 @@ function AppContent() {
           showCart={true}
         />
       )}
-      <Footer />
+      {!hideFooter && <Footer />}
     </div>
   );
 }
