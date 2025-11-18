@@ -273,7 +273,7 @@ export default function AppointmentPage() {
                 My Upcoming Appointments
               </button>
               <button
-                onClick={() => navigate('/feedback')}
+                onClick={() => navigate('/feedback', { state: { from: 'appointments' } })}
                 className="px-6 py-3 rounded-3xl font-semibold flex items-center justify-center gap-2 transition-colors shadow-md border-2 border-secondary text-accent-cream hover:bg-secondary hover:text-chonky-brown relative"
               >
                 <FaCommentDots />

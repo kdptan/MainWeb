@@ -94,6 +94,19 @@ class ProductRetrieveUpdateDestroyAPIView(APIView):
         print(f"Serializer errors: {serializer.errors}")
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+    def patch(self, request, pk):
+        """Handle PATCH requests for partial updates including image upload"""
+        product = self.get_object(pk)
+        if not product:
+            return Response({"detail": "Not found."}, status=status.HTTP_404_NOT_FOUND)
+        
+        serializer = ProductSerializer(product, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
     def delete(self, request, pk):
         product = self.get_object(pk)
         if not product:

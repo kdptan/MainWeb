@@ -38,6 +38,19 @@ export const updateProductField = async (id, fieldData, token) => {
   return handleResponse(response);
 };
 
+// Update product image (multipart/form-data for file upload)
+export const updateProductImage = async (id, formData, token) => {
+  const response = await fetch(`${API_BASE_URL}/inventory/products/${id}/`, {
+    method: 'PATCH',
+    headers: {
+      Authorization: `Bearer ${token}`,
+      // Don't set Content-Type for FormData - browser will set it with boundary
+    },
+    body: formData,
+  });
+  return handleResponse(response);
+};
+
 // Delete product
 export const deleteProduct = async (id, token) => {
   const response = await fetch(`${API_BASE_URL}/inventory/products/${id}/`, {

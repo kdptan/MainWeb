@@ -59,6 +59,7 @@ class Product(models.Model):
     # per-branch+category item number (1-based). Assigned on first save if missing.
     item_number = models.IntegerField(null=True, blank=True)
     remarks = models.CharField(max_length=255, blank=True)
+    image = models.ImageField(upload_to='product_images/', null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

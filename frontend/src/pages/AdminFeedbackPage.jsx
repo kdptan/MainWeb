@@ -19,7 +19,7 @@ export default function AdminFeedbackPage() {
   const [filterRating, setFilterRating] = useState('all');
   const [typeFilter, setTypeFilter] = useState('purchases'); // 'purchases' or 'appointments'
   const [currentPage, setCurrentPage] = useState(1);
-  const feedbacksPerPage = 10; // 5 per column x 2 columns
+  const feedbacksPerPage = 6; // 3 per column x 2 columns per page
 
   useEffect(() => {
     // Wait for auth to settle before checking

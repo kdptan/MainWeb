@@ -14,7 +14,7 @@ class ProductSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = Product
-        fields = ['id', 'name', 'category', 'description', 'supplier', 'unit_cost', 'retail_price', 'quantity', 'reorder_level', 'reorder_quantity', 'branch', 'item_number', 'formatted_id', 'remarks', 'created_at']
+        fields = ['id', 'name', 'category', 'description', 'supplier', 'unit_cost', 'retail_price', 'quantity', 'reorder_level', 'reorder_quantity', 'branch', 'item_number', 'formatted_id', 'remarks', 'image', 'created_at']
         read_only_fields = ['id', 'created_at', 'item_number', 'formatted_id', 'retail_price']
 
     def get_formatted_id(self, obj):

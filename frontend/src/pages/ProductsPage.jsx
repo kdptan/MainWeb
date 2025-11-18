@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { FaShoppingCart, FaSearch, FaFilter, FaTimes, FaMinus, FaPlus, FaStar, FaCommentDots, FaBox, FaClipboardList } from 'react-icons/fa';
+import { FaShoppingCart, FaSearch, FaFilter, FaTimes, FaMinus, FaPlus, FaStar, FaCommentDots, FaBox, FaClipboardList, FaEdit } from 'react-icons/fa';
 import { useAuth } from '../hooks/useAuth';
 import { useNavigate } from 'react-router-dom';
 import { useToast } from '../hooks/useToast';
@@ -7,6 +7,7 @@ import Toast from '../components/Toast';
 import DecorativeBackground from '../components/DecorativeBackground';
 import { formatCurrency } from '../utils/formatters';
 import { orderService } from '../services/orderService';
+import { updateProductImage } from '../services/inventoryService';
 import productsHero from '../assets/DOG3.png';
 
 export default function ProductsPage() {
@@ -26,11 +27,20 @@ export default function ProductsPage() {
   const [adminPendingOrdersCount, setAdminPendingOrdersCount] = useState(0);
   const [pendingFeedbackCount, setPendingFeedbackCount] = useState(0);
   
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(1);
+  const productsPerPage = 8; // 2 rows × 4 columns
+  
   // Modal state
   const [showQuantityModal, setShowQuantityModal] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [editingProduct, setEditingProduct] = useState(null);
+  const [selectedImage, setSelectedImage] = useState(null);
+  const [uploadingImage, setUploadingImage] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [modalQuantity, setModalQuantity] = useState(1);
   const modalRef = useRef(null);
+  const editModalRef = useRef(null);
 
   const categories = [
     'All',
@@ -211,6 +221,7 @@ export default function ProductsPage() {
     }
 
     setFilteredProducts(filtered);
+    setCurrentPage(1); // Reset to first page when filters change
   }, [products, searchQuery, selectedCategory, selectedBranch]);
 
   useEffect(() => {
@@ -274,6 +285,41 @@ export default function ProductsPage() {
     setModalQuantity(1);
   };
 
+  const openEditModal = (product) => {
+    setEditingProduct(product);
+    setShowEditModal(true);
+    setSelectedImage(null);
+  };
+
+  const closeEditModal = () => {
+    setShowEditModal(false);
+    setEditingProduct(null);
+    setSelectedImage(null);
+  };
+
+  const handleImageUpload = async () => {
+    if (!selectedImage || !editingProduct) return;
+    
+    setUploadingImage(true);
+    try {
+      const formData = new FormData();
+      formData.append('image', selectedImage);
+      
+      await updateProductImage(editingProduct.id, formData, token);
+      
+      // Refresh products list
+      await fetchProducts();
+      
+      toast.showToast('Product image updated successfully', 'success');
+      closeEditModal();
+    } catch (error) {
+      console.error('Error uploading image:', error);
+      toast.showToast('Failed to upload image', 'error');
+    } finally {
+      setUploadingImage(false);
+    }
+  };
+
   const handleModalQuantityChange = (change) => {
     if (!selectedProduct) return;
     const newQuantity = Math.max(1, Math.min(modalQuantity + change, selectedProduct.quantity));
@@ -289,6 +335,26 @@ export default function ProductsPage() {
       modalRef.current.focus();
     }
   }, [showQuantityModal]);
+
+  // Scroll to center and focus edit modal when it opens
+  useEffect(() => {
+    if (showEditModal && editModalRef.current) {
+      // Scroll to center of viewport
+      editModalRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      // Focus the modal container for accessibility
+      editModalRef.current.focus();
+    }
+  }, [showEditModal]);
+
+  // Pagination calculations
+  const indexOfLastProduct = currentPage * productsPerPage;
+  const indexOfFirstProduct = indexOfLastProduct - productsPerPage;
+  const currentProducts = filteredProducts.slice(indexOfFirstProduct, indexOfLastProduct);
+  const totalPages = Math.ceil(filteredProducts.length / productsPerPage);
+
+  const paginate = (pageNumber) => {
+    setCurrentPage(pageNumber);
+  };
 
   return (
     <DecorativeBackground variant="bones">
@@ -369,7 +435,7 @@ export default function ProductsPage() {
                     </button>
                   )}
                   <button
-                    onClick={() => navigate('/feedback')}
+                    onClick={() => navigate('/feedback', { state: { from: 'products' } })}
                     className="px-6 py-3 rounded-3xl font-semibold flex items-center justify-center gap-2 transition-colors shadow-md border-2 border-secondary text-accent-cream hover:bg-secondary hover:text-chonky-brown relative"
                   >
                     <FaCommentDots />
@@ -423,8 +489,9 @@ export default function ProductsPage() {
                   <p className="text-chonky-brown text-lg">No products found matching your criteria.</p>
             </div>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
-              {filteredProducts.map((product, index) => {
+            <>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+                {currentProducts.map((product, index) => {
                 const cardVariants = [
                   { // Original
                     bg: 'bg-primary-dark',
@@ -461,7 +528,21 @@ export default function ProductsPage() {
                     {/* Product Image */}
                     <div className="px-4">
                       <div className="bg-gradient-to-br from-accent-brown to-secondary h-40 flex items-center justify-center relative overflow-hidden flex-shrink-0 rounded-3xl">
-                        <div className="text-6xl opacity-30 group-hover:scale-110 transition-transform duration-300">
+                        {product.image ? (
+                          <img 
+                            src={product.image.startsWith('http') ? product.image : `http://127.0.0.1:8000${product.image}`}
+                            alt={product.name}
+                            className="w-full h-full object-cover"
+                            onError={(e) => {
+                              e.target.style.display = 'none';
+                              e.target.nextElementSibling.style.display = 'block';
+                            }}
+                          />
+                        ) : null}
+                        <div 
+                          className="text-6xl opacity-30 group-hover:scale-110 transition-transform duration-300"
+                          style={{ display: product.image ? 'none' : 'block' }}
+                        >
                           🐾
                         </div>
                         {/* Branch Badge */}
@@ -514,21 +595,68 @@ export default function ProductsPage() {
                       </div>
 
                       {/* Add to Cart Button */}
-                      <div>
+                      <div className="flex gap-2">
                         <button
                           onClick={() => openQuantityModal(product)}
-                          className={`py-2 px-3 rounded-3xl font-semibold flex items-center justify-center gap-2 transition-colors shadow-md text-sm ${variant.button}`}
+                          className={`flex-1 py-2 px-3 rounded-3xl font-semibold flex items-center justify-center gap-2 transition-colors shadow-md text-sm ${variant.button}`}
                           title={!user ? 'Login required to add to cart' : ''}
                         >
                           <FaShoppingCart />
                           {!user ? 'Login' : 'Add'}
                         </button>
+                        {user && user.is_staff && (
+                          <button
+                            onClick={() => openEditModal(product)}
+                            className="py-2 px-3 rounded-3xl font-semibold flex items-center justify-center transition-colors shadow-md text-sm bg-blue-500 text-white hover:bg-blue-600"
+                            title="Edit product image"
+                          >
+                            <FaEdit />
+                          </button>
+                        )}
                       </div>
                     </div>
                   </div>
                 );
               })}
             </div>
+
+            {/* Pagination Controls */}
+            {totalPages > 1 && (
+              <div className="mt-8 flex justify-center items-center gap-2">
+                <button
+                  onClick={() => paginate(currentPage - 1)}
+                  disabled={currentPage === 1}
+                  className="px-4 py-2 rounded-3xl font-semibold bg-primary text-accent-cream hover:bg-primary-dark disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                >
+                  Previous
+                </button>
+                
+                <div className="flex gap-2">
+                  {[...Array(totalPages)].map((_, index) => (
+                    <button
+                      key={index + 1}
+                      onClick={() => paginate(index + 1)}
+                      className={`px-4 py-2 rounded-3xl font-semibold transition-colors ${
+                        currentPage === index + 1
+                          ? 'bg-secondary text-chonky-white'
+                          : 'bg-primary text-accent-cream hover:bg-primary-dark'
+                      }`}
+                    >
+                      {index + 1}
+                    </button>
+                  ))}
+                </div>
+                
+                <button
+                  onClick={() => paginate(currentPage + 1)}
+                  disabled={currentPage === totalPages}
+                  className="px-4 py-2 rounded-3xl font-semibold bg-primary text-accent-cream hover:bg-primary-dark disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                >
+                  Next
+                </button>
+              </div>
+            )}
+            </>
           )}
             </div>
           </div>
@@ -628,6 +756,93 @@ export default function ProductsPage() {
               >
                 <FaShoppingCart />
                 Confirm
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Edit Product Image Modal */}
+      {showEditModal && editingProduct && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div ref={editModalRef} tabIndex={-1} className="bg-white rounded-lg shadow-xl max-w-md w-full p-6">
+            {/* Modal Header */}
+            <div className="flex justify-between items-start mb-4">
+              <h3 className="text-xl font-bold text-chonky-brown">Edit Product Image</h3>
+              <button
+                onClick={closeEditModal}
+                className="text-gray-400 hover:text-chonky-brown transition-colors"
+              >
+                <FaTimes size={20} />
+              </button>
+            </div>
+
+            {/* Product Info */}
+            <div className="mb-6">
+              <h4 className="font-semibold text-chonky-brown mb-1">{editingProduct.name}</h4>
+              <p className="text-sm text-secondary mb-2">{editingProduct.category}</p>
+            </div>
+
+            {/* Current Image Preview */}
+            {editingProduct.image && (
+              <div className="mb-4">
+                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  Current Image:
+                </label>
+                <div className="bg-gray-100 rounded-lg p-4 flex justify-center">
+                  <img 
+                    src={editingProduct.image.startsWith('http') ? editingProduct.image : `http://127.0.0.1:8000${editingProduct.image}`}
+                    alt={editingProduct.name}
+                    className="max-h-40 object-contain"
+                  />
+                </div>
+              </div>
+            )}
+
+            {/* File Input */}
+            <div className="mb-6">
+              <label className="block text-sm font-semibold text-gray-700 mb-2">
+                Select New Image:
+              </label>
+              <input
+                type="file"
+                accept="image/*,.avif"
+                onChange={(e) => setSelectedImage(e.target.files[0])}
+                className="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-secondary file:text-white hover:file:bg-btn-yellow hover:file:text-chonky-brown"
+              />
+            </div>
+
+            {/* Image Preview */}
+            {selectedImage && (
+              <div className="mb-6">
+                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  Preview:
+                </label>
+                <div className="bg-gray-100 rounded-lg p-4 flex justify-center">
+                  <img 
+                    src={URL.createObjectURL(selectedImage)} 
+                    alt="Preview"
+                    className="max-h-40 object-contain"
+                  />
+                </div>
+              </div>
+            )}
+
+            {/* Action Buttons */}
+            <div className="flex gap-3">
+              <button
+                onClick={closeEditModal}
+                disabled={uploadingImage}
+                className="flex-1 px-4 py-3 border-2 border-gray-300 text-gray-700 rounded-3xl font-semibold hover:bg-gray-50 transition-colors disabled:opacity-50"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleImageUpload}
+                disabled={!selectedImage || uploadingImage}
+                className="flex-1 px-4 py-3 bg-secondary text-white rounded-3xl font-semibold hover:bg-btn-yellow hover:text-chonky-brown transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {uploadingImage ? 'Uploading...' : 'Upload'}
               </button>
             </div>
           </div>

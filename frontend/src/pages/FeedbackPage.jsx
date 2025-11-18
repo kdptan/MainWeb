@@ -1,16 +1,18 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { FaStar, FaCheckCircle, FaArrowLeft } from 'react-icons/fa';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { FaStar, FaCheckCircle, FaArrowLeft, FaEye } from 'react-icons/fa';
 import { useAuth } from '../hooks/useAuth';
 import { useToast } from '../hooks/useToast';
 import { orderService } from '../services/orderService';
 import { appointmentService } from '../services/appointmentService';
 import Toast from '../components/Toast';
+import Modal from '../components/Modal';
 import { formatOrderId } from '../utils/formatters';
 import { formatCurrency } from '../utils/formatters';
 
 export default function FeedbackPage() {
   const navigate = useNavigate();
+  const location = useLocation();
   const { user } = useAuth();
   const toast = useToast();
   
@@ -27,9 +29,12 @@ export default function FeedbackPage() {
   const [appointmentComment, setAppointmentComment] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [typeFilter, setTypeFilter] = useState('products'); // 'products' or 'appointments'
-  const [dateFilter, setDateFilter] = useState('all');
+  const [statusFilter, setStatusFilter] = useState('pending'); // 'pending' or 'completed'
   const [currentPage, setCurrentPage] = useState(1);
   const ordersPerPage = 6; // 3 per column x 2 columns
+  const [viewModalOpen, setViewModalOpen] = useState(false);
+  const [viewModalType, setViewModalType] = useState(null); // 'order' | 'appointment'
+  const [viewModalData, setViewModalData] = useState(null);
 
   useEffect(() => {
     // Wait for auth to settle
@@ -53,9 +58,8 @@ export default function FeedbackPage() {
     setLoading(true);
     try {
       const data = await orderService.getOrders({ status: 'completed' });
-      // Filter out orders that already have feedback
-      const ordersWithoutFeedback = data.filter(order => !order.has_feedback);
-      setCompletedOrders(ordersWithoutFeedback);
+      // Keep all completed orders; we'll filter by has_feedback based on statusFilter
+      setCompletedOrders(Array.isArray(data) ? data : []);
     } catch (error) {
       console.error('Error fetching orders:', error);
       toast.showToast('Failed to load orders', 'error');
@@ -67,9 +71,8 @@ export default function FeedbackPage() {
   const fetchCompletedAppointments = async () => {
     try {
       const data = await appointmentService.getAppointments({ status: 'completed' });
-      // Filter out appointments that already have feedback
-      const appointmentsWithoutFeedback = (data || []).filter(apt => !apt.has_feedback);
-      setCompletedAppointments(appointmentsWithoutFeedback);
+      // Keep all completed appointments; we'll filter by has_feedback based on statusFilter
+      setCompletedAppointments(Array.isArray(data) ? data : []);
     } catch (error) {
       console.error('Error fetching appointments:', error);
     }
@@ -79,38 +82,12 @@ export default function FeedbackPage() {
     return formatOrderId(order.order_id || order.id);
   };
 
-  // Filter orders by date
+  // Filter items by pending/completed feedback
   const getFilteredOrders = () => {
     const dataToFilter = typeFilter === 'products' ? completedOrders : completedAppointments;
-    
-    // Ensure we always return an array
     if (!dataToFilter || !Array.isArray(dataToFilter)) return [];
-    
-    if (dateFilter === 'all') return dataToFilter;
-
-    const now = new Date();
-    const filterDate = new Date();
-
-    switch (dateFilter) {
-      case 'week':
-        filterDate.setDate(now.getDate() - 7);
-        break;
-      case 'month':
-        filterDate.setDate(now.getDate() - 30);
-        break;
-      case '3months':
-        filterDate.setMonth(now.getMonth() - 3);
-        break;
-      default:
-        return dataToFilter;
-    }
-
-    return dataToFilter.filter(item => {
-      const itemDate = typeFilter === 'products' 
-        ? new Date(item.completed_at || item.created_at)
-        : new Date(item.appointment_date);
-      return itemDate >= filterDate;
-    });
+    const wantPending = statusFilter === 'pending';
+    return dataToFilter.filter(item => wantPending ? !item.has_feedback : !!item.has_feedback);
   };
 
   const filteredOrders = getFilteredOrders();
@@ -118,7 +95,7 @@ export default function FeedbackPage() {
   // Reset to page 1 when filters change
   useEffect(() => {
     setCurrentPage(1);
-  }, [dateFilter, typeFilter]);
+  }, [statusFilter, typeFilter]);
 
   const handleSelectOrder = (order) => {
     setSelectedOrder(order);
@@ -228,6 +205,12 @@ export default function FeedbackPage() {
         ))}
       </div>
     );
+  };
+
+  const openViewFeedback = (item, type) => {
+    setViewModalType(type);
+    setViewModalData(item);
+    setViewModalOpen(true);
   };
 
   if (loading) {
@@ -439,10 +422,14 @@ export default function FeedbackPage() {
       {/* Header */}
       <div className="mb-8 relative text-center">
         <button
-          onClick={() => navigate('/products')}
+          onClick={() => {
+            const from = location.state?.from;
+            const backPath = from === 'appointments' ? '/appointments' : '/products';
+            navigate(backPath);
+          }}
           className="absolute left-0 top-1/2 -translate-y-1/2 flex items-center gap-2 bg-secondary text-white px-4 py-2 rounded-3xl hover:bg-btn-yellow hover:text-chonky-brown transition-colors font-semibold"
         >
-          <FaArrowLeft /> Back to Products
+          <FaArrowLeft /> {location.state?.from === 'appointments' ? 'Back to Appointments' : 'Back to Products'}
         </button>
         
         <div>
@@ -477,48 +464,28 @@ export default function FeedbackPage() {
         </div>
       </div>
 
-      {/* Date Filter */}
+      {/* Status Filter: Pending vs Completed feedback */}
       <div className="bg-white rounded-3xl shadow-sm p-4 mb-6">
         <div className="flex flex-wrap gap-2">
           <button
-            onClick={() => setDateFilter('all')}
-            className={`px-4 py-2 rounded-3xl font-medium transition-colors ${
-              dateFilter === 'all'
+            onClick={() => setStatusFilter('pending')}
+            className={`px-6 py-2 rounded-3xl font-medium transition-colors ${
+              statusFilter === 'pending'
                 ? 'bg-red-600 text-white'
                 : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
             }`}
           >
-            All Time
+            Pending Feedback
           </button>
           <button
-            onClick={() => setDateFilter('week')}
-            className={`px-4 py-2 rounded-3xl font-medium transition-colors ${
-              dateFilter === 'week'
-                ? 'bg-red-600 text-white'
+            onClick={() => setStatusFilter('completed')}
+            className={`px-6 py-2 rounded-3xl font-medium transition-colors ${
+              statusFilter === 'completed'
+                ? 'bg-green-600 text-white'
                 : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
             }`}
           >
-            Last 7 Days
-          </button>
-          <button
-            onClick={() => setDateFilter('month')}
-            className={`px-4 py-2 rounded-3xl font-medium transition-colors ${
-              dateFilter === 'month'
-                ? 'bg-red-600 text-white'
-                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-            }`}
-          >
-            Last 30 Days
-          </button>
-          <button
-            onClick={() => setDateFilter('3months')}
-            className={`px-4 py-2 rounded-3xl font-medium transition-colors ${
-              dateFilter === '3months'
-                ? 'bg-red-600 text-white'
-                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-            }`}
-          >
-            Last 3 Months
+            Completed Feedback
           </button>
         </div>
       </div>
@@ -531,9 +498,9 @@ export default function FeedbackPage() {
             {typeFilter === 'products' ? 'No Orders to Review' : 'No Appointments to Review'}
           </h3>
           <p className="text-chonky-brown mb-4">
-            {dateFilter === 'all' 
+            {statusFilter === 'pending' 
               ? `You don't have any completed ${typeFilter === 'products' ? 'orders' : 'appointments'} that need feedback.`
-              : `No completed ${typeFilter === 'products' ? 'orders' : 'appointments'} found in the selected time period.`}
+              : `You don't have any ${typeFilter === 'products' ? 'order' : 'appointment'} feedback submitted yet.`}
           </p>
           <button
             onClick={() => navigate(typeFilter === 'products' ? '/my-orders' : '/appointments')}
@@ -591,12 +558,23 @@ export default function FeedbackPage() {
                   </div>
                 </div>
 
-                <button
-                  onClick={() => handleSelectOrder(order)}
-                  className="w-full py-2 px-4 bg-secondary text-chonky-white rounded-3xl hover:bg-btn-yellow hover:text-chonky-brown font-semibold transition-colors flex items-center justify-center gap-2"
-                >
-                  <FaStar /> Leave Feedback
-                </button>
+                {statusFilter === 'pending' ? (
+                  <button
+                    onClick={() => handleSelectOrder(order)}
+                    className="w-full py-2 px-4 bg-secondary text-chonky-white rounded-3xl hover:bg-btn-yellow hover:text-chonky-brown font-semibold transition-colors flex items-center justify-center gap-2"
+                  >
+                    <FaStar /> Leave Feedback
+                  </button>
+                ) : (
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => openViewFeedback(order, 'order')}
+                      className="w-full py-2 px-4 bg-blue-600 text-white rounded-3xl hover:bg-blue-500 font-semibold transition-colors flex items-center justify-center gap-2"
+                    >
+                      <FaEye /> View My Feedback
+                    </button>
+                  </div>
+                )}
               </div>
             ))
           ) : (
@@ -640,12 +618,23 @@ export default function FeedbackPage() {
                   </div>
                 </div>
 
-                <button
-                  onClick={() => handleSelectAppointment(appointment)}
-                  className="w-full py-2 px-4 bg-secondary text-chonky-white rounded-3xl hover:bg-btn-yellow hover:text-chonky-brown font-semibold transition-colors flex items-center justify-center gap-2"
-                >
-                  <FaStar /> Leave Feedback
-                </button>
+                {statusFilter === 'pending' ? (
+                  <button
+                    onClick={() => handleSelectAppointment(appointment)}
+                    className="w-full py-2 px-4 bg-secondary text-chonky-white rounded-3xl hover:bg-btn-yellow hover:text-chonky-brown font-semibold transition-colors flex items-center justify-center gap-2"
+                  >
+                    <FaStar /> Leave Feedback
+                  </button>
+                ) : (
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => openViewFeedback(appointment, 'appointment')}
+                      className="w-full py-2 px-4 bg-blue-600 text-white rounded-3xl hover:bg-blue-500 font-semibold transition-colors flex items-center justify-center gap-2"
+                    >
+                      <FaEye /> View My Feedback
+                    </button>
+                  </div>
+                )}
               </div>
             ))
           )}
@@ -701,6 +690,81 @@ export default function FeedbackPage() {
       )}
 
       <Toast />
+      {/* View Feedback Modal */}
+      <Modal
+        isOpen={viewModalOpen}
+        onClose={() => setViewModalOpen(false)}
+        title="My Submitted Feedback"
+        maxWidth="max-w-xl"
+      >
+        <ViewFeedbackContent type={viewModalType} data={viewModalData} />
+      </Modal>
+    </div>
+  );
+}
+
+// View Feedback Modal Content Helper
+function ViewFeedbackContent({ type, data }) {
+  if (!data) return null;
+  if (type === 'order') {
+    const feedback = data.feedback; // Purchase feedback details included in order serializer
+    return (
+      <div className="space-y-4">
+        <div>
+          <h3 className="text-lg font-semibold text-gray-800">Order</h3>
+          <p className="text-gray-600">Order ID: {formatOrderId(data.order_id || data.id)}</p>
+          {data.completed_at && (
+            <p className="text-gray-600">Completed: {new Date(data.completed_at).toLocaleString()}</p>
+          )}
+        </div>
+        {feedback ? (
+          <div className="space-y-2">
+            <h4 className="font-semibold text-gray-800">Overall Purchase Feedback</h4>
+            <div className="flex items-center gap-2">
+              <span className="text-sm text-gray-600">Rating:</span>
+              <div className="flex">
+                {[1,2,3,4,5].map(i => (
+                  <span key={i} className={i <= feedback.rating ? 'text-yellow-400' : 'text-gray-300'}>★</span>
+                ))}
+              </div>
+            </div>
+            {feedback.comment && (
+              <div className="bg-gray-50 rounded-3xl p-4 border-l-4 border-blue-500">
+                <p className="text-gray-700 whitespace-pre-wrap">{feedback.comment}</p>
+              </div>
+            )}
+            <p className="text-xs text-gray-500">Submitted: {new Date(feedback.created_at).toLocaleString()}</p>
+          </div>
+        ) : (
+          <p className="text-gray-500">Feedback details not available.</p>
+        )}
+
+        <div>
+          <h4 className="font-semibold text-gray-800">Items</h4>
+          <ul className="list-disc ml-5 text-gray-700">
+            {(data.items || []).map((item) => (
+              <li key={item.id}>{item.product_details?.name || item.service_details?.service_name || item.item_name} × {item.quantity}</li>
+            ))}
+          </ul>
+        </div>
+      </div>
+    );
+  }
+
+  // Appointment type
+  return (
+    <div className="space-y-4">
+      <div>
+        <h3 className="text-lg font-semibold text-gray-800">Appointment</h3>
+        <p className="text-gray-600">Service: {data.service_name}</p>
+        {data.appointment_date && (
+          <p className="text-gray-600">Date: {new Date(data.appointment_date).toLocaleDateString()}</p>
+        )}
+        {data.time_slot && (
+          <p className="text-gray-600">Time: {data.time_slot}</p>
+        )}
+      </div>
+      <p className="text-gray-500">Your appointment feedback was submitted. Detailed rating/comments are not available in this view.</p>
     </div>
   );
 }

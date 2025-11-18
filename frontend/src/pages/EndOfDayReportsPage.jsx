@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FaCalendar, FaShoppingBag, FaDollarSign, FaChartLine, FaStore, FaPrint } from 'react-icons/fa';
+import { FaCalendar, FaShoppingBag, FaDollarSign, FaChartLine, FaStore, FaPrint, FaFileDownload } from 'react-icons/fa';
 import { useAuth } from '../hooks/useAuth';
 import { useToast } from '../hooks/useToast';
 import { orderService } from '../services/orderService';
@@ -25,6 +25,7 @@ export default function EndOfDayReportsPage() {
     revenueByBranch: {},
     topProducts: [],
     topServices: [],
+    allOrders: [], // Add this for CSV export
   });
 
   useEffect(() => {
@@ -112,6 +113,7 @@ export default function EndOfDayReportsPage() {
         revenueByBranch,
         topProducts,
         topServices,
+        allOrders: filteredOrders, // Store all filtered orders for CSV export
       });
     } catch (error) {
       console.error('Error fetching report data:', error);
@@ -123,6 +125,185 @@ export default function EndOfDayReportsPage() {
 
   const handlePrint = () => {
     window.print();
+  };
+
+  const handleExportCSV = () => {
+    // Helper function to escape CSV values
+    const escapeCSV = (value) => {
+      if (value === null || value === undefined) return '';
+      const stringValue = String(value);
+      // Escape quotes and wrap in quotes if contains comma, quote, or newline
+      if (stringValue.includes(',') || stringValue.includes('"') || stringValue.includes('\n')) {
+        return `"${stringValue.replace(/"/g, '""')}"`;
+      }
+      return stringValue;
+    };
+
+    const csvRows = [];
+    
+    // ===== HEADER SECTION =====
+    csvRows.push('END OF DAY REPORT');
+    csvRows.push('');
+    csvRows.push(`Report Date:,${new Date(selectedDate).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}`);
+    csvRows.push(`Branch:,${selectedBranch === 'all' ? 'All Branches' : selectedBranch}`);
+    csvRows.push(`Generated:,${new Date().toLocaleString('en-US', { dateStyle: 'medium', timeStyle: 'medium' })}`);
+    csvRows.push('');
+    csvRows.push('='.repeat(80));
+    csvRows.push('');
+    
+    // ===== SUMMARY SECTION =====
+    csvRows.push('SUMMARY');
+    csvRows.push('');
+    csvRows.push('Metric,Value');
+    csvRows.push(`Total Orders,${reportData.totalOrders}`);
+    csvRows.push(`Completed Orders,${reportData.completedOrders}`);
+    csvRows.push(`Available for Pickup,${reportData.availableForPickup}`);
+    csvRows.push(`Pending Orders,${reportData.pendingOrders}`);
+    csvRows.push(`Cancelled Orders,${reportData.cancelledOrders}`);
+    csvRows.push(`Total Revenue (Completed Only),₱${reportData.totalRevenue.toFixed(2)}`);
+    csvRows.push('');
+    csvRows.push('='.repeat(80));
+    csvRows.push('');
+    
+    // ===== REVENUE BY BRANCH =====
+    csvRows.push('REVENUE BY BRANCH');
+    csvRows.push('');
+    if (Object.keys(reportData.revenueByBranch).length === 0) {
+      csvRows.push('No completed orders for this period');
+    } else {
+      csvRows.push('Branch,Revenue');
+      Object.entries(reportData.revenueByBranch).forEach(([branch, revenue]) => {
+        csvRows.push(`${branch},₱${revenue.toFixed(2)}`);
+      });
+    }
+    csvRows.push('');
+    csvRows.push('='.repeat(80));
+    csvRows.push('');
+    
+    // ===== ORDER STATUS BREAKDOWN =====
+    csvRows.push('ORDER STATUS BREAKDOWN');
+    csvRows.push('');
+    csvRows.push('Status,Count,Percentage');
+    const total = reportData.totalOrders || 1;
+    csvRows.push(`Completed,${reportData.completedOrders},${((reportData.completedOrders / total) * 100).toFixed(1)}%`);
+    csvRows.push(`Available for Pickup,${reportData.availableForPickup},${((reportData.availableForPickup / total) * 100).toFixed(1)}%`);
+    csvRows.push(`Pending,${reportData.pendingOrders},${((reportData.pendingOrders / total) * 100).toFixed(1)}%`);
+    csvRows.push(`Cancelled,${reportData.cancelledOrders},${((reportData.cancelledOrders / total) * 100).toFixed(1)}%`);
+    csvRows.push('');
+    csvRows.push('='.repeat(80));
+    csvRows.push('');
+    
+    // ===== TOP PRODUCTS =====
+    csvRows.push('TOP PRODUCTS');
+    csvRows.push('');
+    if (reportData.topProducts.length === 0) {
+      csvRows.push('No products sold in this period');
+    } else {
+      csvRows.push('Rank,Product Name,Quantity Sold');
+      reportData.topProducts.forEach((product, index) => {
+        csvRows.push(`${index + 1},${escapeCSV(product.name)},${product.count}`);
+      });
+    }
+    csvRows.push('');
+    csvRows.push('='.repeat(80));
+    csvRows.push('');
+    
+    // ===== TOP SERVICES =====
+    csvRows.push('TOP SERVICES');
+    csvRows.push('');
+    if (reportData.topServices.length === 0) {
+      csvRows.push('No services booked in this period');
+    } else {
+      csvRows.push('Rank,Service Name,Quantity Booked');
+      reportData.topServices.forEach((service, index) => {
+        csvRows.push(`${index + 1},${escapeCSV(service.name)},${service.count}`);
+      });
+    }
+    csvRows.push('');
+    csvRows.push('='.repeat(80));
+    csvRows.push('');
+    
+    // ===== DETAILED ORDER LIST =====
+    csvRows.push('DETAILED ORDER LIST');
+    csvRows.push('');
+    if (reportData.allOrders && reportData.allOrders.length > 0) {
+      csvRows.push('Order ID,Customer,Branch,Status,Total Price,Amount Paid,Change,Order Date');
+      reportData.allOrders.forEach(order => {
+        const orderDate = new Date(order.created_at).toLocaleString('en-US', { dateStyle: 'short', timeStyle: 'short' });
+        csvRows.push([
+          escapeCSV(order.order_id || order.id),
+          escapeCSV(order.user_details?.username || 'N/A'),
+          escapeCSV(order.branch),
+          escapeCSV(order.status),
+          `₱${parseFloat(order.total_price).toFixed(2)}`,
+          `₱${parseFloat(order.amount_paid).toFixed(2)}`,
+          `₱${parseFloat(order.change).toFixed(2)}`,
+          orderDate
+        ].join(','));
+      });
+      csvRows.push('');
+      csvRows.push(`Total Orders: ${reportData.allOrders.length}`);
+    } else {
+      csvRows.push('No orders found for this period');
+    }
+    csvRows.push('');
+    csvRows.push('='.repeat(80));
+    csvRows.push('');
+    
+    // ===== ORDER ITEMS BREAKDOWN =====
+    csvRows.push('ORDER ITEMS BREAKDOWN');
+    csvRows.push('');
+    if (reportData.allOrders && reportData.allOrders.length > 0) {
+      csvRows.push('Order ID,Item Type,Item Name,Quantity,Price per Unit,Subtotal');
+      reportData.allOrders.forEach(order => {
+        if (order.items && order.items.length > 0) {
+          order.items.forEach(item => {
+            const itemName = item.item_type === 'product' 
+              ? (item.product_details?.name || 'Unknown Product')
+              : (item.service_details?.name || 'Unknown Service');
+            const pricePerUnit = parseFloat(item.price);
+            const subtotal = pricePerUnit * item.quantity;
+            
+            csvRows.push([
+              escapeCSV(order.order_id || order.id),
+              escapeCSV(item.item_type),
+              escapeCSV(itemName),
+              item.quantity,
+              `₱${pricePerUnit.toFixed(2)}`,
+              `₱${subtotal.toFixed(2)}`
+            ].join(','));
+          });
+        }
+      });
+    } else {
+      csvRows.push('No order items found for this period');
+    }
+    csvRows.push('');
+    csvRows.push('='.repeat(80));
+    csvRows.push('');
+    
+    // ===== FOOTER =====
+    csvRows.push(`Report generated by: ${user?.username || 'Admin'}`);
+    csvRows.push('End of Report');
+    
+    // Create CSV content
+    const csvContent = csvRows.join('\n');
+    
+    // Create blob with UTF-8 BOM for proper Excel encoding
+    const BOM = '\uFEFF';
+    const blob = new Blob([BOM + csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    
+    const filename = `EOD_Report_${selectedDate}_${selectedBranch === 'all' ? 'All' : selectedBranch}_${Date.now()}.csv`;
+    link.setAttribute('href', url);
+    link.setAttribute('download', filename);
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    
+    toast.showToast('Report exported successfully', 'success');
   };
 
   if (!user || !user.is_staff) {
@@ -146,6 +327,12 @@ export default function EndOfDayReportsPage() {
                 className="flex items-center gap-2 px-4 py-2 bg-secondary text-accent-cream rounded-3xl hover:bg-secondary-light font-medium text-sm transition-colors"
               >
                 <FaPrint /> Print Report
+              </button>
+              <button
+                onClick={handleExportCSV}
+                className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-3xl hover:bg-green-700 font-medium text-sm transition-colors"
+              >
+                <FaFileDownload /> Export to CSV
               </button>
               <button
                 onClick={() => navigate('/admin/sales-report')}
