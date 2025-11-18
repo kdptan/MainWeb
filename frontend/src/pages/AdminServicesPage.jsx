@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FaArrowLeft, FaPlus, FaEdit, FaTrash, FaTimes } from 'react-icons/fa';
 import { useAuth } from '../hooks/useAuth';
@@ -10,6 +10,7 @@ export default function AdminServicesPage() {
   const navigate = useNavigate();
   const { user, token } = useAuth();
   const toast = useToast();
+  const modalRef = useRef(null);
 
   const [services, setServices] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -59,6 +60,18 @@ export default function AdminServicesPage() {
 
     fetchServices();
   }, [user, token, navigate, toast]);
+
+  // Scroll modal to center when it opens
+  useEffect(() => {
+    if (showModal && modalRef.current) {
+      setTimeout(() => {
+        modalRef.current.scrollIntoView({
+          behavior: 'smooth',
+          block: 'center',
+        });
+      }, 100);
+    }
+  }, [showModal]);
 
   const handleOpenModal = (service = null) => {
     if (service) {
@@ -330,7 +343,7 @@ export default function AdminServicesPage() {
       {/* Modal */}
       {showModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-start justify-center pt-4 z-50">
-          <div className="bg-primary-dark rounded-3xl p-8 max-w-2xl w-full max-h-[90vh] overflow-y-auto border-2 border-secondary">
+          <div ref={modalRef} className="bg-primary-dark rounded-3xl p-8 max-w-2xl w-full max-h-[90vh] overflow-y-auto border-2 border-secondary">
             <div className="flex justify-between items-center mb-6">
               <h2 className="heading-main text-accent-cream">
                 {editingService ? 'Edit Service' : 'Create Service'}

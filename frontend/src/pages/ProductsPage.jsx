@@ -1,11 +1,12 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import { FaShoppingCart, FaSearch, FaFilter, FaTimes, FaMinus, FaPlus, FaStar } from 'react-icons/fa';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
+import { FaShoppingCart, FaSearch, FaFilter, FaTimes, FaMinus, FaPlus, FaStar, FaCommentDots, FaBox, FaClipboardList } from 'react-icons/fa';
 import { useAuth } from '../hooks/useAuth';
 import { useNavigate } from 'react-router-dom';
 import { useToast } from '../hooks/useToast';
 import Toast from '../components/Toast';
 import DecorativeBackground from '../components/DecorativeBackground';
 import { formatCurrency } from '../utils/formatters';
+import { orderService } from '../services/orderService';
 import productsHero from '../assets/DOG3.png';
 
 export default function ProductsPage() {
@@ -21,13 +22,15 @@ export default function ProductsPage() {
   const [cart, setCart] = useState([]);
   const [cartLoaded, setCartLoaded] = useState(false);
   const [productRatings, setProductRatings] = useState({});
+  const [pendingOrdersCount, setPendingOrdersCount] = useState(0);
+  const [adminPendingOrdersCount, setAdminPendingOrdersCount] = useState(0);
+  const [pendingFeedbackCount, setPendingFeedbackCount] = useState(0);
   
   // Modal state
   const [showQuantityModal, setShowQuantityModal] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [modalQuantity, setModalQuantity] = useState(1);
-  const [showFeedbackModal, setShowFeedbackModal] = useState(false);
-  const [selectedProductFeedback, setSelectedProductFeedback] = useState(null);
+  const modalRef = useRef(null);
 
   const categories = [
     'All',
@@ -43,6 +46,64 @@ export default function ProductsPage() {
   // Get user-specific cart key
   const getCartKey = useCallback(() => {
     return user ? `cart_${user.id}` : 'cart_guest';
+  }, [user]);
+
+  // Scroll modal to center when it opens
+  useEffect(() => {
+    if (showQuantityModal && modalRef.current) {
+      setTimeout(() => {
+        modalRef.current.scrollIntoView({
+          behavior: 'smooth',
+          block: 'center',
+        });
+      }, 100);
+    }
+  }, [showQuantityModal]);
+
+  // Fetch pending orders count
+  useEffect(() => {
+    const fetchPendingOrdersCount = async () => {
+      if (!user) return;
+      
+      try {
+        const data = await orderService.getOrders({ status: 'pending' });
+        setPendingOrdersCount(data.length);
+
+        // If user is staff, also fetch all pending orders for admin
+        if (user.is_staff) {
+          const adminData = await orderService.getAllOrdersAdmin({ status: 'pending' });
+          setAdminPendingOrdersCount(adminData.length);
+        }
+      } catch (error) {
+        console.error('Error fetching pending orders count:', error);
+      }
+    };
+
+    fetchPendingOrdersCount();
+  }, [user]);
+
+  // Fetch pending feedback count
+  useEffect(() => {
+    const fetchPendingFeedbackCount = async () => {
+      if (!user) return;
+      
+      try {
+        // Fetch completed orders without feedback
+        const orders = await orderService.getOrders({ status: 'completed' });
+        const ordersWithoutFeedback = orders.filter(order => !order.has_feedback);
+        
+        // Fetch completed appointments without feedback (import appointmentService if needed)
+        const appointmentService = await import('../services/appointmentService').then(m => m.appointmentService);
+        const appointments = await appointmentService.getAppointments({ status: 'completed' });
+        const appointmentsWithoutFeedback = (appointments || []).filter(apt => !apt.has_feedback);
+        
+        setPendingFeedbackCount(ordersWithoutFeedback.length + appointmentsWithoutFeedback.length);
+      } catch (error) {
+        console.error('Error fetching pending feedback count:', error);
+      }
+    };
+
+    fetchPendingFeedbackCount();
   }, [user]);
 
   // Load cart from localStorage on mount or when user changes
@@ -91,6 +152,9 @@ export default function ProductsPage() {
     // Always save cart, even if empty
     localStorage.setItem(cartKey, JSON.stringify(cart));
     console.log('Cart saved to localStorage:', cartKey, cart);
+    
+    // Dispatch custom event to notify other components that cart has changed
+    window.dispatchEvent(new CustomEvent('cartUpdated', { detail: { cart } }));
   }, [cart, user, getCartKey, cartLoaded]);
 
   const fetchProducts = useCallback(async () => {
@@ -158,17 +222,6 @@ export default function ProductsPage() {
     filterProducts();
   }, [filterProducts]);
 
-  const viewProductFeedback = async (product) => {
-    try {
-      const feedbackData = await fetch(`http://127.0.0.1:8000/api/orders/product-feedback/${product.id}/`).then(res => res.json());
-      setSelectedProductFeedback(feedbackData);
-      setShowFeedbackModal(true);
-    } catch (error) {
-      console.error('Error fetching product feedback:', error);
-      toast.showToast('Failed to load feedback', 'error');
-    }
-  };
-
   const addToCart = (product) => {
     const existingItem = cart.find((item) => item.id === product.id && item.type === 'product');
     if (existingItem) {
@@ -227,6 +280,16 @@ export default function ProductsPage() {
     setModalQuantity(newQuantity);
   };
 
+  // Scroll to center and focus modal when it opens
+  useEffect(() => {
+    if (showQuantityModal && modalRef.current) {
+      // Scroll to center of viewport
+      modalRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      // Focus the modal container for accessibility
+      modalRef.current.focus();
+    }
+  }, [showQuantityModal]);
+
   return (
     <DecorativeBackground variant="bones">
       <div className="bg-chonky-white min-h-screen">
@@ -275,6 +338,48 @@ export default function ProductsPage() {
                   <div className="mt-3 text-sm text-chonky-white text-center">
                     Showing {filteredProducts.length} of {products.length} products
                   </div>
+                </div>
+                
+                {/* Action Buttons */}
+                <div className="mt-4 flex flex-col md:flex-row gap-3 w-full md:w-auto">
+                  <button
+                    onClick={() => navigate('/my-orders')}
+                    className="px-6 py-3 rounded-3xl font-semibold flex items-center justify-center gap-2 transition-colors shadow-md border-2 border-secondary text-accent-cream hover:bg-secondary hover:text-chonky-brown relative"
+                  >
+                    <FaBox />
+                    My Orders
+                    {pendingOrdersCount > 0 && (
+                      <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold rounded-full h-6 w-6 flex items-center justify-center">
+                        {pendingOrdersCount}
+                      </span>
+                    )}
+                  </button>
+                  {user && user.is_staff && (
+                    <button
+                      onClick={() => navigate('/admin/orders')}
+                      className="px-6 py-3 rounded-3xl font-semibold flex items-center justify-center gap-2 transition-colors shadow-md border-2 border-red-500 text-accent-cream hover:bg-red-500 hover:text-white relative"
+                    >
+                      <FaClipboardList />
+                      Admin Orders
+                      {adminPendingOrdersCount > 0 && (
+                        <span className="absolute -top-2 -right-2 bg-yellow-500 text-chonky-brown text-xs font-bold rounded-full h-6 w-6 flex items-center justify-center">
+                          {adminPendingOrdersCount}
+                        </span>
+                      )}
+                    </button>
+                  )}
+                  <button
+                    onClick={() => navigate('/feedback')}
+                    className="px-6 py-3 rounded-3xl font-semibold flex items-center justify-center gap-2 transition-colors shadow-md border-2 border-secondary text-accent-cream hover:bg-secondary hover:text-chonky-brown relative"
+                  >
+                    <FaCommentDots />
+                    Give Feedback
+                    {pendingFeedbackCount > 0 && (
+                      <span className="absolute -top-2 -right-2 bg-orange-500 text-white text-xs font-bold rounded-full h-6 w-6 flex items-center justify-center">
+                        {pendingFeedbackCount}
+                      </span>
+                    )}
+                  </button>
                 </div>
               </div>
               {/* Right: Products Hero Image */}
@@ -391,10 +496,7 @@ export default function ProductsPage() {
                         {/* Ratings */}
                         <div>
                           {productRatings[product.id] && productRatings[product.id].review_count > 0 ? (
-                            <button
-                              onClick={() => viewProductFeedback(product)}
-                              className="flex items-center gap-2 text-sm hover:text-secondary-lighter transition-colors"
-                            >
+                            <div className="flex items-center gap-2 text-sm">
                               <div className="flex items-center gap-1">
                                 <FaStar className="text-secondary-lighter" />
                                 <span className="font-semibold text-accent-cream">
@@ -404,7 +506,7 @@ export default function ProductsPage() {
                               <span className="text-accent-cream text-xs">
                                 ({productRatings[product.id].review_count})
                               </span>
-                            </button>
+                            </div>
                           ) : (
                             <p className="text-xs text-accent-cream">No ratings yet</p>
                           )}
@@ -435,8 +537,8 @@ export default function ProductsPage() {
 
       {/* Quantity Selection Modal */}
       {showQuantityModal && selectedProduct && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-start justify-center pt-4 z-50">
-          <div className="bg-white rounded-lg shadow-xl max-w-md w-full p-6">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div ref={modalRef} tabIndex={-1} className="bg-white rounded-lg shadow-xl max-w-md w-full p-6">
             {/* Modal Header */}
             <div className="flex justify-between items-start mb-4">
               <h3 className="text-xl font-bold text-chonky-brown">Select Quantity</h3>
@@ -534,82 +636,6 @@ export default function ProductsPage() {
 
       {/* Toast Notification */}
       <Toast {...toast} />
-
-      {/* Product Feedback Modal */}
-      {showFeedbackModal && selectedProductFeedback && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-start justify-center pt-4 z-50" onClick={() => setShowFeedbackModal(false)}>
-          <div className="bg-white rounded-lg shadow-xl max-w-3xl w-full max-h-[80vh] overflow-hidden" onClick={(e) => e.stopPropagation()}>
-            {/* Header */}
-            <div className="bg-blue-600 text-white p-6">
-              <div className="flex justify-between items-start">
-                <div className="flex-1">
-                  <h2 className="text-2xl font-bold mb-2">{selectedProductFeedback.product_name}</h2>
-                  <div className="flex items-center gap-4">
-                    <div className="flex items-center gap-2">
-                      <FaStar className="text-yellow-300" size={24} />
-                      <span className="text-3xl font-bold">{selectedProductFeedback.average_rating.toFixed(1)}</span>
-                    </div>
-                    <span className="text-blue-100">
-                      {selectedProductFeedback.total_reviews} {selectedProductFeedback.total_reviews === 1 ? 'review' : 'reviews'}
-                    </span>
-                  </div>
-                </div>
-                <button
-                  onClick={() => setShowFeedbackModal(false)}
-                  className="text-white hover:text-gray-200"
-                >
-                  <FaTimes size={24} />
-                </button>
-              </div>
-            </div>
-
-            {/* Feedback List */}
-            <div className="p-6 overflow-y-auto max-h-[calc(80vh-200px)]">
-              {selectedProductFeedback.feedbacks.length === 0 ? (
-                <p className="text-gray-500 text-center py-8">No reviews yet</p>
-              ) : (
-                <div className="space-y-4">
-                  {selectedProductFeedback.feedbacks.map((feedback) => (
-                    <div key={feedback.id} className="bg-gray-50 rounded-lg p-4 border border-gray-200">
-                      {/* User Info */}
-                      <div className="flex items-start justify-between mb-2">
-                        <div>
-                          <p className="font-semibold text-gray-900">
-                            {feedback.user_first_name && feedback.user_last_name
-                              ? `${feedback.user_first_name} ${feedback.user_last_name}`
-                              : feedback.username}
-                          </p>
-                          <p className="text-xs text-gray-500">
-                            {new Date(feedback.created_at).toLocaleDateString('en-US', {
-                              year: 'numeric',
-                              month: 'long',
-                              day: 'numeric'
-                            })}
-                          </p>
-                        </div>
-                        {/* Rating Stars */}
-                        <div className="flex gap-1">
-                          {[1, 2, 3, 4, 5].map((star) => (
-                            <FaStar
-                              key={star}
-                              className={star <= feedback.rating ? 'text-yellow-400' : 'text-gray-300'}
-                              size={16}
-                            />
-                          ))}
-                        </div>
-                      </div>
-                      {/* Comment */}
-                      {feedback.comment && (
-                        <p className="text-gray-700 mt-2">{feedback.comment}</p>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-      )}
 
       </div>
     </DecorativeBackground>

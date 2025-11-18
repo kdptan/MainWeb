@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Order, OrderItem, PurchaseFeedback, ProductFeedback
+from .models import Order, OrderItem, PurchaseFeedback, ProductFeedback, Notification
 from inventory.serializers import ProductSerializer
 from services.serializers import ServiceSerializer
 
@@ -61,9 +61,9 @@ class OrderSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = Order
-        fields = ['id', 'user', 'username', 'branch', 'status', 'total_price', 'amount_paid', 'change', 'notes',
+        fields = ['id', 'order_id', 'user', 'username', 'branch', 'status', 'total_price', 'amount_paid', 'change', 'notes',
                   'created_at', 'completed_at', 'items', 'feedback', 'has_feedback']
-        read_only_fields = ['created_at', 'completed_at']
+        read_only_fields = ['order_id', 'created_at', 'completed_at']
     
     def get_user(self, obj):
         return {
@@ -100,3 +100,14 @@ class CreateOrderSerializer(serializers.Serializer):
                 raise serializers.ValidationError("Quantity must be at least 1.")
         
         return items
+
+
+class NotificationSerializer(serializers.ModelSerializer):
+    """Serializer for in-app notifications"""
+    order_id = serializers.CharField(source='order.order_id', read_only=True)
+    branch = serializers.CharField(source='order.branch', read_only=True)
+    
+    class Meta:
+        model = Notification
+        fields = ['id', 'order', 'order_id', 'branch', 'message', 'is_read', 'created_at']
+        read_only_fields = ['created_at']

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FaShoppingCart, FaPlus, FaMinus, FaCheckCircle, FaBox, FaClock, FaTrashAlt } from 'react-icons/fa';
 import { useAuth } from '../hooks/useAuth';
@@ -78,6 +78,8 @@ export default function SalesPage() {
   const navigate = useNavigate();
   const { user } = useAuth();
   const { toast, showToast } = useToast();
+  const serviceTypeModalRef = useRef(null);
+  const checkoutModalRef = useRef(null);
 
   // Page states
   const [currentView, setCurrentView] = useState('pos'); // 'pos' or 'history'
@@ -117,6 +119,29 @@ export default function SalesPage() {
   // Receipt Modal
   const [receiptModalOpen, setReceiptModalOpen] = useState(false);
   const [receiptData, setReceiptData] = useState(null);
+
+  // Scroll modals to center when they open
+  useEffect(() => {
+    if (serviceTypeModal.isOpen && serviceTypeModalRef.current) {
+      setTimeout(() => {
+        serviceTypeModalRef.current.scrollIntoView({
+          behavior: 'smooth',
+          block: 'center',
+        });
+      }, 100);
+    }
+  }, [serviceTypeModal.isOpen]);
+
+  useEffect(() => {
+    if (checkoutModalOpen && checkoutModalRef.current) {
+      setTimeout(() => {
+        checkoutModalRef.current.scrollIntoView({
+          behavior: 'smooth',
+          block: 'center',
+        });
+      }, 100);
+    }
+  }, [checkoutModalOpen]);
 
   // Track if data has been fetched to avoid refetch loop
   const [dataFetched, setDataFetched] = useState(false);
@@ -455,7 +480,7 @@ export default function SalesPage() {
       {/* Service Type Selection Modal */}
       {serviceTypeModal.isOpen && serviceTypeModal.service && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-start justify-center pt-4 z-50">
-          <div className="bg-white rounded-3xl p-8 max-w-md w-full shadow-2xl">
+          <div ref={serviceTypeModalRef} className="bg-white rounded-3xl p-8 max-w-md w-full shadow-2xl">
             <h2 className="text-2xl font-bold text-primary-darker mb-4">
               How would you like to add {serviceTypeModal.service.service_name}?
             </h2>
@@ -820,7 +845,7 @@ export default function SalesPage() {
         {/* Checkout Modal */}
         {checkoutModalOpen && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-start justify-center pt-4 z-50">
-            <div className="bg-white rounded-3xl shadow-2xl p-8 max-w-md w-full h-[95vh] max-h-[95vh] flex flex-col overflow-hidden">
+            <div ref={checkoutModalRef} className="bg-white rounded-3xl shadow-2xl p-8 max-w-md w-full h-[95vh] max-h-[95vh] flex flex-col overflow-hidden">
               <h2 className="text-2xl font-bold text-primary-darker mb-6 flex-shrink-0">Payment Details</h2>
 
               {/* Scrollable Content */}

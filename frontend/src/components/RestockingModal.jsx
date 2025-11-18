@@ -3,6 +3,7 @@ import { FaTimes, FaBox, FaCheck, FaInfoCircle, FaToggleOn, FaToggleOff } from '
 
 // Step 1: Product Selection Modal
 function SelectProductsModal({ isOpen, onClose, onProceed, token, embedded = false }) {
+  const modalRef = React.useRef(null);
   const [allProducts, setAllProducts] = useState([]);
   const [selectedProductsForRestock, setSelectedProductsForRestock] = useState(new Set());
   const [filterCategory, setFilterCategory] = useState('all');
@@ -24,14 +25,24 @@ function SelectProductsModal({ isOpen, onClose, onProceed, token, embedded = fal
     }
   }, [token]);
 
-  const modalRef = React.useRef(null);
-
   useEffect(() => {
     if (isOpen) {
       fetchAllProducts();
       setError('');
     }
   }, [isOpen, fetchAllProducts]);
+
+  // Scroll modal to center when it opens
+  useEffect(() => {
+    if (isOpen && modalRef.current) {
+      setTimeout(() => {
+        modalRef.current.scrollIntoView({
+          behavior: 'smooth',
+          block: 'center',
+        });
+      }, 100);
+    }
+  }, [isOpen]);
 
   useEffect(() => {
     if (!isOpen) return;
@@ -68,7 +79,7 @@ function SelectProductsModal({ isOpen, onClose, onProceed, token, embedded = fal
 
   const renderModalContent = () => {
     return (
-      <div className="bg-white rounded-lg shadow-2xl w-full flex flex-col">
+      <div ref={modalRef} className="bg-white rounded-lg shadow-2xl w-full flex flex-col">
         {/* Content - NOT scrollable */}
         <div className="flex-1 flex flex-col gap-4 min-h-0 overflow-hidden">
           {/* Filters on the left */}

@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FaStar, FaUser, FaShoppingBag, FaCalendar, FaComment } from 'react-icons/fa';
+import { FaStar, FaUser, FaShoppingBag, FaCalendar, FaComment, FaPaw } from 'react-icons/fa';
 import { useAuth } from '../hooks/useAuth';
 import { useToast } from '../hooks/useToast';
 import { orderService } from '../services/orderService';
+import { appointmentService } from '../services/appointmentService';
 import Toast from '../components/Toast';
-import managementBg from '../assets/Management.png';
 import { formatOrderId } from '../utils/formatters';
 
 export default function AdminFeedbackPage() {
@@ -13,9 +13,13 @@ export default function AdminFeedbackPage() {
   const { user } = useAuth();
   const toast = useToast();
   
-  const [feedbacks, setFeedbacks] = useState([]);
+  const [purchaseFeedbacks, setPurchaseFeedbacks] = useState([]);
+  const [appointmentFeedbacks, setAppointmentFeedbacks] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filterRating, setFilterRating] = useState('all');
+  const [typeFilter, setTypeFilter] = useState('purchases'); // 'purchases' or 'appointments'
+  const [currentPage, setCurrentPage] = useState(1);
+  const feedbacksPerPage = 10; // 5 per column x 2 columns
 
   useEffect(() => {
     // Wait for auth to settle before checking
@@ -39,8 +43,12 @@ export default function AdminFeedbackPage() {
   const fetchFeedbacks = async () => {
     setLoading(true);
     try {
-      const data = await orderService.getAllFeedback();
-      setFeedbacks(data);
+      const [purchaseData, appointmentData] = await Promise.all([
+        orderService.getAllFeedback(),
+        appointmentService.getAllFeedback()
+      ]);
+      setPurchaseFeedbacks(purchaseData);
+      setAppointmentFeedbacks(appointmentData || []);
     } catch (error) {
       console.error('Error fetching feedbacks:', error);
       toast.showToast('Failed to load feedback', 'error');
@@ -77,6 +85,8 @@ export default function AdminFeedbackPage() {
     );
   };
 
+  const feedbacks = typeFilter === 'purchases' ? purchaseFeedbacks : appointmentFeedbacks;
+  
   const filteredFeedbacks = filterRating === 'all'
     ? feedbacks
     : feedbacks.filter(fb => fb.rating === parseInt(filterRating));
@@ -85,14 +95,30 @@ export default function AdminFeedbackPage() {
     ? (feedbacks.reduce((sum, fb) => sum + fb.rating, 0) / feedbacks.length).toFixed(1)
     : 0;
 
+  // Reset to page 1 when filters change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [filterRating, typeFilter]);
+
+  // Pagination calculations
+  const totalPages = Math.ceil(filteredFeedbacks.length / feedbacksPerPage);
+  const paginatedFeedbacks = filteredFeedbacks.slice(
+    (currentPage - 1) * feedbacksPerPage,
+    currentPage * feedbacksPerPage
+  );
+
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 min-h-screen bg-accent-cream bg-cover bg-center bg-no-repeat" style={{ backgroundImage: `url(${managementBg})` }}>
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 min-h-screen bg-primary-darker">
       <Toast />
 
       {/* Header */}
       <div className="mb-8">
-        <h1 className="display-md text-accent-cream mb-2">Purchase Feedback</h1>
-        <p className="text-accent-cream">Overall order experience feedback from customers</p>
+        <h1 className="display-md text-accent-cream mb-2">Customer Feedback</h1>
+        <p className="text-accent-cream">
+          {typeFilter === 'purchases' 
+            ? 'Overall order experience feedback from customers'
+            : 'Appointment experience feedback from customers'}
+        </p>
       </div>
 
       {/* Stats */}
@@ -139,6 +165,30 @@ export default function AdminFeedbackPage() {
 
       {/* Filters */}
       <div className="bg-white rounded-3xl shadow-md p-4 mb-6">
+        {/* Type Filter */}
+        <div className="flex flex-wrap gap-2 mb-4 pb-4 border-b">
+          <button
+            onClick={() => setTypeFilter('purchases')}
+            className={`px-6 py-2 rounded-3xl font-medium transition-colors flex items-center gap-2 ${
+              typeFilter === 'purchases'
+                ? 'bg-blue-600 text-white'
+                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+            }`}
+          >
+            <FaShoppingBag /> Purchases
+          </button>
+          <button
+            onClick={() => setTypeFilter('appointments')}
+            className={`px-6 py-2 rounded-3xl font-medium transition-colors flex items-center gap-2 ${
+              typeFilter === 'appointments'
+                ? 'bg-blue-600 text-white'
+                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+            }`}
+          >
+            <FaPaw /> Appointments
+          </button>
+        </div>
+        
         <div className="flex flex-wrap gap-4 items-center">
           <label className="text-sm font-medium text-gray-700">Filter by Rating:</label>
           <select
@@ -171,13 +221,14 @@ export default function AdminFeedbackPage() {
           <h3 className="text-xl font-semibold text-gray-700 mb-2">No Feedback Yet</h3>
           <p className="text-gray-500">
             {filterRating === 'all'
-              ? 'No purchase feedback has been submitted yet.'
+              ? `No ${typeFilter === 'purchases' ? 'purchase' : 'appointment'} feedback has been submitted yet.`
               : `No feedback with ${filterRating} star(s) found.`}
           </p>
         </div>
       ) : (
-        <div className="space-y-4">
-          {filteredFeedbacks.map((feedback) => (
+        <>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+          {paginatedFeedbacks.map((feedback) => (
             <div key={feedback.id} className="bg-white rounded-3xl shadow-md p-6 hover:shadow-lg transition-shadow">
               {/* Header */}
               <div className="flex flex-wrap items-start justify-between mb-4 gap-4">
@@ -191,8 +242,26 @@ export default function AdminFeedbackPage() {
                       <p className="font-semibold text-gray-900">{feedback.username}</p>
                     </div>
                     <div className="flex items-center gap-2 text-sm text-gray-500">
-                      <FaShoppingBag size={12} />
-                      <span>{generateOrderId(feedback)}</span>
+                      {typeFilter === 'purchases' ? (
+                        <>
+                          <FaShoppingBag size={12} />
+                          <span>{generateOrderId(feedback)}</span>
+                        </>
+                      ) : (
+                        <>
+                          <FaPaw size={12} />
+                          <span>{feedback.service_name}</span>
+                          {feedback.appointment_date && (
+                            <span className="ml-2">
+                              • {new Date(feedback.appointment_date).toLocaleDateString('en-US', {
+                                month: 'short',
+                                day: 'numeric',
+                                year: 'numeric'
+                              })}
+                            </span>
+                          )}
+                        </>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -222,6 +291,48 @@ export default function AdminFeedbackPage() {
             </div>
           ))}
         </div>
+        
+        {/* Pagination Controls */}
+        {totalPages > 1 && (
+          <div className="mt-8 flex justify-center items-center gap-4">
+            <button
+              onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+              disabled={currentPage === 1}
+              className="px-4 py-2 bg-secondary text-white rounded-3xl hover:bg-orange-500 disabled:bg-gray-300 disabled:cursor-not-allowed font-medium transition-colors"
+            >
+              Previous
+            </button>
+            
+            <div className="flex items-center gap-2">
+              {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                <button
+                  key={page}
+                  onClick={() => setCurrentPage(page)}
+                  className={`px-3 py-2 rounded-3xl font-medium transition-colors ${
+                    currentPage === page
+                      ? 'bg-secondary text-white'
+                      : 'bg-white text-chonky-brown hover:bg-gray-100 border border-secondary'
+                  }`}
+                >
+                  {page}
+                </button>
+              ))}
+            </div>
+            
+            <button
+              onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+              disabled={currentPage === totalPages}
+              className="px-4 py-2 bg-secondary text-white rounded-3xl hover:bg-orange-500 disabled:bg-gray-300 disabled:cursor-not-allowed font-medium transition-colors"
+            >
+              Next
+            </button>
+          </div>
+        )}
+        
+        <p className="text-center mt-4 text-white">
+          Page {currentPage} of {totalPages} (Showing {Math.min(feedbacksPerPage, filteredFeedbacks.length - (currentPage - 1) * feedbacksPerPage)} of {filteredFeedbacks.length} feedback(s))
+        </p>
+        </>
       )}
     </div>
   );

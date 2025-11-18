@@ -1,11 +1,11 @@
-import React, { useEffect, useState, useMemo, useCallback } from 'react';
+import React, { useEffect, useState, useMemo, useCallback, useRef } from 'react';
 import { useAuth } from '../../hooks/useAuth';
 import { FaBox, FaHistory, FaTimes, FaReceipt } from 'react-icons/fa';
 import { useToast } from '../../hooks/useToast';
 import Toast from '../../components/Toast';
 import ProductHistoryModal from '../../components/ProductHistoryModal';
 import RestockReceiptModal from '../../components/RestockReceiptModal';
-import { formatCurrency, formatNumber } from '../../utils/formatters';
+import { formatCurrency } from '../../utils/formatters';
 import axios from 'axios';
 
 // eslint-disable-next-line no-unused-vars
@@ -22,6 +22,8 @@ const categories = [
 export default function Inventory(){
   const { token } = useAuth();
   const { toast, showToast } = useToast();
+  const manageStockModalRef = useRef(null);
+  const restockModalRef = useRef(null);
   const [inventory, setInventory] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -69,6 +71,29 @@ export default function Inventory(){
       document.body.style.overflow = 'unset';
     };
   }, [showManageStockModal, showRestockModal, showReceiptModal]);
+
+  // Scroll modals to center when they open
+  useEffect(() => {
+    if (showManageStockModal && manageStockModalRef.current) {
+      setTimeout(() => {
+        manageStockModalRef.current.scrollIntoView({
+          behavior: 'smooth',
+          block: 'center',
+        });
+      }, 100);
+    }
+  }, [showManageStockModal]);
+
+  useEffect(() => {
+    if (showRestockModal && restockModalRef.current) {
+      setTimeout(() => {
+        restockModalRef.current.scrollIntoView({
+          behavior: 'smooth',
+          block: 'center',
+        });
+      }, 100);
+    }
+  }, [showRestockModal]);
 
   const fetchInventory = useCallback(async () => {
     setLoading(true); setError(null);
@@ -760,7 +785,7 @@ export default function Inventory(){
       {/* Manage Stock Modal */}
       {showManageStockModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-start justify-center pt-4 z-50">
-          <div className="bg-white rounded-lg shadow-2xl w-[90vw] max-w-6xl flex flex-col" style={{ maxHeight: '85vh' }}>
+          <div ref={manageStockModalRef} className="bg-white rounded-lg shadow-2xl w-[90vw] max-w-6xl flex flex-col" style={{ maxHeight: '85vh' }}>
             {/* Modal Header */}
             <div className="bg-gradient-to-r from-primary to-primary-dark px-6 py-4 flex items-center justify-between flex-shrink-0">
               <div>
@@ -903,7 +928,7 @@ export default function Inventory(){
       {/* Restock Modal */}
       {showRestockModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-start justify-center pt-4 z-50">
-          <div className="bg-white rounded-lg shadow-2xl w-[90vw] max-w-4xl max-h-[90vh] overflow-hidden flex flex-col">
+          <div ref={restockModalRef} className="bg-white rounded-lg shadow-2xl w-[90vw] max-w-4xl max-h-[90vh] overflow-hidden flex flex-col">
             {/* Modal Header */}
             <div className="bg-gradient-to-r from-primary to-primary-dark px-6 py-4 flex items-center justify-between">
               <div>

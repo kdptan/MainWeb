@@ -111,3 +111,20 @@ class ProductFeedback(models.Model):
     
     def __str__(self):
         return f"Product Feedback: {self.product.name} in Order #{self.order.id} - {self.rating} stars"
+
+
+class Notification(models.Model):
+    """In-app notifications for users"""
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='notifications')
+    order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name='notifications')
+    message = models.TextField()
+    is_read = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        ordering = ['-created_at']
+        verbose_name = 'Notification'
+        verbose_name_plural = 'Notifications'
+    
+    def __str__(self):
+        return f"Notification for {self.user.username} - Order #{self.order.order_id}"

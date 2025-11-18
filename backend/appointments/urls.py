@@ -6,7 +6,9 @@ from .views import (
     AppointmentDetailView,
     UpdateAppointmentStatusView,
     AdminUpdateAppointmentStatusView,
-    AvailableTimeSlotsView
+    AvailableTimeSlotsView,
+    CreateAppointmentFeedbackView,
+    AppointmentFeedbackListView
 )
 
 urlpatterns = [
@@ -17,4 +19,6 @@ urlpatterns = [
     path('<int:pk>/status/', UpdateAppointmentStatusView.as_view(), name='appointment-update-status'),
     path('admin/<int:pk>/status/', AdminUpdateAppointmentStatusView.as_view(), name='admin-appointment-update-status'),
     path('available-slots/', AvailableTimeSlotsView.as_view(), name='available-time-slots'),
+    path('feedback/', CreateAppointmentFeedbackView.as_view(), name='appointment-feedback-create'),
+    path('feedback/all/', AppointmentFeedbackListView.as_view(), name='appointment-feedback-list'),
 ]

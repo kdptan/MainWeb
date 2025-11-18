@@ -32,6 +32,14 @@ export default function RestockReceiptModal({ isOpen, onClose, restockData }) {
     return () => document.removeEventListener('mousedown', handler);
   }, [isOpen, onClose]);
 
+  // Scroll to center and focus modal when opened
+  useEffect(() => {
+    if (isOpen && modalRef.current) {
+      modalRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      modalRef.current.focus();
+    }
+  }, [isOpen]);
+
   if (!isOpen || !restockData) return null;
 
   const handlePrint = () => {
@@ -51,6 +59,7 @@ export default function RestockReceiptModal({ isOpen, onClose, restockData }) {
       {/* Receipt Modal - fixed to viewport center, doesn't scroll with page */}
       <div
         ref={modalRef}
+        tabIndex={-1}
         className="fixed z-50 left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-xs p-4"
         style={{ maxHeight: '90vh' }}
       >

@@ -7,7 +7,9 @@ from decimal import Decimal
 from inventory.models import ProductHistory
 from django.db import transaction
 from django.db.models import Avg, Count
-from .models import Order, OrderItem, PurchaseFeedback, ProductFeedback
+from django.core.mail import send_mail
+from django.conf import settings
+from .models import Order, OrderItem, PurchaseFeedback, ProductFeedback, Notification
 from inventory.models import Product
 from services.models import Service
 from .serializers import (
@@ -15,7 +17,8 @@ from .serializers import (
     CreateOrderSerializer, 
     PurchaseFeedbackSerializer,
     OrderItemSerializer,
-    ProductFeedbackSerializer
+    ProductFeedbackSerializer,
+    NotificationSerializer
 )
 
 # Keep backward compatibility
@@ -133,6 +136,46 @@ class CreateOrderView(APIView):
                     reason=f'Sold in order {order.order_id}'
                 )
         
+        # Create notification for the user
+        notification_message = f"Order #{order.order_id} is ready to be picked up at {order.branch} branch."
+        Notification.objects.create(
+            user=request.user,
+            order=order,
+            message=notification_message
+        )
+        
+        # Send email notification to user
+        try:
+            user_email = request.user.email
+            if user_email:
+                subject = f"Order #{order.order_id} Ready for Pickup"
+                message = f"""
+Hello {request.user.first_name or request.user.username},
+
+Your order #{order.order_id} has been placed successfully and is ready to be picked up!
+
+Pickup Location: {order.branch} Branch
+Total Amount: ₱{order.total_price}
+
+Please bring this order number when picking up your order.
+
+Thank you for shopping with Chonky Boi Pet Store!
+
+Best regards,
+Chonky Boi Team
+                """.strip()
+                
+                send_mail(
+                    subject=subject,
+                    message=message,
+                    from_email=settings.DEFAULT_FROM_EMAIL,
+                    recipient_list=[user_email],
+                    fail_silently=True,  # Don't fail order creation if email fails
+                )
+        except Exception as e:
+            # Log error but don't fail the order creation
+            print(f"Failed to send email notification: {str(e)}")
+        
         # Return created order
         order_serializer = OrderSerializer(order)
         return Response(order_serializer.data, status=status.HTTP_201_CREATED)
@@ -245,6 +288,9 @@ class UpdateOrderStatusView(APIView):
             
             order.status = new_status
             order.save()
+            # Mark related notifications as read if order is completed
+            if new_status == 'completed':
+                order.notifications.filter(is_read=False).update(is_read=True)
             serializer = OrderSerializer(order)
             return Response(serializer.data)
         else:
@@ -357,6 +403,9 @@ class AdminUpdateOrderStatusView(APIView):
             order.completed_at = timezone.now()
         print(f"DEBUG: Before save - order.amount_paid={order.amount_paid}, order.change={order.change}")
         order.save()
+        # Mark related notifications as read if order is completed
+        if new_status == 'completed':
+            order.notifications.filter(is_read=False).update(is_read=True)
         print(f"DEBUG: After save - order.amount_paid={order.amount_paid}, order.change={order.change}")
         
         serializer = OrderSerializer(order)
@@ -495,4 +544,35 @@ class ProductRatingsView(APIView):
             }
         
         return Response(ratings)
+
+
+class NotificationListView(generics.ListAPIView):
+    """Get all notifications for the authenticated user - only for pending orders"""
+    serializer_class = NotificationSerializer
+    permission_classes = [IsAuthenticated]
+    
+    def get_queryset(self):
+        # Only return unread notifications for orders that are pending or available for pickup
+        return Notification.objects.filter(
+            user=self.request.user,
+            is_read=False,
+            order__status__in=['pending', 'available_for_pickup']
+        )
+
+
+class MarkNotificationReadView(APIView):
+    """Mark a notification as read"""
+    permission_classes = [IsAuthenticated]
+    
+    def post(self, request, notification_id):
+        try:
+            notification = Notification.objects.get(id=notification_id, user=request.user)
+            notification.is_read = True
+            notification.save()
+            return Response({'message': 'Notification marked as read'}, status=status.HTTP_200_OK)
+        except Notification.DoesNotExist:
+            return Response(
+                {'error': 'Notification not found'},
+                status=status.HTTP_404_NOT_FOUND
+            )
 

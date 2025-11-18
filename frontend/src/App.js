@@ -41,6 +41,42 @@ function AppContent() {
   const [pendingOrdersCount, setPendingOrdersCount] = useState(0);
   const [myOrdersCount, setMyOrdersCount] = useState(0);
   const [feedbackCount, setFeedbackCount] = useState(0);
+  const [cart, setCart] = useState([]);
+
+  // Load cart from localStorage
+  useEffect(() => {
+    const getCartKey = () => {
+      return user ? `cart_${user.id}` : 'cart_guest';
+    };
+    
+    const loadCart = () => {
+      const cartKey = getCartKey();
+      const savedCart = localStorage.getItem(cartKey);
+      if (savedCart) {
+        try {
+          setCart(JSON.parse(savedCart));
+        } catch (err) {
+          console.error('Error loading cart:', err);
+          setCart([]);
+        }
+      } else {
+        setCart([]);
+      }
+    };
+    
+    loadCart();
+    
+    // Listen for cart updates from other components
+    const handleCartUpdate = (event) => {
+      loadCart();
+    };
+    
+    window.addEventListener('cartUpdated', handleCartUpdate);
+    
+    return () => {
+      window.removeEventListener('cartUpdated', handleCartUpdate);
+    };
+  }, [location.pathname, user]); // Reload cart when navigating or user changes
 
   // Pages that should show floating buttons
   const showFloatingButtons = 
@@ -182,7 +218,7 @@ function AppContent() {
       {showFloatingButtons && (
         <FloatingActionButtons 
           user={user}
-          cart={[]}
+          cart={cart}
           pendingOrdersCount={pendingOrdersCount}
           myOrdersCount={myOrdersCount}
           feedbackCount={feedbackCount}

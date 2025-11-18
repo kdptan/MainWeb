@@ -8,10 +8,23 @@ export default function UpdateProfileModal({ onClose }) {
   const [form, setForm] = useState({ username: user?.username || '', email: user?.email || '', new_password: '', confirm_password: '' });
   const [file, setFile] = useState(null);
   const fileRef = useRef();
+  const modalRef = useRef(null);
   const [error, setError] = useState('');
   const [saving, setSaving] = useState(false);
   const [editingUsername, setEditingUsername] = useState(false);
   const [editingEmail, setEditingEmail] = useState(false);
+
+  // Scroll to modal when opened
+  useEffect(() => {
+    if (modalRef.current) {
+      setTimeout(() => {
+        modalRef.current.scrollIntoView({
+          behavior: 'smooth',
+          block: 'center',
+        });
+      }, 100);
+    }
+  }, []);
 
   // Disable body scroll when modal is open
   useEffect(() => {
@@ -85,7 +98,7 @@ export default function UpdateProfileModal({ onClose }) {
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-40 flex items-start justify-center pt-4 z-50">
-      <div className="bg-white rounded-md p-6 w-full max-w-md max-h-[90vh] overflow-auto">
+      <div ref={modalRef} className="bg-white rounded-md p-6 w-full max-w-md max-h-[90vh] overflow-auto">
         <h3 className="text-lg font-medium mb-4">Update Profile</h3>
   {error && <div className="text-sm text-red-600 mb-2 break-words whitespace-pre-wrap max-w-full">{error}</div>}
         <form onSubmit={onSave} className="space-y-3">

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FaSearch, FaClock, FaCheckCircle } from 'react-icons/fa';
 import { useAuth } from '../hooks/useAuth';
@@ -9,6 +9,7 @@ import servicesHero from '../assets/DOG2.png'; // Assuming you have a services h
 export default function ServicesPage() {
   const navigate = useNavigate();
   const { token } = useAuth();
+  const modalRef = useRef(null);
   const [services, setServices] = useState([]);
   const [filteredServices, setFilteredServices] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -301,6 +302,7 @@ export default function ServicesPage() {
             onClick={() => setSelectedService(null)}
           >
             <div
+              ref={modalRef}
               className="bg-primary-dark rounded-lg shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto border-2 border-primary"
               onClick={(e) => e.stopPropagation()}
             >

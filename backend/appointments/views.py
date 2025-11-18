@@ -4,10 +4,10 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from django.db.models import Q
 from datetime import datetime, timedelta, time
-from .models import Appointment
+from .models import Appointment, AppointmentFeedback
 from services.models import Service
 from pets.models import PetProfile
-from .serializers import AppointmentSerializer, CreateAppointmentSerializer
+from .serializers import AppointmentSerializer, CreateAppointmentSerializer, AppointmentFeedbackSerializer
 
 
 class CreateAppointmentView(APIView):
@@ -269,3 +269,47 @@ class AvailableTimeSlotsView(APIView):
             'may_overlap': service.may_overlap,
             'available_slots': available_slots
         })
+
+
+class CreateAppointmentFeedbackView(APIView):
+    """Create feedback for a completed appointment"""
+    permission_classes = [IsAuthenticated]
+    
+    def post(self, request):
+        # Verify appointment exists and belongs to user
+        appointment_id = request.data.get('appointment')
+        
+        if not appointment_id:
+            return Response({'error': 'appointment is required'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        try:
+            appointment = Appointment.objects.get(id=appointment_id, user=request.user)
+        except Appointment.DoesNotExist:
+            return Response({'error': 'Appointment not found or does not belong to you'}, status=status.HTTP_404_NOT_FOUND)
+        
+        # Check if appointment is completed
+        if appointment.status != 'completed':
+            return Response({'error': 'Can only leave feedback for completed appointments'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        # Check if feedback already exists
+        if hasattr(appointment, 'feedback'):
+            return Response({'error': 'Feedback already exists for this appointment'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        # Create feedback
+        serializer = AppointmentFeedbackSerializer(data=request.data)
+        if not serializer.is_valid():
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        
+        serializer.save(user=request.user)
+        
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+
+class AppointmentFeedbackListView(generics.ListAPIView):
+    """List all appointment feedbacks (public)"""
+    serializer_class = AppointmentFeedbackSerializer
+    permission_classes = [AllowAny]
+    
+    def get_queryset(self):
+        return AppointmentFeedback.objects.all().select_related('user', 'appointment__service')
+

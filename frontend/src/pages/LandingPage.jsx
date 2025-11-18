@@ -183,8 +183,8 @@ export default function LandingPage() {
                       <div className="flex items-start gap-4">
                         <div className="flex-shrink-0 bg-secondary text-chonky-white rounded-full p-3 shadow-md">🚚</div>
                         <div>
-                          <h3 className="heading-card text-chonky-brown mb-1">Fast Delivery & Pickup</h3>
-                          <p className="text-body text-chonky-poop">Quick and reliable shipping to your doorstep, or convenient in-store pickup at our branches.</p>
+                          <h3 className="heading-card text-chonky-brown mb-1">Convenient Pickup</h3>
+                          <p className="text-body text-chonky-poop">Easy and convenient in-store pickup at our branches. Shop online and collect your order at your preferred location.</p>
                         </div>
                       </div>
                       <div className="flex items-start gap-4">

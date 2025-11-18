@@ -18,6 +18,8 @@ export default function CartPage() {
   const [selectedBranch, setSelectedBranch] = useState('Matina');
   const [notes, setNotes] = useState('');
   const [loading, setLoading] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 3;
 
   // Get user-specific cart key
   const getCartKey = useCallback(() => {
@@ -97,6 +99,9 @@ export default function CartPage() {
     const cartKey = getCartKey();
     localStorage.setItem(cartKey, JSON.stringify(cart));
     console.log('Cart saved to localStorage:', cartKey, cart);
+    
+    // Dispatch custom event to notify other components that cart has changed
+    window.dispatchEvent(new CustomEvent('cartUpdated', { detail: { cart } }));
   }, [cart, user, getCartKey, cartLoaded]);
 
   // Check if cart has mixed branches
@@ -185,6 +190,9 @@ export default function CartPage() {
 
       await orderService.createOrder(orderData);
       
+      // Dispatch custom event to notify Navbar to refresh notifications
+      window.dispatchEvent(new Event('orderCreated'));
+      
       // Clear cart
       const cartKey = getCartKey();
       setCart([]);
@@ -268,7 +276,7 @@ export default function CartPage() {
             </h2>
             
             <div className="space-y-4">
-              {cart.map((item) => (
+              {cart.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage).map((item) => (
                 <div
                   key={`${item.type}-${item.id}`}
                   className="flex items-center gap-4 p-4 border border-secondary rounded-3xl hover:border-btn-yellow transition-colors"
@@ -337,6 +345,29 @@ export default function CartPage() {
               ))}
             </div>
 
+            {/* Pagination Controls */}
+            {cart.length > itemsPerPage && (
+              <div className="flex justify-center items-center gap-4 mt-6">
+                <button
+                  onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+                  disabled={currentPage === 1}
+                  className="px-4 py-2 rounded-3xl bg-secondary text-chonky-white hover:bg-btn-yellow hover:text-chonky-brown transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  Previous
+                </button>
+                <span className="text-chonky-brown font-semibold">
+                  Page {currentPage} of {Math.ceil(cart.length / itemsPerPage)}
+                </span>
+                <button
+                  onClick={() => setCurrentPage(prev => Math.min(Math.ceil(cart.length / itemsPerPage), prev + 1))}
+                  disabled={currentPage === Math.ceil(cart.length / itemsPerPage)}
+                  className="px-4 py-2 rounded-3xl bg-secondary text-chonky-white hover:bg-btn-yellow hover:text-chonky-brown transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  Next
+                </button>
+              </div>
+            )}
+
             {/* Mixed branches warning */}
             {hasMixedBranches() && (
               <div className="mt-4 p-4 bg-red-50 border border-red-200 rounded-3xl">
@@ -350,7 +381,7 @@ export default function CartPage() {
 
             <button
               onClick={continueShopping}
-              className="text-secondary hover:text-btn-yellow flex items-center gap-2 font-semibold transition-colors"
+              className="text-secondary hover:text-btn-yellow flex items-center gap-2 font-semibold transition-colors mt-4"
             >
               ← Continue Shopping
             </button>

@@ -49,3 +49,22 @@ class Appointment(models.Model):
     @property
     def duration_minutes(self):
         return self.service.duration_minutes
+
+
+class AppointmentFeedback(models.Model):
+    """
+    Feedback for completed appointments - displayed publicly
+    Similar to product feedback system
+    """
+    appointment = models.OneToOneField(Appointment, on_delete=models.CASCADE, related_name='feedback')
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='appointment_feedbacks')
+    rating = models.IntegerField(choices=[(i, i) for i in range(1, 6)])  # 1-5 stars
+    comment = models.TextField(blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        ordering = ['-created_at']
+    
+    def __str__(self):
+        return f"{self.user.username} - {self.appointment.service.service_name} - {self.rating} stars"

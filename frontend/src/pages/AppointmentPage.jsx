@@ -1,9 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { FaCalendar, FaClock, FaMapMarkerAlt, FaPaw, FaCheck, FaTimes } from 'react-icons/fa';
+import { FaCalendar, FaClock, FaMapMarkerAlt, FaPaw, FaCheck, FaTimes, FaCommentDots } from 'react-icons/fa';
 import { useAuth } from '../hooks/useAuth';
 import { useToast } from '../hooks/useToast';
 import { appointmentService } from '../services/appointmentService';
+import { orderService } from '../services/orderService';
 import Toast from '../components/Toast';
 import PetAvatar from '../components/PetAvatar';
 import GenderIcon from '../components/GenderIcon';
@@ -16,6 +17,7 @@ export default function AppointmentPage() {
   const location = useLocation();
   const { user } = useAuth();
   const toast = useToast();
+  const addOnsModalRef = useRef(null);
   
   const [step, setStep] = useState(1); // 1: Service, 2: Date/Time, 3: Confirm
   const [services, setServices] = useState([]);
@@ -23,6 +25,7 @@ export default function AppointmentPage() {
   const [loading, setLoading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [showAddOnsModal, setShowAddOnsModal] = useState(false);
+  const [pendingFeedbackCount, setPendingFeedbackCount] = useState(0);
   
   // Form data
   const [selectedService, setSelectedService] = useState(null);
@@ -50,6 +53,7 @@ export default function AppointmentPage() {
 
     fetchServices();
     fetchPets();
+    fetchPendingFeedbackCount();
     
     // Check if coming from Services page with a selected service
     if (location.state?.selectedService) {
@@ -58,6 +62,18 @@ export default function AppointmentPage() {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user]);
+
+  // Scroll modal to center when it opens
+  useEffect(() => {
+    if (showAddOnsModal && addOnsModalRef.current) {
+      setTimeout(() => {
+        addOnsModalRef.current.scrollIntoView({
+          behavior: 'smooth',
+          block: 'center',
+        });
+      }, 100);
+    }
+  }, [showAddOnsModal]);
 
   const fetchServices = async () => {
     setLoading(true);
@@ -101,6 +117,22 @@ export default function AppointmentPage() {
       console.error('Error fetching pets:', error);
       setPets([]); // Set empty array on error
       toast.showToast('Failed to load pets', 'error');
+    }
+  };
+
+  const fetchPendingFeedbackCount = async () => {
+    try {
+      // Fetch completed orders without feedback
+      const orders = await orderService.getOrders({ status: 'completed' });
+      const ordersWithoutFeedback = orders.filter(order => !order.has_feedback);
+      
+      // Fetch completed appointments without feedback
+      const appointments = await appointmentService.getAppointments({ status: 'completed' });
+      const appointmentsWithoutFeedback = (appointments || []).filter(apt => !apt.has_feedback);
+      
+      setPendingFeedbackCount(ordersWithoutFeedback.length + appointmentsWithoutFeedback.length);
+    } catch (error) {
+      console.error('Error fetching pending feedback count:', error);
     }
   };
 
@@ -239,6 +271,18 @@ export default function AppointmentPage() {
               >
                 <FaCalendar />
                 My Upcoming Appointments
+              </button>
+              <button
+                onClick={() => navigate('/feedback')}
+                className="px-6 py-3 rounded-3xl font-semibold flex items-center justify-center gap-2 transition-colors shadow-md border-2 border-secondary text-accent-cream hover:bg-secondary hover:text-chonky-brown relative"
+              >
+                <FaCommentDots />
+                Give Feedback
+                {pendingFeedbackCount > 0 && (
+                  <span className="absolute -top-2 -right-2 bg-orange-500 text-white text-xs font-bold rounded-full h-6 w-6 flex items-center justify-center">
+                    {pendingFeedbackCount}
+                  </span>
+                )}
               </button>
             </div>
 
@@ -688,7 +732,7 @@ export default function AppointmentPage() {
         {/* Add-ons Modal */}
         {showAddOnsModal && selectedService && !selectedService.is_solo && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-start justify-center pt-4 z-50" onClick={() => setShowAddOnsModal(false)}>
-            <div className="bg-primary-dark rounded-3xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto border-2 border-chonky-poop" onClick={(e) => e.stopPropagation()}>
+            <div ref={addOnsModalRef} className="bg-primary-dark rounded-3xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto border-2 border-chonky-poop" onClick={(e) => e.stopPropagation()}>
               {/* Modal Header */}
               <div className="bg-chonky-khaki p-6 text-primary-darker border-b-2 border-chonky-poop sticky top-0">
                 <div className="flex justify-between items-center">

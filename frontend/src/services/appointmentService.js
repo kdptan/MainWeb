@@ -139,4 +139,33 @@ export const appointmentService = {
     
     return await response.json();
   },
+
+  // Create appointment feedback
+  createFeedback: async (feedbackData) => {
+    const response = await fetch(`${API_BASE_URL}/appointments/feedback/`, {
+      method: 'POST',
+      headers: getAuthHeaders(),
+      body: JSON.stringify(feedbackData),
+    });
+    
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.error || 'Failed to submit feedback');
+    }
+    
+    return await response.json();
+  },
+
+  // Get all appointment feedback (admin only)
+  getAllFeedback: async () => {
+    const response = await fetch(`${API_BASE_URL}/appointments/feedback/all/`, {
+      headers: getAuthHeaders(),
+    });
+    
+    if (!response.ok) {
+      throw new Error('Failed to fetch appointment feedback');
+    }
+    
+    return await response.json();
+  },
 };

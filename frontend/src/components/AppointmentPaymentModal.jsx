@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { FaTimes, FaCheck } from 'react-icons/fa';
 import { formatCurrency } from '../utils/formatters';
 
 export default function AppointmentPaymentModal({ isOpen, onClose, appointment, onPaymentComplete }) {
+  const modalRef = useRef(null);
   const [selectedSize, setSelectedSize] = useState('M');
   const [amountPaid, setAmountPaid] = useState('');
 
@@ -16,6 +17,18 @@ export default function AppointmentPaymentModal({ isOpen, onClose, appointment, 
     return () => {
       document.body.style.overflow = 'unset';
     };
+  }, [isOpen]);
+
+  // Scroll modal to center when it opens
+  useEffect(() => {
+    if (isOpen && modalRef.current) {
+      setTimeout(() => {
+        modalRef.current.scrollIntoView({
+          behavior: 'smooth',
+          block: 'center',
+        });
+      }, 100);
+    }
   }, [isOpen]);
 
   // Reset state when modal opens with a new appointment
@@ -134,7 +147,7 @@ export default function AppointmentPaymentModal({ isOpen, onClose, appointment, 
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-start justify-center pt-4 z-50">
-      <div className="bg-white rounded-lg shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-auto">
+      <div ref={modalRef} className="bg-white rounded-lg shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-auto">
         {/* Header */}
         <div className="sticky top-0 bg-gradient-to-r from-secondary to-orange-500 text-white p-6 flex justify-between items-center">
           <h2 className="heading-main">Payment Entry</h2>

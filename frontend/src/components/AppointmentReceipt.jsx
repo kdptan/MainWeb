@@ -135,7 +135,7 @@ export default function AppointmentReceipt({ appointment }) {
         </div>
         <div className="flex justify-between mb-1.5 text-[11px]">
           <span className="font-semibold">Customer:</span>
-          <span>{appointment.user_details?.first_name} {appointment.user_details?.last_name}</span>
+          <span>{appointment.user_details?.username || 'N/A'}</span>
         </div>
         <div className="flex justify-between text-[11px]">
           <span className="font-semibold">Contact:</span>
@@ -152,11 +152,7 @@ export default function AppointmentReceipt({ appointment }) {
           <div className="space-y-1">
             <div className="flex justify-between text-[11px]">
               <span>Pet Name:</span>
-              <span className="font-semibold">{appointment.pet_details.name}</span>
-            </div>
-            <div className="flex justify-between text-[11px]">
-              <span>Species:</span>
-              <span>{appointment.pet_details.species}</span>
+              <span className="font-semibold">{appointment.pet_details.pet_name || 'N/A'}</span>
             </div>
             <div className="flex justify-between text-[11px]">
               <span>Breed:</span>

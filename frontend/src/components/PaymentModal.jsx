@@ -1,9 +1,22 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { FaTimes, FaCheck } from 'react-icons/fa';
 import { formatCurrency } from '../utils/formatters';
 
 export default function PaymentModal({ isOpen, onClose, order, onPaymentComplete }) {
   const [amountPaid, setAmountPaid] = useState('');
+  const modalRef = useRef(null);
+
+  // Scroll to modal when opened
+  useEffect(() => {
+    if (isOpen && modalRef.current) {
+      setTimeout(() => {
+        modalRef.current.scrollIntoView({
+          behavior: 'smooth',
+          block: 'center',
+        });
+      }, 100);
+    }
+  }, [isOpen]);
 
   // Disable body scroll when modal is open
   useEffect(() => {
@@ -98,7 +111,7 @@ export default function PaymentModal({ isOpen, onClose, order, onPaymentComplete
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-start justify-center pt-4 z-50">
-      <div className="bg-white rounded-lg shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-auto">
+      <div ref={modalRef} className="bg-white rounded-lg shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-auto">
         {/* Header */}
         <div className="sticky top-0 bg-gradient-to-r from-secondary to-orange-500 text-white p-6 flex justify-between items-center">
           <h2 className="heading-main">Payment Entry</h2>
@@ -111,7 +124,7 @@ export default function PaymentModal({ isOpen, onClose, order, onPaymentComplete
           {/* Order Items Summary */}
           <div className="bg-gray-50 rounded-lg p-4 border-2 border-gray-200">
             <h3 className="text-lg font-bold text-gray-900 mb-4">Items Purchased</h3>
-            <div className="space-y-2 mb-4 max-h-64 overflow-y-auto">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-2 mb-4 max-h-64 overflow-y-auto">
               {order.items?.map((item, index) => (
                 <div key={index} className="flex justify-between items-center p-2 bg-white rounded border border-gray-100">
                   <div className="flex-1">

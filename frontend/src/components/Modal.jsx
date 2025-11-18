@@ -1,6 +1,19 @@
-import React from 'react';
+import React, { useRef, useEffect } from 'react';
 
 export default function Modal({ isOpen, onClose, title, children, maxWidth = 'max-w-2xl' }) {
+  const modalRef = useRef(null);
+
+  useEffect(() => {
+    if (isOpen && modalRef.current) {
+      setTimeout(() => {
+        modalRef.current.scrollIntoView({
+          behavior: 'smooth',
+          block: 'center',
+        });
+      }, 100);
+    }
+  }, [isOpen]);
+
   if (!isOpen) return null;
 
   const handleClose = () => {
@@ -11,7 +24,7 @@ export default function Modal({ isOpen, onClose, title, children, maxWidth = 'ma
 
   return (
     <div className="fixed inset-0 bg-gray-800 bg-opacity-50 flex items-start justify-center pt-4 z-50 overflow-y-auto">
-      <div className={`bg-white rounded shadow-lg w-full ${maxWidth} my-8`}>
+      <div ref={modalRef} className={`bg-white rounded shadow-lg w-full ${maxWidth} my-8`}>
         <div className="p-4 border-b flex justify-between items-center">
           <h2 className="text-xl font-semibold">{title}</h2>
           <button

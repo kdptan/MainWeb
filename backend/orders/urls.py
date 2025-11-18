@@ -10,7 +10,9 @@ from .views import (
     FeedbackListView,
     CreateProductFeedbackView,
     ProductFeedbackListView,
-    ProductRatingsView
+    ProductRatingsView,
+    NotificationListView,
+    MarkNotificationReadView
 )
 
 urlpatterns = [
@@ -30,4 +32,8 @@ urlpatterns = [
     path('product-feedback/', CreateProductFeedbackView.as_view(), name='product-feedback-create'),
     path('product-feedback/<int:product_id>/', ProductFeedbackListView.as_view(), name='product-feedback-list-public'),
     path('product-ratings/', ProductRatingsView.as_view(), name='product-ratings-public'),
+    
+    # Notification endpoints
+    path('notifications/', NotificationListView.as_view(), name='notifications-list'),
+    path('notifications/<int:notification_id>/read/', MarkNotificationReadView.as_view(), name='notification-mark-read'),
 ]

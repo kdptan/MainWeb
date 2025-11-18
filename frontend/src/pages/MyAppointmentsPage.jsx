@@ -19,6 +19,9 @@ export default function MyAppointmentsPage() {
   const [loading, setLoading] = useState(false);
   const [statusFilter, setStatusFilter] = useState('all');
   const [confirmDialog, setConfirmDialog] = useState({ isOpen: false, appointmentId: null });
+  const [upcomingPage, setUpcomingPage] = useState(1);
+  const [pastPage, setPastPage] = useState(1);
+  const appointmentsPerPage = 4; // 2 per column x 2 columns
 
   useEffect(() => {
     // Wait for auth to settle
@@ -120,6 +123,26 @@ export default function MyAppointmentsPage() {
     apt => ['completed', 'cancelled'].includes(apt.status)
   );
 
+  // Reset pagination when status filter changes
+  useEffect(() => {
+    setUpcomingPage(1);
+    setPastPage(1);
+  }, [statusFilter]);
+
+  // Pagination calculations
+  const totalUpcomingPages = Math.ceil(upcomingAppointments.length / appointmentsPerPage);
+  const totalPastPages = Math.ceil(pastAppointments.length / appointmentsPerPage);
+  
+  const paginatedUpcoming = upcomingAppointments.slice(
+    (upcomingPage - 1) * appointmentsPerPage,
+    upcomingPage * appointmentsPerPage
+  );
+  
+  const paginatedPast = pastAppointments.slice(
+    (pastPage - 1) * appointmentsPerPage,
+    pastPage * appointmentsPerPage
+  );
+
   return (
     <div className="min-h-screen bg-primary-darker py-8 px-4 sm:px-6 lg:px-8">
       <Toast {...toast} />
@@ -203,8 +226,8 @@ export default function MyAppointmentsPage() {
             {(statusFilter === 'all' || ['pending', 'confirmed'].includes(statusFilter)) && upcomingAppointments.length > 0 && (
               <div className="mb-8">
                 <h2 className="heading-main text-accent-cream mb-4">Upcoming Appointments</h2>
-                <div className="space-y-4">
-                  {upcomingAppointments.map((appointment) => (
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                  {paginatedUpcoming.map((appointment) => (
                     <div key={appointment.id} className="bg-white rounded-3xl shadow-md p-6 hover:shadow-lg transition-shadow border border-secondary">
                       <div className="flex justify-between items-start mb-4">
                         <div>
@@ -269,6 +292,43 @@ export default function MyAppointmentsPage() {
                     </div>
                   ))}
                 </div>
+                
+                {/* Upcoming Appointments Pagination */}
+                {totalUpcomingPages > 1 && (
+                  <div className="mt-6 flex justify-center items-center gap-4">
+                    <button
+                      onClick={() => setUpcomingPage(prev => Math.max(prev - 1, 1))}
+                      disabled={upcomingPage === 1}
+                      className="px-4 py-2 bg-secondary text-white rounded-3xl hover:bg-orange-500 disabled:bg-gray-300 disabled:cursor-not-allowed font-medium transition-colors"
+                    >
+                      Previous
+                    </button>
+                    
+                    <div className="flex items-center gap-2">
+                      {Array.from({ length: totalUpcomingPages }, (_, i) => i + 1).map((page) => (
+                        <button
+                          key={page}
+                          onClick={() => setUpcomingPage(page)}
+                          className={`px-3 py-2 rounded-3xl font-medium transition-colors ${
+                            upcomingPage === page
+                              ? 'bg-secondary text-white'
+                              : 'bg-white text-chonky-brown hover:bg-gray-100 border border-secondary'
+                          }`}
+                        >
+                          {page}
+                        </button>
+                      ))}
+                    </div>
+                    
+                    <button
+                      onClick={() => setUpcomingPage(prev => Math.min(prev + 1, totalUpcomingPages))}
+                      disabled={upcomingPage === totalUpcomingPages}
+                      className="px-4 py-2 bg-secondary text-white rounded-3xl hover:bg-orange-500 disabled:bg-gray-300 disabled:cursor-not-allowed font-medium transition-colors"
+                    >
+                      Next
+                    </button>
+                  </div>
+                )}
               </div>
             )}
 
@@ -276,8 +336,8 @@ export default function MyAppointmentsPage() {
             {(statusFilter === 'all' || ['completed', 'cancelled'].includes(statusFilter)) && pastAppointments.length > 0 && (
               <div>
                 <h2 className="heading-main text-accent-cream mb-4">Past Appointments</h2>
-                <div className="space-y-4">
-                  {pastAppointments.map((appointment) => (
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                  {paginatedPast.map((appointment) => (
                     <div key={appointment.id} className="bg-white rounded-3xl shadow-md p-6 hover:shadow-lg transition-shadow border border-secondary">
                       <div className="flex justify-between items-start mb-4">
                         <div>
@@ -321,6 +381,43 @@ export default function MyAppointmentsPage() {
                     </div>
                   ))}
                 </div>
+                
+                {/* Past Appointments Pagination */}
+                {totalPastPages > 1 && (
+                  <div className="mt-6 flex justify-center items-center gap-4">
+                    <button
+                      onClick={() => setPastPage(prev => Math.max(prev - 1, 1))}
+                      disabled={pastPage === 1}
+                      className="px-4 py-2 bg-secondary text-white rounded-3xl hover:bg-orange-500 disabled:bg-gray-300 disabled:cursor-not-allowed font-medium transition-colors"
+                    >
+                      Previous
+                    </button>
+                    
+                    <div className="flex items-center gap-2">
+                      {Array.from({ length: totalPastPages }, (_, i) => i + 1).map((page) => (
+                        <button
+                          key={page}
+                          onClick={() => setPastPage(page)}
+                          className={`px-3 py-2 rounded-3xl font-medium transition-colors ${
+                            pastPage === page
+                              ? 'bg-secondary text-white'
+                              : 'bg-white text-chonky-brown hover:bg-gray-100 border border-secondary'
+                          }`}
+                        >
+                          {page}
+                        </button>
+                      ))}
+                    </div>
+                    
+                    <button
+                      onClick={() => setPastPage(prev => Math.min(prev + 1, totalPastPages))}
+                      disabled={pastPage === totalPastPages}
+                      className="px-4 py-2 bg-secondary text-white rounded-3xl hover:bg-orange-500 disabled:bg-gray-300 disabled:cursor-not-allowed font-medium transition-colors"
+                    >
+                      Next
+                    </button>
+                  </div>
+                )}
               </div>
             )}
 

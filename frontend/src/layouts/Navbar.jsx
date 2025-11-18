@@ -39,19 +39,19 @@ export default function Navbar() {
 
     const fetchNotifications = async () => {
       try {
-        const response = await fetchWithAuth(`${API_BASE_URL}/orders/`);
+        const response = await fetchWithAuth(`${API_BASE_URL}/orders/notifications/`);
         
         if (!response.ok) {
           console.error('Failed to fetch notifications:', response.status);
           return;
         }
         
-        const orders = await response.json();
+        const notifications = await response.json();
         
-        // Filter orders that are marked as available for pickup
-        const pickupAvailable = orders.filter(order => order.status === 'available_for_pickup');
-        setNotifications(pickupAvailable);
-        setUnreadCount(pickupAvailable.length);
+        // Filter unread notifications
+        const unreadNotifications = notifications.filter(notification => !notification.is_read);
+        setNotifications(unreadNotifications);
+        setUnreadCount(unreadNotifications.length);
       } catch (error) {
         console.error('Error fetching notifications:', error);
       }
@@ -60,7 +60,17 @@ export default function Navbar() {
     fetchNotifications();
     // Poll for new notifications every 30 seconds
     const interval = setInterval(fetchNotifications, 30000);
-    return () => clearInterval(interval);
+    
+    // Listen for custom event when order is created
+    const handleOrderCreated = () => {
+      fetchNotifications();
+    };
+    window.addEventListener('orderCreated', handleOrderCreated);
+    
+    return () => {
+      clearInterval(interval);
+      window.removeEventListener('orderCreated', handleOrderCreated);
+    };
   }, [user]);
 
   // Hide navbar on auth pages
@@ -136,7 +146,7 @@ export default function Navbar() {
                         <a href="/management/petprofile" className="block px-4 py-2 text-sm text-primary-darker hover:bg-accent-cream hover:text-secondary transition-colors rounded-3xl">Pet Profile</a>
                         <a href="/management/activity-log" className="block px-4 py-2 text-sm text-primary-darker hover:bg-accent-cream hover:text-secondary transition-colors rounded-3xl">Activity Log</a>
                         <a href="/management/staff-management" className="block px-4 py-2 text-sm text-primary-darker hover:bg-accent-cream hover:text-secondary transition-colors rounded-3xl">Staff Management</a>
-                        <a href="/admin/feedback" className="block px-4 py-2 text-sm text-primary-darker hover:bg-accent-cream hover:text-secondary transition-colors rounded-3xl">Purchase Feedback</a>
+                        <a href="/admin/feedback" className="block px-4 py-2 text-sm text-primary-darker hover:bg-accent-cream hover:text-secondary transition-colors rounded-3xl">Feedback</a>
                       </div>
                     </div>
                   )}
@@ -225,13 +235,7 @@ export default function Navbar() {
                           notifications.map((notification) => (
                             <div key={notification.id} className="px-4 py-3 border-b border-secondary hover:bg-accent-cream transition-colors">
                               <div className="text-sm font-medium text-primary-darker">
-                                Order {formatOrderId(notification.id)} is available for pickup!
-                              </div>
-                              <div className="text-xs text-primary-dark mt-1">
-                                Branch: {notification.branch}
-                              </div>
-                              <div className="text-xs text-primary-dark">
-                                Amount: {formatCurrency(notification.total_price)}
+                                Order {formatOrderId(notification.order_id)} is ready to be picked up at {notification.branch}!
                               </div>
                               <button
                                 onClick={() => navigate('/my-orders')}

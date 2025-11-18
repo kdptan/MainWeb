@@ -26,7 +26,7 @@ export default function AdminOrdersPage() {
   const [receiptModalOpen, setReceiptModalOpen] = useState(false);
   const [selectedReceipt, setSelectedReceipt] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
-  const ordersPerPage = 5;
+  const ordersPerPage = 6; // 3 per column x 2 columns
   const [confirmDialog, setConfirmDialog] = useState({
     isOpen: false,
     title: '',
@@ -135,32 +135,6 @@ export default function AdminOrdersPage() {
         } catch (error) {
           console.error('Error cancelling order:', error);
           toast.showToast('Failed to cancel order', 'error');
-        }
-      }
-    });
-  };
-
-  const handleMarkAsAvailableForPickup = async (orderId) => {
-    setConfirmDialog({
-      isOpen: true,
-      title: 'Mark as Available for Pickup',
-      message: 'Mark this order as available for pickup? The customer will be notified.',
-      onConfirm: async () => {
-        setConfirmDialog({ ...confirmDialog, isOpen: false });
-        
-        try {
-          await orderService.adminUpdateOrderStatus(orderId, 'available_for_pickup');
-          toast.showToast('Order marked as available for pickup', 'success');
-          
-          // Refresh orders list
-          const filters = {};
-          if (filterStatus !== 'all') filters.status = filterStatus;
-          if (filterBranch !== 'all') filters.branch = filterBranch;
-          const data = await orderService.getAllOrdersAdmin(filters);
-          setOrders(data);
-        } catch (error) {
-          console.error('Error marking order as available:', error);
-          toast.showToast('Failed to mark order as available', 'error');
         }
       }
     });
@@ -360,7 +334,7 @@ export default function AdminOrdersPage() {
         </div>
       ) : (
         <>
-          <div className="space-y-4">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
             {orders
               .slice((currentPage - 1) * ordersPerPage, currentPage * ordersPerPage)
               .map((order) => (
@@ -372,10 +346,13 @@ export default function AdminOrdersPage() {
               <div className="p-6 bg-gray-50 border-b border-gray-200">
                 <div className="flex justify-between items-start mb-4">
                   <div className="flex-1">
-                    <div className="flex items-center gap-4 mb-2">
-                      <h3 className="text-lg font-semibold text-chonky-brown">
-                        Order ID: {formatOrderId(order.order_id || order.id)}
-                      </h3>
+                    <div className="flex items-start gap-4 mb-2">
+                      <div>
+                        <p className="text-xs text-chonky-brown opacity-60 mb-1">Order ID</p>
+                        <h3 className="text-lg font-semibold text-chonky-brown">
+                          {formatOrderId(order.order_id || order.id)}
+                        </h3>
+                      </div>
                       <span
                         className={`px-3 py-1 rounded-full text-xs font-semibold border ${getStatusColor(
                           order.status
@@ -431,18 +408,8 @@ export default function AdminOrdersPage() {
                     )}
                   </button>
                   
-                  {/* Mark as Available for Pickup Button - Only for pending orders */}
+                  {/* Mark as Completed Button - For pending orders */}
                   {order.status === 'pending' && (
-                    <button
-                      onClick={() => handleMarkAsAvailableForPickup(order.id)}
-                      className="ml-auto flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-3xl hover:bg-blue-700 font-medium text-sm transition-colors"
-                    >
-                      🔔 Mark as Available for Pickup
-                    </button>
-                  )}
-
-                  {/* Mark as Completed Button - Only for orders available for pickup */}
-                  {order.status === 'available_for_pickup' && (
                     <button
                       onClick={() => handleMarkAsCompleted(order.id)}
                       className="ml-auto flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-3xl hover:bg-green-700 font-medium text-sm transition-colors"
@@ -461,8 +428,8 @@ export default function AdminOrdersPage() {
                     </button>
                   )}
                   
-                  {/* Cancel Order Button - For pending or available for pickup orders */}
-                  {(order.status === 'pending' || order.status === 'available_for_pickup') && (
+                  {/* Cancel Order Button - For pending orders */}
+                  {order.status === 'pending' && (
                     <button
                       onClick={() => handleCancelOrder(order.id)}
                       className="flex items-center gap-2 px-4 py-2 bg-red-500 text-white rounded-3xl hover:bg-red-600 font-medium text-sm transition-colors"

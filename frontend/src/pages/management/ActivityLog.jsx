@@ -5,7 +5,6 @@ import Toast from '../../components/Toast';
 import ConfirmDialog from '../../components/ConfirmDialog';
 import Modal from '../../components/Modal';
 import { fetchLoginActivities, deactivateUser, fetchDeactivatedUsers, reactivateUser } from '../../services/activityService';
-import managementBg from '../../assets/Management.png';
 
 const ActivityLog = () => {
   const [activities, setActivities] = useState([]);
@@ -156,7 +155,7 @@ const ActivityLog = () => {
   };
 
   return (
-    <div className="container mx-auto p-6 min-h-screen bg-accent-cream bg-cover bg-center bg-no-repeat" style={{ backgroundImage: `url(${managementBg})` }}>
+    <div className="container mx-auto p-6 min-h-screen bg-primary-darker">
       <div className="flex justify-between items-center mb-6">
         <h1 className="heading-main text-accent-cream">Activity Log</h1>
         <button

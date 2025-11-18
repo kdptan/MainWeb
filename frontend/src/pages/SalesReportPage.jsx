@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FaArrowLeft, FaPrint, FaFilter, FaCalendar } from 'react-icons/fa';
+import { FaPrint, FaFilter, FaCalendar } from 'react-icons/fa';
 import { useAuth } from '../hooks/useAuth';
 import { useToast } from '../hooks/useToast';
 import Toast from '../components/Toast';
@@ -79,7 +79,41 @@ export default function SalesReportPage() {
   const [productPage, setProductPage] = useState(1);
   const [servicePage, setServicePage] = useState(1);
   const [activeTab, setActiveTab] = useState('analytics'); // 'analytics' or 'transactions'
+  const [transactionType, setTransactionType] = useState('product'); // 'product' or 'service'
+  const [selectedFilterMonth, setSelectedFilterMonth] = useState(new Date().toISOString().slice(0, 7)); // Format: YYYY-MM
+  const [isAnimating, setIsAnimating] = useState(false);
+  const [slideDirection, setSlideDirection] = useState(''); // 'toLeft' or 'toRight'
   const itemsPerPage = 6;
+
+  // Handle transaction type switch with animation
+  const handleTransactionTypeSwitch = (direction) => {
+    if (isAnimating) return; // Prevent multiple clicks during animation
+    
+    setIsAnimating(true);
+    setSlideDirection(direction);
+    
+    setTimeout(() => {
+      setTransactionType(transactionType === 'product' ? 'service' : 'product');
+      setIsAnimating(false);
+      setSlideDirection('');
+    }, 400);
+  };
+
+  // Filter transactions by date
+  const filterTransactionsByDate = (transactions) => {
+    if (!selectedFilterMonth) return transactions;
+    const [year, month] = selectedFilterMonth.split('-');
+    return transactions.filter(transaction => {
+      const transactionDate = new Date(transaction.transactionDate);
+      const transYear = transactionDate.getFullYear();
+      const transMonth = transactionDate.getMonth() + 1; // getMonth() is 0-indexed
+      return transYear === parseInt(year) && transMonth === parseInt(month);
+    });
+  };
+
+  // Apply date filter to transactions
+  const filteredProductTransactions = filterTransactionsByDate(productTransactions);
+  const filteredServiceTransactions = filterTransactionsByDate(serviceTransactions);
 
   // Fetch sales data on mount and when filters change
   useEffect(() => {
@@ -420,8 +454,8 @@ export default function SalesReportPage() {
     };
   };
 
-  const productTotals = calculateTotals(productTransactions);
-  const serviceTotals = calculateTotals(serviceTransactions);
+  const productTotals = calculateTotals(filteredProductTransactions);
+  const serviceTotals = calculateTotals(filteredServiceTransactions);
   const analytics = calculateAnalytics(productTransactions, serviceTransactions);
 
   if (!user || !user.is_staff) {
@@ -839,15 +873,81 @@ export default function SalesReportPage() {
             {/* Transactions Tab */}
             {activeTab === 'transactions' && (
             <div className="space-y-8">
-            {/* Products Transactions Section */}
+            {/* Transactions Section with Toggle */}
             <div className="bg-white rounded-3xl shadow-lg overflow-hidden mb-8">
-              <div className="bg-gradient-to-r from-blue-500 to-blue-600 px-8 py-6">
-                <h2 className="text-2xl font-bold text-white">
-                  Product Transactions ({productTransactions.length})
+              <div className={`px-8 py-6 flex items-center justify-between transition-colors duration-300 ${
+                transactionType === 'product' 
+                  ? 'bg-gradient-to-r from-blue-500 to-blue-600' 
+                  : 'bg-gradient-to-r from-green-500 to-green-600'
+              }`}>
+                {/* Left Arrow */}
+                <button
+                  onClick={() => handleTransactionTypeSwitch('toRight')}
+                  className={`text-white rounded-full p-3 transition-all transform hover:scale-110 shadow-lg ${
+                    transactionType === 'product' 
+                      ? 'hover:bg-white hover:text-blue-600' 
+                      : 'hover:bg-white hover:text-green-600'
+                  }`}
+                  title={transactionType === 'product' ? 'Switch to Service Transactions' : 'Switch to Product Transactions'}
+                  disabled={isAnimating}
+                >
+                  <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={3}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
+                  </svg>
+                </button>
+
+                {/* Title */}
+                <h2 className="text-2xl font-bold text-white text-center flex-1">
+                  {transactionType === 'product' 
+                    ? `Product Transactions (${filteredProductTransactions.length})`
+                    : `Service Transactions (${filteredServiceTransactions.length})`}
                 </h2>
+
+                {/* Right Arrow */}
+                <button
+                  onClick={() => handleTransactionTypeSwitch('toLeft')}
+                  className={`text-white rounded-full p-3 transition-all transform hover:scale-110 shadow-lg ${
+                    transactionType === 'product' 
+                      ? 'hover:bg-white hover:text-blue-600' 
+                      : 'hover:bg-white hover:text-green-600'
+                  }`}
+                  title={transactionType === 'product' ? 'Switch to Service Transactions' : 'Switch to Product Transactions'}
+                  disabled={isAnimating}
+                >
+                  <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={3}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+                  </svg>
+                </button>
               </div>
 
-              {productTransactions.length > 0 ? (
+              {/* Date Filter */}
+              <div className="bg-gray-50 px-8 py-4 border-b border-gray-200">
+                <div className="flex items-center gap-2">
+                  <label className="text-sm font-medium text-gray-700">Filter by Month:</label>
+                  <input
+                    type="month"
+                    value={selectedFilterMonth}
+                    onChange={(e) => {
+                      setSelectedFilterMonth(e.target.value);
+                      setProductPage(1);
+                      setServicePage(1);
+                    }}
+                    className="px-3 py-2 border border-blue-600 bg-blue-50 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
+              </div>
+
+              {/* Transaction Content with Slide Animation */}
+              <div className="relative">
+                {/* Product Transactions */}
+                <div className={`w-full transition-transform duration-400 ease-in-out ${
+                  transactionType === 'product' 
+                    ? (slideDirection === 'toLeft' ? '-translate-x-full absolute top-0 left-0 right-0' : '')
+                    : (slideDirection === 'toRight' ? 'absolute top-0 left-0 right-0' : 'hidden')
+                }`}>
+              {(transactionType === 'product' || slideDirection === 'toRight') && (
+              <>
+              {filteredProductTransactions.length > 0 ? (
                 <>
                   <div className="overflow-x-auto">
                     <div style={{ minHeight: '336px', display: 'flex', flexDirection: 'column' }}>
@@ -868,7 +968,7 @@ export default function SalesReportPage() {
                           </tr>
                         </thead>
                         <tbody>
-                          {productTransactions
+                          {filteredProductTransactions
                             .slice((productPage - 1) * itemsPerPage, productPage * itemsPerPage)
                             .map((transaction, idx) => (
                             <tr
@@ -943,7 +1043,7 @@ export default function SalesReportPage() {
                   {/* Product Pagination Controls */}
                   <div className="flex items-center justify-between px-6 py-4 border-t border-gray-200 bg-gray-50">
                     <p className="text-sm text-gray-600">
-                      Page {productPage} of {Math.ceil(productTransactions.length / itemsPerPage)} | Total: {productTransactions.length} transactions
+                      Page {productPage} of {Math.ceil(filteredProductTransactions.length / itemsPerPage)} | Total: {filteredProductTransactions.length} transactions
                     </p>
                     <div className="flex gap-2">
                       <button
@@ -954,8 +1054,8 @@ export default function SalesReportPage() {
                         Previous
                       </button>
                       <button
-                        onClick={() => setProductPage(Math.min(Math.ceil(productTransactions.length / itemsPerPage), productPage + 1))}
-                        disabled={productPage === Math.ceil(productTransactions.length / itemsPerPage)}
+                        onClick={() => setProductPage(Math.min(Math.ceil(filteredProductTransactions.length / itemsPerPage), productPage + 1))}
+                        disabled={productPage === Math.ceil(filteredProductTransactions.length / itemsPerPage)}
                         className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-3xl hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
                       >
                         Next
@@ -969,17 +1069,19 @@ export default function SalesReportPage() {
                   <p>No product transactions found for the selected period.</p>
                 </div>
               )}
-            </div>
-
-            {/* Services Transactions Section */}
-            <div className="bg-white rounded-3xl shadow-lg overflow-hidden">
-              <div className="bg-gradient-to-r from-green-500 to-green-600 px-8 py-6">
-                <h2 className="text-2xl font-bold text-white">
-                  Service Transactions ({serviceTransactions.length})
-                </h2>
+              </>
+              )}
               </div>
 
-              {serviceTransactions.length > 0 ? (
+              {/* Service Transactions */}
+              <div className={`w-full transition-transform duration-400 ease-in-out ${
+                transactionType === 'service'
+                  ? (slideDirection === 'toRight' ? 'translate-x-full absolute top-0 left-0 right-0' : '')
+                  : (slideDirection === 'toLeft' ? 'absolute top-0 left-0 right-0' : 'hidden')
+              }`}>
+              {(transactionType === 'service' || slideDirection === 'toLeft') && (
+              <>
+              {filteredServiceTransactions.length > 0 ? (
                 <>
                   <div className="overflow-x-auto">
                     <div style={{ minHeight: '336px', display: 'flex', flexDirection: 'column' }}>
@@ -1000,7 +1102,7 @@ export default function SalesReportPage() {
                           </tr>
                         </thead>
                         <tbody>
-                          {serviceTransactions
+                          {filteredServiceTransactions
                             .slice((servicePage - 1) * itemsPerPage, servicePage * itemsPerPage)
                             .map((transaction, idx) => (
                             <tr
@@ -1079,7 +1181,7 @@ export default function SalesReportPage() {
                     {/* Service Pagination Controls */}
                     <div className="flex items-center justify-between px-6 py-4 border-t border-gray-200 bg-gray-50">
                       <p className="text-sm text-gray-600">
-                        Page {servicePage} of {Math.ceil(serviceTransactions.length / itemsPerPage)} | Total: {serviceTransactions.length} transactions
+                        Page {servicePage} of {Math.ceil(filteredServiceTransactions.length / itemsPerPage)} | Total: {filteredServiceTransactions.length} transactions
                       </p>
                       <div className="flex gap-2">
                         <button
@@ -1090,8 +1192,8 @@ export default function SalesReportPage() {
                           Previous
                         </button>
                         <button
-                          onClick={() => setServicePage(Math.min(Math.ceil(serviceTransactions.length / itemsPerPage), servicePage + 1))}
-                          disabled={servicePage === Math.ceil(serviceTransactions.length / itemsPerPage)}
+                          onClick={() => setServicePage(Math.min(Math.ceil(filteredServiceTransactions.length / itemsPerPage), servicePage + 1))}
+                          disabled={servicePage === Math.ceil(filteredServiceTransactions.length / itemsPerPage)}
                           className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-3xl hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
                         >
                           Next
@@ -1105,6 +1207,10 @@ export default function SalesReportPage() {
                   <p>No service transactions found for the selected period.</p>
                 </div>
               )}
+              </>
+              )}
+              </div>
+              </div>
             </div>
 
             {/* Grand Total Summary */}

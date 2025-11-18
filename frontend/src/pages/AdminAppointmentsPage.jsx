@@ -21,6 +21,8 @@ export default function AdminAppointmentsPage() {
   const [statusFilter, setStatusFilter] = useState('all'); // upcoming, all
   const [branchFilter, setBranchFilter] = useState('all');
   const [dateFilter, setDateFilter] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
+  const appointmentsPerPage = 4; // 2 per column × 2 columns
   const [paymentModalOpen, setPaymentModalOpen] = useState(false);
   const [selectedPaymentAppointment, setSelectedPaymentAppointment] = useState(null);
   const [receiptModalOpen, setReceiptModalOpen] = useState(false);
@@ -48,6 +50,11 @@ export default function AdminAppointmentsPage() {
     fetchAppointments();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user, statusFilter, branchFilter, dateFilter]);
+
+  // Reset to page 1 when filters change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [statusFilter, branchFilter, dateFilter]);
 
   const fetchAppointments = async () => {
     setLoading(true);
@@ -191,6 +198,12 @@ export default function AdminAppointmentsPage() {
     );
   };
 
+  // Pagination calculations
+  const totalPages = Math.ceil(appointments.length / appointmentsPerPage);
+  const startIndex = (currentPage - 1) * appointmentsPerPage;
+  const endIndex = startIndex + appointmentsPerPage;
+  const currentAppointments = appointments.slice(startIndex, endIndex);
+
   return (
     <div className="min-h-screen bg-primary-darker py-8 px-4 sm:px-6 lg:px-8">
       <Toast {...toast} />
@@ -277,8 +290,9 @@ export default function AdminAppointmentsPage() {
             <p className="text-gray-400">No appointments match your current filters.</p>
           </div>
         ) : (
-          <div className="space-y-4">
-            {appointments.map((appointment) => (
+          <>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            {currentAppointments.map((appointment) => (
               <div key={appointment.id} className="bg-white rounded-3xl p-6 hover:shadow-lg transition-shadow">
                 <div className="flex justify-between items-start mb-4">
                   <div className="flex-1">
@@ -388,6 +402,45 @@ export default function AdminAppointmentsPage() {
               </div>
             ))}
           </div>
+
+          {/* Pagination Controls */}
+          {totalPages > 1 && (
+            <div className="flex items-center justify-between mt-6 bg-white rounded-3xl p-4">
+              <p className="text-sm text-gray-600">
+                Page {currentPage} of {totalPages} | Total: {appointments.length} appointments
+              </p>
+              <div className="flex gap-2">
+                <button
+                  onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
+                  disabled={currentPage === 1}
+                  className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-3xl hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  Previous
+                </button>
+                {[...Array(totalPages)].map((_, idx) => (
+                  <button
+                    key={idx + 1}
+                    onClick={() => setCurrentPage(idx + 1)}
+                    className={`px-4 py-2 text-sm font-medium rounded-3xl transition-colors ${
+                      currentPage === idx + 1
+                        ? 'bg-secondary text-white'
+                        : 'text-gray-700 bg-white border border-gray-300 hover:bg-gray-50'
+                    }`}
+                  >
+                    {idx + 1}
+                  </button>
+                ))}
+                <button
+                  onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
+                  disabled={currentPage === totalPages}
+                  className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-3xl hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  Next
+                </button>
+              </div>
+            </div>
+          )}
+          </>
         )}
       </div>
 

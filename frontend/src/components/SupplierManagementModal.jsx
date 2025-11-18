@@ -1,10 +1,11 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { FaTimes, FaPlus, FaEdit, FaTrash, FaSearch, FaChevronLeft, FaChevronRight } from 'react-icons/fa';
 import axios from 'axios';
 import { useAuth } from '../hooks/useAuth';
 
 const SupplierManagementModal = ({ isOpen, onClose }) => {
   const { token } = useAuth();
+  const modalRef = useRef(null);
   const scrollContainerRef = React.useRef(null);
   const [suppliers, setSuppliers] = useState([]);
   const [showForm, setShowForm] = useState(false);
@@ -50,6 +51,18 @@ const SupplierManagementModal = ({ isOpen, onClose }) => {
     return () => {
       document.body.style.overflow = 'unset';
     };
+  }, [isOpen]);
+
+  // Scroll modal to center when it opens
+  useEffect(() => {
+    if (isOpen && modalRef.current) {
+      setTimeout(() => {
+        modalRef.current.scrollIntoView({
+          behavior: 'smooth',
+          block: 'center',
+        });
+      }, 100);
+    }
   }, [isOpen]);
 
   // Fetch suppliers on mount
@@ -158,7 +171,7 @@ const SupplierManagementModal = ({ isOpen, onClose }) => {
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-start justify-center pt-4 z-50 p-4">
-      <div className="bg-white rounded-lg shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-y-auto">
+      <div ref={modalRef} className="bg-white rounded-lg shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-y-auto">
         {/* Header */}
         <div className="sticky top-0 bg-gradient-to-r from-secondary to-orange-600 px-6 py-4 flex items-center justify-between z-10">
           <div>

@@ -1,8 +1,9 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { FaHistory } from 'react-icons/fa';
 import { formatCurrency } from '../utils/formatters';
 
 export default function ProductHistoryModal({ isOpen, onClose, token, embedded = false }) {
+  const modalRef = useRef(null);
   const [history, setHistory] = useState([]);
   const [loading, setLoading] = useState(false);
   const [filter, setFilter] = useState('all'); // all, addition, restock, sale, adjustment, damaged, return
@@ -22,6 +23,18 @@ export default function ProductHistoryModal({ isOpen, onClose, token, embedded =
         document.body.style.overflow = 'unset';
       }
     };
+  }, [isOpen, embedded]);
+
+  // Scroll modal to center when it opens (only if not embedded)
+  useEffect(() => {
+    if (!embedded && isOpen && modalRef.current) {
+      setTimeout(() => {
+        modalRef.current.scrollIntoView({
+          behavior: 'smooth',
+          block: 'center',
+        });
+      }, 100);
+    }
   }, [isOpen, embedded]);
 
   const fetchHistory = useCallback(async () => {
@@ -105,7 +118,7 @@ export default function ProductHistoryModal({ isOpen, onClose, token, embedded =
   if (!isOpen) return null;
 
   const historyContent = (
-    <div className="bg-white rounded-lg shadow-2xl w-[85vw] max-w-[1400px] max-h-[90vh] flex flex-col mx-auto">
+    <div ref={modalRef} className="bg-white rounded-lg shadow-2xl w-[85vw] max-w-[1400px] max-h-[90vh] flex flex-col mx-auto">
         {/* Filters Header */}
         <div className="sticky top-0 bg-gray-50 p-3 z-10 border-b border-gray-200">
           {/* Filters */}
